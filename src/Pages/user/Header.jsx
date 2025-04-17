@@ -6,11 +6,11 @@ import SignupForm from "../auth/SignupForm";
 const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
   const [isSigninOpen, setSigninOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
   useEffect(() => {
-
     // Remove spinner after load
     const timer = setTimeout(() => {
       const spinner = document.getElementById("spinner");
@@ -19,24 +19,14 @@ const Header = () => {
       }
     }, 1000);
 
-    // Initialize Bootstrap navbar
-    const navbarToggler = document.querySelector(".navbar-toggler");
-    const navbarCollapse = document.querySelector(".navbar-collapse");
-
-    if (navbarToggler && navbarCollapse) {
-      navbarToggler.addEventListener("click", () => {
-        navbarCollapse.classList.toggle("show");
-      });
-    }
-
     return () => {
       clearTimeout(timer);
-      // Clean up event listener
-      if (navbarToggler) {
-        navbarToggler.removeEventListener("click", () => { });
-      }
     };
   }, []);
+
+  const toggleNav = () => {
+    setIsNavOpen(prevState => !prevState);
+  };
 
   return (
     <div className="bg-white p-0">
@@ -106,60 +96,79 @@ const Header = () => {
               <button
                 type="button"
                 className="navbar-toggler"
+                onClick={toggleNav}
                 aria-label="Toggle navigation"
               >
                 <span className="navbar-toggler-icon"></span>
               </button>
-              <div className="navbar-collapse" id="navbarCollapse">
-
+              <div 
+                className={`navbar-collapse ${isNavOpen ? 'show' : 'collapse'}`} 
+                id="navbarCollapse"
+              >
                 <div className="navbar-nav me-auto py-0">
-                  <Link
-                    to="/"
-                    className={`nav-item nav-link ${currentPath === "/" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
-                  >
-                    Rooms
-                  </Link>
-                  <Link
-                    to="/about"
-                    className={`nav-item nav-link ${currentPath === "/about" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
-                  >
-                    About
-                  </Link>
-                  <Link
-                    to="/service"
-                    className={`nav-item nav-link ${currentPath === "/service" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
-                  >
-                    Services
-                  </Link>
-
-                  <Link to="/room"
-                    className={`nav-item nav-link ${currentPath === "/Rooms" ? "text-warning fw-bold border-bottom border-warning" : ""}`}>
-                    Rooms
-                  </Link>
-                  <div className="nav-item dropdown">
-                    <a
-                      href="#"
-                      className="nav-link dropdown-toggle"
-                      role="button"
+                  {isNavOpen ? (
+                    <>
+                      <Link
+                        to="/"
+                        className={`nav-item nav-link ${currentPath === "/" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
+                      >
+                        Rooms
+                      </Link>
+                      <Link
+                        to="/about"
+                        className={`nav-item nav-link ${currentPath === "/about" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
+                      >
+                        About
+                      </Link>
+                      <Link
+                        to="/service"
+                        className={`nav-item nav-link ${currentPath === "/service" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
+                      >
+                        Services
+                      </Link>
+                      <Link to="/room"
+                        className={`nav-item nav-link ${currentPath === "/Rooms" ? "text-warning fw-bold border-bottom border-warning" : ""}`}>
+                        Rooms
+                      </Link>
+                      <div className="nav-item dropdown">
+                        <a
+                          href="#"
+                          className="nav-link dropdown-toggle"
+                          role="button"
+                        >
+                          Pages
+                        </a>
+                        <div className="dropdown-menu rounded-0 m-0">
+                          <Link to="/booking" className="dropdown-item">
+                            Booking
+                          </Link>
+                          <Link to="/team" className="dropdown-item">
+                            Our Team
+                          </Link>
+                          <Link to="/testimonial" className="dropdown-item">
+                            Testimonial
+                          </Link>
+                        </div>
+                      </div>
+                      <Link to="/contact" className="nav-item nav-link">
+                        Contact
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      to={currentPath}
+                      className="nav-item nav-link text-warning fw-bold border-bottom border-warning"
                     >
-                      Pages
-                    </a>
-                    <div className="dropdown-menu rounded-0 m-0">
-                      <Link to="/booking" className="dropdown-item">
-                        Booking
-                      </Link>
-                      <Link to="/team" className="dropdown-item">
-                        Our Team
-                      </Link>
-                      <Link to="/testimonial" className="dropdown-item">
-                        Testimonial
-                      </Link>
-                    </div>
-                  </div>
-
-                  <Link to="/contact" className="nav-item nav-link">
-                    Contact
-                  </Link>
+                      {currentPath === "/" && "Rooms"}
+                      {currentPath === "/about" && "About"}
+                      {currentPath === "/service" && "Services"}
+                      {currentPath === "/Rooms" && "Rooms"}
+                      {currentPath === "/booking" && "Booking"}
+                      {currentPath === "/team" && "Our Team"}
+                      {currentPath === "/testimonial" && "Testimonial"}
+                      {currentPath === "/contact" && "Contact"}
+                    </Link>
+                  )}
                 </div>
                 <div className="d-flex">
                   <button
