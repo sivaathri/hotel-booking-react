@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef,useEffect } from "react";
 import carouselImg1 from "../../assets/Leonardo_Phoenix.jpg";
 import carouselImg2 from "../../assets/Images/About Images/carousel-2.jpg";
 import about1 from "../../assets/Images/About Images/about-1.jpg";
@@ -15,7 +15,40 @@ import Footer from "./Footer";
 
 const Home = () => {
   const [videoSrc, setVideoSrc] = useState(null);
+  const [guests, setGuests] = useState({
+    adults: 1,
+    children: 0,
+    
+  });
 
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleChange = (type, delta) => {
+    setGuests(prev => ({
+      ...prev,
+      [type]: Math.max(0, prev[type] + delta),
+    }));
+  };
+
+  const getSummary = () => {
+    const total = Object.entries(guests)
+      .filter(([_, count]) => count > 0)
+      .map(([key, count]) => `${count} ${key}`)
+      .join(", ");
+    return total || "Select Guests";
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const handleVideoOpen = (src) => {
     setVideoSrc(src);
   };
@@ -149,7 +182,7 @@ const Home = () => {
                     <label className="block text-white text-sm font-medium mb-1">Check-in</label>
                     <input
                       type="date"
-                      className="w-full border border-white- rounded-lg bg-white px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-white rounded-lg bg-white px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-100 "
                     />
                   </div>
                   {/* Check-out */}
@@ -161,16 +194,40 @@ const Home = () => {
                     />
                   </div>
                   {/* Adults */}
-                  <div>
-                    <label className="block text-white text-sm font-medium mb-1">Rooms&Guests</label>
-                    <select className="w-full border border-gray-300 bg-white rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option>Adult</option>
-                      <option value="1">Adult 1</option>
-                      <option value="2">Adult 2</option>
-                      <option value="3">Adult 3</option>
-                    </select>
-                  </div>
+                  <div className="relative w-full max-w-sm" ref={dropdownRef}>
+                    <label className="block text-white text-sm font-medium mb-1">Rooms & Guests</label>
+                    <input
+                      readOnly
+                      onClick={() => setIsOpen(!isOpen)}
+                      value={getSummary()}
+                      className="w-full border border-gray-300 bg-white rounded-lg px-4 py-2 text-gray-700 focus:outline-none cursor-pointer"
+                    />
 
+                    {isOpen && (
+                      <div className="absolute top-full mt-2 left-0 w-full bg-white p-4 rounded-lg shadow-md z-10">
+                        {["adults", "children"].map(type => (
+                          <div key={type} className="flex justify-between items-center mb-2">
+                            <span className="capitalize text-gray-700">{type}</span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                className="px-2 py-1 bg-gray-200 rounded text-gray-700"
+                                onClick={() => handleChange(type, -1)}
+                              >
+                                -
+                              </button>
+                              <span>{guests[type]}</span>
+                              <button
+                                className="px-2 py-1 bg-gray-200 rounded text-gray-700"
+                                onClick={() => handleChange(type, 1)}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Submit Button */}
