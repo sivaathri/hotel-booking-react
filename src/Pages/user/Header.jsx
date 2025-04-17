@@ -151,7 +151,7 @@ const Header = () => {
                         >
                           Pages
                         </a>
-                        <div className="dropdown-menu rounded-0 m-0">
+                        <div className="dropdown-menu w-20 rounded-0 m-0">
                           <Link to="/booking" className="dropdown-item">
                             Booking
                           </Link>
