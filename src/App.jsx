@@ -18,8 +18,9 @@ import Dashboard from "./Pages/admin/Dashboard";
 import BookingList from "./Pages/admin/BookingList";
 import RoomList from "./Pages/admin/RoomList";
 import UserList from "./Pages/admin/UserList";
-
+// Home Screen Imports
 import Home from "./Pages/user/Home";
+import About from './Pages/user/About';
 import UserRoomList from "./Pages/user/UserRoomList";
 import RoomDetails from './Pages/user/RoomDetails';
 import UserBookRoom from './Pages/user/UserBookRoom';
@@ -29,15 +30,26 @@ import UserDashboard from './Pages/user/UserDashboard';
 import MyBookings from './Pages/user/MyBookings';
 import BookingRoom from './Pages/user/BookingRoom';
 import UserProfile from './Pages/user/UserProfile';
+// SignIn and SignupForm  Imports
 import AuthLogin from './Pages/auth/SignIn';
 import AuthRegister from './Pages/auth/SignupForm';
-import About from './Pages/user/About';
+
 function App() {
   return (
     <>
       <Router>
         <Routes>
+           {/* HOme Screen Routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/About" element={<About />} />
+
+
+
+
+
+
+
+
           <Route path="/rooms" element={<UserRoomList />} />
           <Route path="/rooms/:id" element={<RoomDetails />} />
           <Route path="/book/:id" element={<UserBookRoom />} />
@@ -47,9 +59,11 @@ function App() {
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/book-room" element={<BookingRoom />} />
           <Route path="/user-profile" element={<UserProfile />} />
+
+     {/*  Signup and Signin  Routes */}
           <Route path="/login" element={<AuthLogin />} />
           <Route path="/register" element={<AuthRegister />} />
-          <Route path="/About" element={<About />} />
+        
 
 
 
