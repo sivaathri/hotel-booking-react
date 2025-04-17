@@ -93,7 +93,7 @@ const Home = () => {
                   <div className="p-3 pt-8 sm:pt-12" style={{ maxWidth: "900px" }}>
                     <h1
                       className="text-white mb-4 mt-0 sm:mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
-                      style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}
+
                     >
                       Find The Right Hotel Today
                     </h1>
@@ -103,31 +103,30 @@ const Home = () => {
             </div>
 
 
-            {/* <div className="carousel-item position-relative" style={{ height: "500px" }}>
+            <div className="carousel-item active relative" style={{ height: "500px" }}>
               <img
-                className="w-100 h-100 object-fit-cover"
-                src={carouselImg2}
-                alt="Luxury Hotel 2"
-                style={{ objectFit: "cover" }}
+                className="w-100 h-100 object-cover"
+                src={carouselImg1}
+                alt="Luxury Hotel 1"
               />
-              <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center">
-                <div className="container">
-                  <div className="p-3" style={{ maxWidth: "700px" }}>
-                    <h1 className="display-3 text-white mb-4" 
-                        style={{ 
-                          fontSize: "60px", 
-                          fontWeight: "700",
-                          textShadow: "2px 2px 4px rgba(0,0,0,0.3)"
-                        }}>
-                      Discover Luxury & Comfort
+
+              {/* Overlay Content */}
+              <div className="absolute top-0 left-0 w-full h-full flex items-start">
+                <div className="container mt-12 sm:mt-16 md:mt-20">
+                  <div className="p-3 pt-8 sm:pt-12" style={{ maxWidth: "900px" }}>
+                    <h1
+                      className="text-white mb-4 mt-0 sm:mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
+                      style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}
+                    >
+                      Find The Right Hotel Today
                     </h1>
                   </div>
                 </div>
               </div>
-            </div> */}
+            </div>
           </div>
 
-          {/* <button
+          <button
             className="carousel-control-prev"
             type="button"
             data-bs-target="#header-carousel"
@@ -151,7 +150,7 @@ const Home = () => {
               aria-hidden="true"
             ></span>
             <span className="visually-hidden">Next</span>
-          </button> */}
+          </button>
         </div>
 
         {/* Carousel End */}
