@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import carouselImg1 from "../../assets/Leonardo_Phoenix.jpg";
 import carouselImg2 from "../../assets/Images/About Images/carousel-2.jpg";
 import about1 from "../../assets/Images/About Images/about-1.jpg";
@@ -18,7 +18,7 @@ const Home = () => {
   const [guests, setGuests] = useState({
     adults: 1,
     children: 0,
-    
+
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -86,28 +86,28 @@ const Home = () => {
           data-bs-ride="carousel"
         >
           <div className="carousel-inner">
-            <div className="carousel-item active position-relative" style={{ height: "500px" }}>
+            <div className="carousel-item active relative" style={{ height: "500px" }}>
               <img
-                className="w-100 h-100 object-fit-cover"
+                className="w-100 h-100 object-cover"
                 src={carouselImg1}
                 alt="Luxury Hotel 1"
-                style={{ objectFit: "cover" }}
               />
-              <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-start">
-                <div className="container mt-5 pt-5">
-                  <div className="p-3" style={{ maxWidth: "900px", paddingTop: "50px" }}>
-                    <h1 className="display-3 text-white mb-4"
-                      style={{
-                        fontSize: "60px",
-                        fontWeight: "700",
-                        textShadow: "2px 2px 4px rgba(0,0,0,0.3)"
-                      }}>
+
+              {/* Overlay Content */}
+              <div className="absolute top-0 left-0 w-full h-full flex items-start">
+                <div className="container mt-12 sm:mt-16 md:mt-20">
+                  <div className="p-3 pt-8 sm:pt-12" style={{ maxWidth: "900px" }}>
+                    <h1
+                      className="text-white mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
+                      style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}
+                    >
                       Find The Right Hotel Today
                     </h1>
                   </div>
                 </div>
               </div>
             </div>
+
 
             {/* <div className="carousel-item position-relative" style={{ height: "500px" }}>
               <img
@@ -162,39 +162,41 @@ const Home = () => {
 
         {/* Carousel End */}
         <div className="w-full pb-0 animate-fadeIn">
-
           <div className="container mx-auto px-4">
-            <div className="bg-dark shadow-3xl p-8 rounded-2xl  relative border z-20  border-gray-100 -mt-75 z-20 relative">
+            <div className="bg-dark shadow-3xl p-6 sm:p-8 rounded-2xl relative border z-20 border-gray-100 -mt-75">
               <div className="flex flex-col md:flex-row md:items-end gap-6">
                 {/* Left: Form Fields */}
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-6">
-                  {/* Enter Destination */}
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                  {/* Destination */}
                   <div>
                     <label className="block text-white text-sm font-medium mb-1">Enter Destination</label>
                     <input
                       type="text"
                       placeholder="Location"
-                      className="w-full border border-white- rounded-lg bg-white px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-white rounded-lg bg-white px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
+
                   {/* Check-in */}
                   <div>
                     <label className="block text-white text-sm font-medium mb-1">Check-in</label>
                     <input
                       type="date"
-                      className="w-full border border-white rounded-lg bg-white px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-100 "
+                      className="w-full border border-white rounded-lg bg-white px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-100"
                     />
                   </div>
+
                   {/* Check-out */}
                   <div>
                     <label className="block text-white text-sm font-medium mb-1">Check-out</label>
                     <input
                       type="date"
-                      className="w-full border border-white- rounded-lg px-4 py-2 bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-white rounded-lg px-4 py-2 bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  {/* Adults */}
-                  <div className="relative w-full max-w-sm" ref={dropdownRef}>
+
+                  {/* Guests */}
+                  <div className="relative w-full" ref={dropdownRef}>
                     <label className="block text-white text-sm font-medium mb-1">Rooms & Guests</label>
                     <input
                       readOnly
@@ -231,8 +233,8 @@ const Home = () => {
                 </div>
 
                 {/* Submit Button */}
-                <div className="w-full  md:w-40">
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition duration-200">
+                <div className="w-full md:w-40">
+                  <button className="w-full mt-4 md:mt-0 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition duration-200">
                     Submit
                   </button>
                 </div>
@@ -240,6 +242,7 @@ const Home = () => {
             </div>
           </div>
         </div>
+
 
 
         <div className="mt-50 py-10 px-4 md:px-10 bg-white">
@@ -355,19 +358,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="w-full md:w-1/2">
-              <div className="relative">
-                <button
-                  type="button"
-                  className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 btn-play"
-                  onClick={() =>
-                    handleVideoOpen("https://www.youtube.com/embed/DWRcNpR6Kdc")
-                  }
-                >
-                  <span className="text-white text-4xl">▶</span>
-                </button>
-              </div>
-            </div>
+
           </div>
 
           {/* Video Modal */}

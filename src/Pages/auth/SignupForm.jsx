@@ -18,16 +18,16 @@ function SignupForm() {
 
   return (
     <form>
-      <input type="text" placeholder="Username" className="border w-full mb-3 p-2" />
-      <input type="email" placeholder="Email" className="border w-full mb-3 p-2" />
-      <input type="password" placeholder="Password" className="border w-full mb-3 p-2" />
+      <input type="text" placeholder="Username" className="border-1 w-full mb-3 p-2" />
+      <input type="email" placeholder="Email" className="border-1 w-full mb-3 p-2" />
+      <input type="password" placeholder="Password" className="border-1 w-full mb-3 p-2" />
       
       <input
         type="number"
         placeholder="Mobile Number"
         value={mobile}
         onChange={handleMobileChange}
-        className="border w-full mb-3 p-2"
+        className="border-1 w-full mb-3 p-2"
       />
 
       <button
