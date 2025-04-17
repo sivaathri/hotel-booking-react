@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import SignupForm from "../auth/SignupForm";
+import SignIn from "../auth/SignIn";
 
 const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
@@ -216,13 +217,7 @@ const Header = () => {
                       </button>
                       <h2 className="text-lg font-bold mb-4">Sign In</h2>
                       {/* Replace below with your signin form */}
-                      <form>
-                        <input type="email" placeholder="Email" className="border w-full mb-3 p-2" />
-                        <input type="password" placeholder="Password" className="border w-full mb-3 p-2" />
-                        <button type="submit" className="bg-gray-800 text-white py-2 px-4 rounded">
-                          Login
-                        </button>
-                      </form>
+                    <SignIn/>
                     </div>
                   </div>
                 )}

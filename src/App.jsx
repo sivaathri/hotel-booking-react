@@ -29,7 +29,7 @@ import UserDashboard from './Pages/user/UserDashboard';
 import MyBookings from './Pages/user/MyBookings';
 import BookingRoom from './Pages/user/BookingRoom';
 import UserProfile from './Pages/user/UserProfile';
-import AuthLogin from './Pages/auth/AuthLogin';
+import AuthLogin from './Pages/auth/SignIn';
 import AuthRegister from './Pages/auth/SignupForm';
 import About from './Pages/user/About';
 function App() {
