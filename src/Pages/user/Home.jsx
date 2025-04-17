@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import carouselImg1 from "../../assets/Leonardo_Phoenix.jpg";
+import carouselImg1 from "../../assets/Images/About Images/carousel-1.jpg";
+import carouselImg2 from "../../assets/Images/About Images/carousel-2.jpg";
+
 import room1 from "../../assets/Images/About Images/room-1.jpg";
 import room2 from "../../assets/Images/About Images/room-2.jpg";
 import room3 from "../../assets/Images/About Images/room-3.jpg";
@@ -106,7 +108,7 @@ const Home = () => {
             <div className="carousel-item active relative" style={{ height: "500px" }}>
               <img
                 className="w-100 h-100 object-cover"
-                src={carouselImg1}
+                src={carouselImg2}
                 alt="Luxury Hotel 1"
               />
 
@@ -133,7 +135,7 @@ const Home = () => {
             data-bs-slide="prev"
           >
             <span
-              className="carousel-control-prev-icon"
+              className="mr-30 carousel-control-prev-icon"
               aria-hidden="true"
             ></span>
             <span className="visually-hidden">Previous</span>
@@ -146,7 +148,7 @@ const Home = () => {
             data-bs-slide="next"
           >
             <span
-              className="carousel-control-next-icon"
+              className="ml-30 carousel-control-next-icon"
               aria-hidden="true"
             ></span>
             <span className="visually-hidden">Next</span>
