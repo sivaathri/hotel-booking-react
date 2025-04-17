@@ -1,11 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import carouselImg1 from "../../assets/Leonardo_Phoenix.jpg";
-import carouselImg2 from "../../assets/Images/About Images/carousel-2.jpg";
-import about1 from "../../assets/Images/About Images/about-1.jpg";
-import about2 from "../../assets/Images/About Images/about-2.jpg";
-import about3 from "../../assets/Images/About Images/about-3.jpg";
-import about4 from "../../assets/Images/About Images/about-4.jpg";
-import { FaHotel, FaUsers, FaUsersCog } from "react-icons/fa";
 import room1 from "../../assets/Images/About Images/room-1.jpg";
 import room2 from "../../assets/Images/About Images/room-2.jpg";
 import room3 from "../../assets/Images/About Images/room-3.jpg";
@@ -98,7 +92,7 @@ const Home = () => {
                 <div className="container mt-12 sm:mt-16 md:mt-20">
                   <div className="p-3 pt-8 sm:pt-12" style={{ maxWidth: "900px" }}>
                     <h1
-                      className="text-white mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
+                      className="text-white mb-4 mt-0 sm:mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
                       style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}
                     >
                       Find The Right Hotel Today

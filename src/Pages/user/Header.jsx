@@ -12,18 +12,30 @@ const Header = () => {
   const currentPath = location.pathname;
 
   useEffect(() => {
-    // Remove spinner after load
     const timer = setTimeout(() => {
       const spinner = document.getElementById("spinner");
       if (spinner) {
         spinner.style.display = "none";
       }
     }, 1000);
-
+  
+    const handleResize = () => {
+      if (window.innerWidth >= 992) {
+        setIsNavOpen(true);
+      } else {
+        setIsNavOpen(false);
+      }
+    };
+  
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+  
     return () => {
       clearTimeout(timer);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
+  
 
   const toggleNav = () => {
     setIsNavOpen(prevState => !prevState);
