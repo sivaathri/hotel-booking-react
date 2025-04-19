@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./Pages/Login";
-import BookingForm from "./Pages/BookingForm";
-import RoomForm from "./Pages/RoomForm";
-import UserForm from "./Pages/UserForm";
-import ContactForm from "./Pages/ContactForm";
-import Gallery from "./Pages/Gallery";
-import Services from "./Pages/Services";
-import AdminLogin from "./Pages/AdminLogin";
+// import Login from "./Pages/Login";
+// import BookingForm from "./Pages/BookingForm";
+// import RoomForm from "./Pages/RoomForm";
+// import UserForm from "./Pages/UserForm";
+// import ContactForm from "./Pages/ContactForm";
+// import Gallery from "./Pages/Gallery";
+// import Services from "./Pages/Services";
+// import AdminLogin from "./Pages/AdminLogin";
 import AdminDashboard from "./Pages/admin/AdminDashboard";
 import CustomersList from "./Pages/admin/CustomersList";
 import StaffList from "./Pages/admin/StaffList";
@@ -54,7 +54,7 @@ function App() {
           <Route path="/rooms/:id" element={<RoomDetails />} />
           <Route path="/book/:id" element={<UserBookRoom />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<UserLogin />} />
+          {/* <Route path="/login" element={<UserLogin />} /> */}
           <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/book-room" element={<BookingRoom />} />
@@ -67,15 +67,15 @@ function App() {
 
 
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin/bookings/add" element={<BookingForm />} />
-          <Route path="/admin/rooms/add" element={<RoomForm />} />
-          <Route path="/admin/users/add" element={<UserForm />} />
+          {/* <Route path="/login" element={<Login />} /> */}
+          {/* <Route path="/admin/bookings/add" element={<BookingForm />} />
+          <Route path="/admin/rooms/add" element={<RoomForm />} /> */}
+          {/* <Route path="/admin/users/add" element={<UserForm />} />
           <Route path="/contact" element={<ContactForm />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/services" element={<Services />} />
 
-          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} /> */}
           <Route path="/admin/customers" element={<CustomersList />} />
           <Route path="/admin/invoices" element={<InvoiceList />} />
           <Route path="/admin/staff" element={<StaffList />} />
