@@ -158,7 +158,7 @@ const Home = () => {
         {/* Carousel End */}
         <div className="w-full pb-0 animate-fadeIn">
           <div className="container mx-auto px-4">
-            <div className="bg-dark shadow-3xl p-6 sm:p-8 rounded-2xl relative border z-20 border-gray-100 -mt-75">
+            <div className="bg-dark shadow-3xl p-6 sm:p-8 rounded-2xl relative  z-20 border-gray-100 -mt-75">
               <div className="flex flex-col md:flex-row md:items-end gap-6">
                 {/* Left: Form Fields */}
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
