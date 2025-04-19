@@ -1,12 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import Login from "./Pages/Login";
-// import BookingForm from "./Pages/BookingForm";
-// import RoomForm from "./Pages/RoomForm";
-// import UserForm from "./Pages/UserForm";
-// import ContactForm from "./Pages/ContactForm";
-// import Gallery from "./Pages/Gallery";
-// import Services from "./Pages/Services";
-// import AdminLogin from "./Pages/AdminLogin";
 import AdminDashboard from "./Pages/admin/AdminDashboard";
 import CustomersList from "./Pages/admin/CustomersList";
 import StaffList from "./Pages/admin/StaffList";
@@ -33,13 +25,14 @@ import UserProfile from './Pages/user/UserProfile';
 // SignIn and SignupForm  Imports
 import AuthLogin from './Pages/auth/SignIn';
 import AuthRegister from './Pages/auth/SignupForm';
-
+// Host Rooms  Imports
+import Hosthome from './Pages/Host/Home'
 function App() {
   return (
     <>
       <Router>
         <Routes>
-           {/* HOme Screen Routes */}
+          {/* HOme Screen Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/About" element={<About />} />
 
@@ -60,22 +53,17 @@ function App() {
           <Route path="/book-room" element={<BookingRoom />} />
           <Route path="/user-profile" element={<UserProfile />} />
 
-     {/*  Signup and Signin  Routes */}
+          {/*  Signup and Signin  Routes */}
           <Route path="/login" element={<AuthLogin />} />
           <Route path="/register" element={<AuthRegister />} />
+
+
+          {/*  Host Rooms  Routes */}
+
+          <Route path="/Hosthome" element={<Hosthome />}/>
+
         
 
-
-
-          {/* <Route path="/login" element={<Login />} /> */}
-          {/* <Route path="/admin/bookings/add" element={<BookingForm />} />
-          <Route path="/admin/rooms/add" element={<RoomForm />} /> */}
-          {/* <Route path="/admin/users/add" element={<UserForm />} />
-          <Route path="/contact" element={<ContactForm />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/services" element={<Services />} />
-
-          <Route path="/admin/login" element={<AdminLogin />} /> */}
           <Route path="/admin/customers" element={<CustomersList />} />
           <Route path="/admin/invoices" element={<InvoiceList />} />
           <Route path="/admin/staff" element={<StaffList />} />

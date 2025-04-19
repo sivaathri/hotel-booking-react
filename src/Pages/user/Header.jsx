@@ -184,12 +184,13 @@ const Header = () => {
                   )}
                 </div>
                 <div className="d-flex align-items-center">
-                  <button
-                    className="text-light me-3 bg-transparent border-0 p-0"
+                  <Link
+                    to="/Hosthome"
+                    className="text-light me-3 bg-transparent border-0 p-0 text-decoration-none"
                     style={{ cursor: 'pointer' }}
                   >
                     Join our Hoterlier
-                  </button>
+                  </Link>
                   <button
                     onClick={() => setSignupOpen(true)}
                     className="btn btn-outline-light me-3 rounded-0 py-2 px-4"
