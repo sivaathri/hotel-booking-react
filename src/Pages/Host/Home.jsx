@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const LocationMarker = ({ position, setPosition, setAddress }) => {
+const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }) => {
   useMapEvents({
     async click(e) {
       const newPosition = e.latlng;
@@ -25,6 +25,16 @@ const LocationMarker = ({ position, setPosition, setAddress }) => {
         const data = await response.json();
         if (data.display_name) {
           setAddress(data.display_name);
+          // Extract address components
+          const address = data.address || {};
+          setAddressDetails({
+            addressLine1: address.road || '',
+            addressLine2: address.house_number || '',
+            city: address.city || address.town || address.village || '',
+            state: address.state || '',
+            country: address.country || '',
+            postalCode: address.postcode || ''
+          });
         }
       } catch (error) {
         console.error('Error fetching address:', error);
@@ -37,12 +47,12 @@ const LocationMarker = ({ position, setPosition, setAddress }) => {
 
 const StepIndicator = ({ currentStep, totalSteps }) => {
   return (
-    <div className="fixed top-0 left-0 w-full z-50 bg-gray-100 h-1">
+    <div className="fixed top-0 left-0 w-full z-50 bg-gray-100 h-2">
       <motion.div
-        className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+        className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
         initial={{ width: 0 }}
         animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
       />
     </div>
   );
@@ -50,10 +60,16 @@ const StepIndicator = ({ currentStep, totalSteps }) => {
 
 const PageTransition = ({ children, direction }) => (
   <motion.div
-    initial={{ x: direction === 'left' ? -1000 : 1000, opacity: 0 }}
-    animate={{ x: 0, opacity: 1 }}
-    exit={{ x: direction === 'left' ? 1000 : -1000, opacity: 0 }}
-    transition={{ type: "spring", stiffness: 50, damping: 20 }}
+    initial={{ x: direction === 'left' ? -1000 : 1000, opacity: 0, scale: 0.8 }}
+    animate={{ x: 0, opacity: 1, scale: 1 }}
+    exit={{ x: direction === 'left' ? 1000 : -1000, opacity: 0, scale: 0.8 }}
+    transition={{ 
+      type: "spring", 
+      stiffness: 100, 
+      damping: 20,
+      mass: 1,
+      velocity: 0.5
+    }}
     className="w-full"
   >
     {children}
@@ -64,12 +80,68 @@ const FloatingLabel = ({ children }) => (
   <motion.div
     initial={{ y: 20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
-    transition={{ duration: 0.5 }}
+    transition={{ duration: 0.5, delay: 0.1 }}
     className="mb-6"
   >
     {children}
   </motion.div>
 );
+
+const InputField = ({ type = 'text', value, onChange, placeholder, className = '', ...props }) => (
+  <input
+    type={type}
+    value={value}
+    onChange={onChange}
+    placeholder={placeholder}
+    className={`w-full px-6 py-4 bg-white border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-300 placeholder-gray-400 text-gray-800 shadow-sm hover:shadow-md ${className}`}
+    {...props}
+  />
+);
+
+const Checkbox = ({ checked, onChange, label, className = '' }) => (
+  <label className={`flex items-center space-x-3 p-4 bg-white rounded-xl cursor-pointer border-2 border-gray-200 hover:border-indigo-500 transition-all duration-300 ${className}`}>
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
+    />
+    <span className="text-gray-700">{label}</span>
+  </label>
+);
+
+const RadioButton = ({ checked, onChange, label, name, className = '' }) => (
+  <label className={`flex items-center space-x-3 p-4 bg-white rounded-xl cursor-pointer border-2 border-gray-200 hover:border-indigo-500 transition-all duration-300 ${className}`}>
+    <input
+      type="radio"
+      name={name}
+      checked={checked}
+      onChange={onChange}
+      className="h-5 w-5 rounded-full text-indigo-500 focus:ring-indigo-500 border-gray-300"
+    />
+    <span className="text-gray-700">{label}</span>
+  </label>
+);
+
+const Button = ({ children, onClick, variant = 'primary', className = '', ...props }) => {
+  const variants = {
+    primary: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600',
+    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    success: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600'
+  };
+
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={`px-8 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md ${variants[variant]} ${className}`}
+      {...props}
+    >
+      {children}
+    </motion.button>
+  );
+};
 
 const Home = () => {
   const [step, setStep] = useState(1);
@@ -84,6 +156,7 @@ const Home = () => {
     city: '',
     state: '',
     country: '',
+    postalCode: '',
     location: null,
     
     // Step 3: Rooms Setup
@@ -176,7 +249,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <StepIndicator currentStep={step} totalSteps={10} />
       
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -186,9 +259,9 @@ const Home = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+          <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100">
             <motion.h1 
-              className="text-4xl font-bold mb-8 text-gray-800"
+              className="text-4xl font-bold mb-8 text-gray-800 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               transition={{ type: "spring", stiffness: 100 }}
@@ -210,12 +283,10 @@ const Home = () => {
                 <PageTransition key="step1" direction="right">
                   <div className="space-y-6">
                     <FloatingLabel>
-                      <input
-                        type="text"
+                      <InputField
                         value={hotelData.propertyName}
                         onChange={(e) => setHotelData({ ...hotelData, propertyName: e.target.value })}
                         placeholder="Enter your property name"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                       />
                     </FloatingLabel>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -225,16 +296,12 @@ const Home = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
-                          <label className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl cursor-pointer border border-gray-200 hover:bg-gray-100 transition-all duration-300">
-                            <input
-                              type="radio"
-                              name="propertyType"
-                              checked={hotelData.propertyType === type}
-                              onChange={() => setHotelData({ ...hotelData, propertyType: type })}
-                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
-                            />
-                            <span className="text-gray-700">{type}</span>
-                          </label>
+                          <RadioButton
+                            checked={hotelData.propertyType === type}
+                            onChange={() => setHotelData({ ...hotelData, propertyType: type })}
+                            label={type}
+                            name="propertyType"
+                          />
                         </motion.div>
                       ))}
                     </div>
@@ -244,79 +311,93 @@ const Home = () => {
 
               {step === 2 && (
                 <PageTransition key="step2" direction="right">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-6">
-                      <FloatingLabel>
-                        <input
-                          type="text"
-                          value={hotelData.addressLine1}
-                          onChange={(e) => setHotelData({ ...hotelData, addressLine1: e.target.value })}
-                          placeholder="Address Line 1"
-                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                        />
-                      </FloatingLabel>
-                      <FloatingLabel>
-                        <input
-                          type="text"
-                          value={hotelData.addressLine2}
-                          onChange={(e) => setHotelData({ ...hotelData, addressLine2: e.target.value })}
-                          placeholder="Address Line 2"
-                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                        />
-                      </FloatingLabel>
-                      <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-sm">
+                      <h3 className="text-lg font-semibold mb-4 text-gray-800">Address Details</h3>
+                      <div className="space-y-4">
                         <FloatingLabel>
-                          <input
+                          <InputField
                             type="text"
-                            value={hotelData.city}
-                            onChange={(e) => setHotelData({ ...hotelData, city: e.target.value })}
-                            placeholder="City"
-                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                            value={hotelData.addressLine1}
+                            onChange={(e) => setHotelData({ ...hotelData, addressLine1: e.target.value })}
+                            placeholder="Address Line 1"
                           />
                         </FloatingLabel>
                         <FloatingLabel>
-                          <input
+                          <InputField
                             type="text"
-                            value={hotelData.state}
-                            onChange={(e) => setHotelData({ ...hotelData, state: e.target.value })}
-                            placeholder="State/Province"
-                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                            value={hotelData.addressLine2}
+                            onChange={(e) => setHotelData({ ...hotelData, addressLine2: e.target.value })}
+                            placeholder="Address Line 2"
                           />
                         </FloatingLabel>
+                        <div className="grid grid-cols-2 gap-4">
+                          <FloatingLabel>
+                            <InputField
+                              type="text"
+                              value={hotelData.city}
+                              onChange={(e) => setHotelData({ ...hotelData, city: e.target.value })}
+                              placeholder="City"
+                            />
+                          </FloatingLabel>
+                          <FloatingLabel>
+                            <InputField
+                              type="text"
+                              value={hotelData.state}
+                              onChange={(e) => setHotelData({ ...hotelData, state: e.target.value })}
+                              placeholder="State/Province"
+                            />
+                          </FloatingLabel>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <FloatingLabel>
+                            <InputField
+                              type="text"
+                              value={hotelData.country}
+                              onChange={(e) => setHotelData({ ...hotelData, country: e.target.value })}
+                              placeholder="Country"
+                            />
+                          </FloatingLabel>
+                          <FloatingLabel>
+                            <InputField
+                              type="text"
+                              value={hotelData.postalCode}
+                              onChange={(e) => setHotelData({ ...hotelData, postalCode: e.target.value })}
+                              placeholder="Postal/Zip Code"
+                            />
+                          </FloatingLabel>
+                        </div>
                       </div>
-                      <FloatingLabel>
-                        <input
-                          type="text"
-                          value={hotelData.country}
-                          onChange={(e) => setHotelData({ ...hotelData, country: e.target.value })}
-                          placeholder="Country"
-                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                        />
-                      </FloatingLabel>
                     </div>
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 }}
-                      className="h-[60vh] w-full rounded-xl overflow-hidden shadow-md"
-                    >
-                      <MapContainer
-                        center={[11.9416, 79.8083]}
-                        zoom={13}
-                        style={{ height: '100%', width: '100%' }}
-                        className="rounded-xl"
+
+                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-sm h-full">
+                      <h3 className="text-lg font-semibold mb-4 text-gray-800">Select Location on Map</h3>
+                      <p className="text-sm text-gray-500 mb-4">Click on the map to select your property's location. The address will be automatically filled.</p>
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="h-[calc(100%-6rem)] w-full rounded-xl overflow-hidden shadow-md"
                       >
-                        <TileLayer
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        />
-                        <LocationMarker
-                          position={hotelData.location}
-                          setPosition={(pos) => setHotelData({ ...hotelData, location: pos })}
-                          setAddress={(addr) => setHotelData({ ...hotelData, address: addr })}
-                        />
-                      </MapContainer>
-                    </motion.div>
+                        <MapContainer
+                          center={[11.9416, 79.8083]}
+                          zoom={13}
+                          style={{ height: '100%', width: '100%' }}
+                          className="rounded-xl"
+                        >
+                          <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                          />
+                          <LocationMarker
+                            position={hotelData.location}
+                            setPosition={(pos) => setHotelData({ ...hotelData, location: pos })}
+                            setAddress={(addr) => setHotelData({ ...hotelData, address: addr })}
+                            setAddressDetails={(details) => setHotelData({ ...hotelData, ...details })}
+                          />
+                        </MapContainer>
+                      </motion.div>
+                    </div>
                   </div>
                 </PageTransition>
               )}
@@ -329,8 +410,7 @@ const Home = () => {
                         <h3 className="text-xl font-semibold mb-4">Room {index + 1}</h3>
                         <div className="space-y-4">
                           <FloatingLabel>
-                            <input
-                              type="text"
+                            <InputField
                               value={room.name}
                               onChange={(e) => {
                                 const newRooms = [...hotelData.rooms];
@@ -338,12 +418,11 @@ const Home = () => {
                                 setHotelData({ ...hotelData, rooms: newRooms });
                               }}
                               placeholder="Room Name / Type"
-                              className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                             />
                           </FloatingLabel>
                           <div className="grid grid-cols-2 gap-4">
                             <FloatingLabel>
-                              <input
+                              <InputField
                                 type="number"
                                 value={room.capacity}
                                 onChange={(e) => {
@@ -352,7 +431,6 @@ const Home = () => {
                                   setHotelData({ ...hotelData, rooms: newRooms });
                                 }}
                                 placeholder="Capacity"
-                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                               />
                             </FloatingLabel>
                             <FloatingLabel>
@@ -363,7 +441,7 @@ const Home = () => {
                                   newRooms[index].bedType = e.target.value;
                                   setHotelData({ ...hotelData, rooms: newRooms });
                                 }}
-                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-800"
+                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800"
                               >
                                 <option value="">Select Bed Type</option>
                                 {bedTypes.map((type) => (
@@ -382,7 +460,7 @@ const Home = () => {
                                   newRooms[index].hasBathroom = e.target.checked;
                                   setHotelData({ ...hotelData, rooms: newRooms });
                                 }}
-                                className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                                className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                               />
                               <span>Attached Bathroom</span>
                             </label>
@@ -395,15 +473,14 @@ const Home = () => {
                                   newRooms[index].hasBalcony = e.target.checked;
                                   setHotelData({ ...hotelData, rooms: newRooms });
                                 }}
-                                className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                                className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                               />
                               <span>Balcony</span>
                             </label>
                           </div>
                           {room.hasBalcony && (
                             <FloatingLabel>
-                              <input
-                                type="text"
+                              <InputField
                                 value={room.balconyView}
                                 onChange={(e) => {
                                   const newRooms = [...hotelData.rooms];
@@ -411,7 +488,6 @@ const Home = () => {
                                   setHotelData({ ...hotelData, rooms: newRooms });
                                 }}
                                 placeholder="Balcony View (e.g., Sea, Garden, City)"
-                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                               />
                             </FloatingLabel>
                           )}
@@ -430,7 +506,7 @@ const Home = () => {
                                     }
                                     setHotelData({ ...hotelData, rooms: newRooms });
                                   }}
-                                  className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                                  className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                                 />
                                 <span>{facility}</span>
                               </label>
@@ -454,7 +530,7 @@ const Home = () => {
                           }]
                         });
                       }}
-                      className="w-full px-6 py-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-300"
+                      className="w-full px-6 py-4 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-all duration-300"
                     >
                       Add Another Room
                     </button>
@@ -485,7 +561,7 @@ const Home = () => {
                               />
                               <label
                                 htmlFor={`room-photos-${index}`}
-                                className="cursor-pointer text-gray-600 hover:text-blue-500"
+                                className="cursor-pointer text-gray-600 hover:text-indigo-500"
                               >
                                 Click to upload photos
                                 <p className="text-sm text-gray-400 mt-2">Max 5MB per image</p>
@@ -514,19 +590,17 @@ const Home = () => {
                                 : hotelData.languages.filter(l => l !== language);
                               setHotelData({ ...hotelData, languages: newLanguages });
                             }}
-                            className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                           />
                           <span>{language}</span>
                         </label>
                       ))}
                     </div>
                     <FloatingLabel>
-                      <input
-                        type="text"
+                      <InputField
                         value={hotelData.otherLanguage}
                         onChange={(e) => setHotelData({ ...hotelData, otherLanguage: e.target.value })}
                         placeholder="Other Language (if any)"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                       />
                     </FloatingLabel>
                   </div>
@@ -538,20 +612,20 @@ const Home = () => {
                   <div className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <FloatingLabel>
-                        <input
+                        <InputField
                           type="time"
                           value={hotelData.checkInTime}
                           onChange={(e) => setHotelData({ ...hotelData, checkInTime: e.target.value })}
-                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-800"
+                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800"
                         />
                         <span className="text-sm text-gray-500">Check-In Time</span>
                       </FloatingLabel>
                       <FloatingLabel>
-                        <input
+                        <InputField
                           type="time"
                           value={hotelData.checkOutTime}
                           onChange={(e) => setHotelData({ ...hotelData, checkOutTime: e.target.value })}
-                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-800"
+                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800"
                         />
                         <span className="text-sm text-gray-500">Check-Out Time</span>
                       </FloatingLabel>
@@ -568,7 +642,7 @@ const Home = () => {
                             type="checkbox"
                             checked={hotelData[rule.value]}
                             onChange={(e) => setHotelData({ ...hotelData, [rule.value]: e.target.checked })}
-                            className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                           />
                           <span>{rule.label}</span>
                         </label>
@@ -582,12 +656,11 @@ const Home = () => {
                 <PageTransition key="step7" direction="right">
                   <div className="space-y-6">
                     <FloatingLabel>
-                      <input
+                      <InputField
                         type="number"
                         value={hotelData.pricePerNight}
                         onChange={(e) => setHotelData({ ...hotelData, pricePerNight: e.target.value })}
                         placeholder="Price Per Night (₹)"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                       />
                     </FloatingLabel>
                     <div className="space-y-4">
@@ -607,7 +680,7 @@ const Home = () => {
                                 newDiscounts[discount.value] = e.target.checked;
                                 setHotelData({ ...hotelData, discounts: newDiscounts });
                               }}
-                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                              className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                             />
                             <span>{discount.label}</span>
                           </label>
@@ -624,7 +697,7 @@ const Home = () => {
                               name="refundPolicy"
                               checked={hotelData.refundPolicy === policy}
                               onChange={() => setHotelData({ ...hotelData, refundPolicy: policy })}
-                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                              className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                             />
                             <span>{policy}</span>
                           </label>
@@ -652,7 +725,7 @@ const Home = () => {
                                   : hotelData.allowedGuests.filter(g => g !== type);
                                 setHotelData({ ...hotelData, allowedGuests: newAllowedGuests });
                               }}
-                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                              className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                             />
                             <span>{type}</span>
                           </label>
@@ -667,7 +740,7 @@ const Home = () => {
                             type="checkbox"
                             checked={hotelData.instantBooking}
                             onChange={(e) => setHotelData({ ...hotelData, instantBooking: e.target.checked })}
-                            className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                           />
                           <span>Instant Booking</span>
                         </label>
@@ -676,7 +749,7 @@ const Home = () => {
                             type="checkbox"
                             checked={hotelData.manualApproval}
                             onChange={(e) => setHotelData({ ...hotelData, manualApproval: e.target.checked })}
-                            className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                           />
                           <span>Manual Approval</span>
                         </label>
@@ -703,7 +776,7 @@ const Home = () => {
                                   : hotelData.paymentMethods.filter(m => m !== method);
                                 setHotelData({ ...hotelData, paymentMethods: newPaymentMethods });
                               }}
-                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                              className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                             />
                             <span>{method}</span>
                           </label>
@@ -711,51 +784,43 @@ const Home = () => {
                       </div>
                     </div>
                     <FloatingLabel>
-                      <input
-                        type="text"
+                      <InputField
                         value={hotelData.panGstId}
                         onChange={(e) => setHotelData({ ...hotelData, panGstId: e.target.value })}
                         placeholder="PAN/GST ID"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                       />
                     </FloatingLabel>
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Bank Details</h3>
                       <div className="space-y-4">
                         <FloatingLabel>
-                          <input
-                            type="text"
+                          <InputField
                             value={hotelData.bankDetails.accountName}
                             onChange={(e) => setHotelData({
                               ...hotelData,
                               bankDetails: { ...hotelData.bankDetails, accountName: e.target.value }
                             })}
                             placeholder="Account Holder Name"
-                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                           />
                         </FloatingLabel>
                         <FloatingLabel>
-                          <input
-                            type="text"
+                          <InputField
                             value={hotelData.bankDetails.accountNumber}
                             onChange={(e) => setHotelData({
                               ...hotelData,
                               bankDetails: { ...hotelData.bankDetails, accountNumber: e.target.value }
                             })}
                             placeholder="Account Number"
-                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                           />
                         </FloatingLabel>
                         <FloatingLabel>
-                          <input
-                            type="text"
+                          <InputField
                             value={hotelData.bankDetails.ifscCode}
                             onChange={(e) => setHotelData({
                               ...hotelData,
                               bankDetails: { ...hotelData.bankDetails, ifscCode: e.target.value }
                             })}
                             placeholder="IFSC Code"
-                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                           />
                         </FloatingLabel>
                       </div>
@@ -780,7 +845,7 @@ const Home = () => {
                           />
                           <label
                             htmlFor="id-proof"
-                            className="cursor-pointer text-gray-600 hover:text-blue-500"
+                            className="cursor-pointer text-gray-600 hover:text-indigo-500"
                           >
                             Upload ID Proof
                           </label>
@@ -795,7 +860,7 @@ const Home = () => {
                           />
                           <label
                             htmlFor="ownership-proof"
-                            className="cursor-pointer text-gray-600 hover:text-blue-500"
+                            className="cursor-pointer text-gray-600 hover:text-indigo-500"
                           >
                             Upload Ownership Proof
                           </label>
@@ -808,7 +873,7 @@ const Home = () => {
                           type="checkbox"
                           checked={hotelData.termsAccepted}
                           onChange={(e) => setHotelData({ ...hotelData, termsAccepted: e.target.checked })}
-                          className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                          className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
                         />
                         <span>I confirm all details are correct and accept TripNGrub's terms and policies</span>
                       </label>
@@ -825,33 +890,29 @@ const Home = () => {
               transition={{ delay: 0.2 }}
             >
               {step > 1 && (
-                <motion.button
+                <Button
                   onClick={handleBack}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-300"
+                  variant="secondary"
                 >
                   Back
-                </motion.button>
+                </Button>
               )}
               {step < 10 ? (
-                <motion.button
+                <Button
                   onClick={handleNext}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="ml-auto px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
+                  variant="primary"
+                  className="ml-auto"
                 >
                   Next
-                </motion.button>
+                </Button>
               ) : (
-                <motion.button
+                <Button
                   onClick={handleSubmit}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="ml-auto px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300"
+                  variant="success"
+                  className="ml-auto"
                 >
                   Submit
-                </motion.button>
+                </Button>
               )}
             </motion.div>
           </div>
