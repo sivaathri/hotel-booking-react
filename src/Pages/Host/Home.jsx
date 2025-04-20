@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -18,7 +18,6 @@ const LocationMarker = ({ position, setPosition, setAddress }) => {
       const newPosition = e.latlng;
       setPosition(newPosition);
       
-      // Reverse geocode the coordinates
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newPosition.lat}&lon=${newPosition.lng}&zoom=18&addressdetails=1`
@@ -75,41 +74,92 @@ const FloatingLabel = ({ children }) => (
 const Home = () => {
   const [step, setStep] = useState(1);
   const [hotelData, setHotelData] = useState({
-    hotelName: '',
+    // Step 1: Basic Information
+    propertyName: '',
+    propertyType: '',
+    
+    // Step 2: Location
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    country: '',
     location: null,
-    description: '',
-    address: '',
-    contact: '',
-    roomType: '',
-    price: '',
-    capacity: '',
-    facilities: [],
+    
+    // Step 3: Rooms Setup
+    rooms: [{
+      name: '',
+      capacity: '',
+      bedType: '',
+      hasBathroom: false,
+      hasBalcony: false,
+      balconyView: '',
+      facilities: []
+    }],
+    
+    // Step 4: Room Photos
+    roomPhotos: [],
+    
+    // Step 5: Language Preference
+    languages: [],
+    otherLanguage: '',
+    
+    // Step 6: House Rules
+    checkInTime: '',
+    checkOutTime: '',
+    petsAllowed: false,
+    smokingAllowed: false,
+    alcoholAllowed: false,
+    noiseRestrictions: false,
+    
+    // Step 7: Pricing & Availability
+    pricePerNight: '',
+    discounts: {
+      longStay: false,
+      earlyBird: false,
+      lastMinute: false
+    },
+    refundPolicy: '',
+    availability: [],
+    
+    // Step 8: Guest Booking Preferences
+    allowedGuests: [],
+    instantBooking: false,
+    manualApproval: false,
+    
+    // Step 9: Payment Setup
+    paymentMethods: [],
+    panGstId: '',
+    bankDetails: {
+      accountNumber: '',
+      ifscCode: '',
+      accountName: ''
+    },
+    
+    // Step 10: Verification
+    idProof: null,
+    ownershipProof: null,
+    termsAccepted: false
   });
 
-  const facilitiesOptions = [
-    { name: 'WiFi', icon: '📶' },
-    { name: 'Air Conditioning', icon: '❄️' },
-    { name: 'TV', icon: '📺' },
-    { name: 'Mini Bar', icon: '🍷' },
-    { name: 'Room Service', icon: '🛎️' },
-    { name: 'Swimming Pool', icon: '🏊‍♂️' },
-    { name: 'Gym', icon: '💪' },
-    { name: 'Spa', icon: '💆‍♂️' },
-    { name: 'Restaurant', icon: '🍽️' },
-    { name: 'Parking', icon: '🅿️' },
+  const propertyTypes = [
+    'Hotel', 'Apartment', 'Hut House', 'Resort', 'Beach House', 'Villa'
   ];
 
-  const handleFacilityChange = (facility) => {
-    setHotelData(prev => ({
-      ...prev,
-      facilities: prev.facilities.includes(facility)
-        ? prev.facilities.filter(f => f !== facility)
-        : [...prev.facilities, facility]
-    }));
-  };
+  const bedTypes = ['Queen', 'King', 'Twin'];
+  const roomFacilities = [
+    'Private Bathroom', 'Bathtub', 'Kitchen Access', 'Jacuzzi',
+    'Washing Machine', 'Air Conditioning', 'Heating', 'Free WiFi',
+    'Smart TV', 'Breakfast Included', 'Parking'
+  ];
+
+  const languages = ['English', 'Hindi'];
+  const refundPolicies = ['Fully Refundable', 'Partial Refund', 'Non-refundable'];
+  const allowedGuestTypes = ['Married Couples', 'Families', 'Solo Travelers', 'Friends'];
+  const paymentMethodOptions = ['UPI', 'Bank Transfer', 'Cash at Check-In', 'Online'];
 
   const handleNext = () => {
-    if (step < 5) {
+    if (step < 10) {
       setStep(step + 1);
     }
   };
@@ -121,13 +171,13 @@ const Home = () => {
   };
 
   const handleSubmit = () => {
-    // Handle form submission here
     console.log('Hotel Data:', hotelData);
+    // Handle form submission here
   };
 
   return (
     <div className="min-h-screen bg-white">
-      <StepIndicator currentStep={step} totalSteps={5} />
+      <StepIndicator currentStep={step} totalSteps={10} />
       
       <div className="min-h-screen flex items-center justify-center p-4">
         <motion.div 
@@ -143,96 +193,107 @@ const Home = () => {
               animate={{ y: 0 }}
               transition={{ type: "spring", stiffness: 100 }}
             >
-              {step === 1 && "Let's Start Your Journey"}
-              {step === 2 && "Pin Your Paradise"}
-              {step === 3 && "Tell Us More"}
-              {step === 4 && "Room Specifications"}
-              {step === 5 && "Amazing Amenities"}
+              {step === 1 && "Basic Information"}
+              {step === 2 && "Location Details"}
+              {step === 3 && "Rooms Setup"}
+              {step === 4 && "Room Photos"}
+              {step === 5 && "Language Preference"}
+              {step === 6 && "House Rules"}
+              {step === 7 && "Pricing & Availability"}
+              {step === 8 && "Booking Preferences"}
+              {step === 9 && "Payment Setup"}
+              {step === 10 && "Verification"}
             </motion.h1>
 
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <PageTransition key="step1" direction="right">
-                  <FloatingLabel>
-                    <input
-                      type="text"
-                      value={hotelData.hotelName}
-                      onChange={(e) => setHotelData({ ...hotelData, hotelName: e.target.value })}
-                      placeholder="Enter your hotel name"
-                      className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                    />
-                  </FloatingLabel>
+                  <div className="space-y-6">
+                    <FloatingLabel>
+                      <input
+                        type="text"
+                        value={hotelData.propertyName}
+                        onChange={(e) => setHotelData({ ...hotelData, propertyName: e.target.value })}
+                        placeholder="Enter your property name"
+                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                      />
+                    </FloatingLabel>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {propertyTypes.map((type) => (
+                        <motion.div
+                          key={type}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <label className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl cursor-pointer border border-gray-200 hover:bg-gray-100 transition-all duration-300">
+                            <input
+                              type="radio"
+                              name="propertyType"
+                              checked={hotelData.propertyType === type}
+                              onChange={() => setHotelData({ ...hotelData, propertyType: type })}
+                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span className="text-gray-700">{type}</span>
+                          </label>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
                 </PageTransition>
               )}
 
               {step === 2 && (
                 <PageTransition key="step2" direction="right">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left Side - Location Details */}
                     <div className="space-y-6">
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="bg-gray-50 p-6 rounded-xl border border-gray-200"
-                      >
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Location Details</h3>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Selected Address</label>
-                            <div className="bg-white p-4 rounded-lg border border-gray-200 min-h-[100px]">
-                              {hotelData.address ? (
-                                <p className="text-gray-800">{hotelData.address}</p>
-                              ) : (
-                                <p className="text-gray-400 italic">Click on the map to select a location</p>
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Coordinates</label>
-                            <div className="bg-white p-4 rounded-lg border border-gray-200">
-                              {hotelData.location ? (
-                                <p className="text-gray-800">
-                                  Latitude: {hotelData.location.lat.toFixed(6)}<br />
-                                  Longitude: {hotelData.location.lng.toFixed(6)}
-                                </p>
-                              ) : (
-                                <p className="text-gray-400 italic">No location selected</p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                      
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="bg-gray-50 p-6 rounded-xl border border-gray-200"
-                      >
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Instructions</h3>
-                        <ul className="space-y-2 text-gray-600">
-                          <li className="flex items-start">
-                            <span className="text-blue-500 mr-2">•</span>
-                            Click anywhere on the map to select your hotel location
-                          </li>
-                          <li className="flex items-start">
-                            <span className="text-blue-500 mr-2">•</span>
-                            The address will be automatically filled
-                          </li>
-                          <li className="flex items-start">
-                            <span className="text-blue-500 mr-2">•</span>
-                            You can drag the marker to adjust the location
-                          </li>
-                          <li className="flex items-start">
-                            <span className="text-blue-500 mr-2">•</span>
-                            Zoom in/out for more precise placement
-                          </li>
-                        </ul>
-                      </motion.div>
+                      <FloatingLabel>
+                        <input
+                          type="text"
+                          value={hotelData.addressLine1}
+                          onChange={(e) => setHotelData({ ...hotelData, addressLine1: e.target.value })}
+                          placeholder="Address Line 1"
+                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                        />
+                      </FloatingLabel>
+                      <FloatingLabel>
+                        <input
+                          type="text"
+                          value={hotelData.addressLine2}
+                          onChange={(e) => setHotelData({ ...hotelData, addressLine2: e.target.value })}
+                          placeholder="Address Line 2"
+                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                        />
+                      </FloatingLabel>
+                      <div className="grid grid-cols-2 gap-4">
+                        <FloatingLabel>
+                          <input
+                            type="text"
+                            value={hotelData.city}
+                            onChange={(e) => setHotelData({ ...hotelData, city: e.target.value })}
+                            placeholder="City"
+                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                          />
+                        </FloatingLabel>
+                        <FloatingLabel>
+                          <input
+                            type="text"
+                            value={hotelData.state}
+                            onChange={(e) => setHotelData({ ...hotelData, state: e.target.value })}
+                            placeholder="State/Province"
+                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                          />
+                        </FloatingLabel>
+                      </div>
+                      <FloatingLabel>
+                        <input
+                          type="text"
+                          value={hotelData.country}
+                          onChange={(e) => setHotelData({ ...hotelData, country: e.target.value })}
+                          placeholder="Country"
+                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                        />
+                      </FloatingLabel>
                     </div>
-
-                    {/* Right Side - Map */}
                     <motion.div
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -263,32 +324,140 @@ const Home = () => {
               {step === 3 && (
                 <PageTransition key="step3" direction="right">
                   <div className="space-y-6">
-                    <FloatingLabel>
-                      <input
-                        type="text"
-                        value={hotelData.address}
-                        onChange={(e) => setHotelData({ ...hotelData, address: e.target.value })}
-                        placeholder="Address"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                      />
-                    </FloatingLabel>
-                    <FloatingLabel>
-                      <input
-                        type="text"
-                        value={hotelData.contact}
-                        onChange={(e) => setHotelData({ ...hotelData, contact: e.target.value })}
-                        placeholder="Contact Number"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                      />
-                    </FloatingLabel>
-                    <FloatingLabel>
-                      <textarea
-                        value={hotelData.description}
-                        onChange={(e) => setHotelData({ ...hotelData, description: e.target.value })}
-                        placeholder="Tell us about your hotel..."
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800 h-32 resize-none"
-                      />
-                    </FloatingLabel>
+                    {hotelData.rooms.map((room, index) => (
+                      <div key={index} className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h3 className="text-xl font-semibold mb-4">Room {index + 1}</h3>
+                        <div className="space-y-4">
+                          <FloatingLabel>
+                            <input
+                              type="text"
+                              value={room.name}
+                              onChange={(e) => {
+                                const newRooms = [...hotelData.rooms];
+                                newRooms[index].name = e.target.value;
+                                setHotelData({ ...hotelData, rooms: newRooms });
+                              }}
+                              placeholder="Room Name / Type"
+                              className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                            />
+                          </FloatingLabel>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FloatingLabel>
+                              <input
+                                type="number"
+                                value={room.capacity}
+                                onChange={(e) => {
+                                  const newRooms = [...hotelData.rooms];
+                                  newRooms[index].capacity = e.target.value;
+                                  setHotelData({ ...hotelData, rooms: newRooms });
+                                }}
+                                placeholder="Capacity"
+                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                              />
+                            </FloatingLabel>
+                            <FloatingLabel>
+                              <select
+                                value={room.bedType}
+                                onChange={(e) => {
+                                  const newRooms = [...hotelData.rooms];
+                                  newRooms[index].bedType = e.target.value;
+                                  setHotelData({ ...hotelData, rooms: newRooms });
+                                }}
+                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-800"
+                              >
+                                <option value="">Select Bed Type</option>
+                                {bedTypes.map((type) => (
+                                  <option key={type} value={type}>{type}</option>
+                                ))}
+                              </select>
+                            </FloatingLabel>
+                          </div>
+                          <div className="flex items-center space-x-4">
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={room.hasBathroom}
+                                onChange={(e) => {
+                                  const newRooms = [...hotelData.rooms];
+                                  newRooms[index].hasBathroom = e.target.checked;
+                                  setHotelData({ ...hotelData, rooms: newRooms });
+                                }}
+                                className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                              />
+                              <span>Attached Bathroom</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={room.hasBalcony}
+                                onChange={(e) => {
+                                  const newRooms = [...hotelData.rooms];
+                                  newRooms[index].hasBalcony = e.target.checked;
+                                  setHotelData({ ...hotelData, rooms: newRooms });
+                                }}
+                                className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                              />
+                              <span>Balcony</span>
+                            </label>
+                          </div>
+                          {room.hasBalcony && (
+                            <FloatingLabel>
+                              <input
+                                type="text"
+                                value={room.balconyView}
+                                onChange={(e) => {
+                                  const newRooms = [...hotelData.rooms];
+                                  newRooms[index].balconyView = e.target.value;
+                                  setHotelData({ ...hotelData, rooms: newRooms });
+                                }}
+                                placeholder="Balcony View (e.g., Sea, Garden, City)"
+                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                              />
+                            </FloatingLabel>
+                          )}
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {roomFacilities.map((facility) => (
+                              <label key={facility} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  checked={room.facilities.includes(facility)}
+                                  onChange={(e) => {
+                                    const newRooms = [...hotelData.rooms];
+                                    if (e.target.checked) {
+                                      newRooms[index].facilities.push(facility);
+                                    } else {
+                                      newRooms[index].facilities = newRooms[index].facilities.filter(f => f !== facility);
+                                    }
+                                    setHotelData({ ...hotelData, rooms: newRooms });
+                                  }}
+                                  className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                                />
+                                <span>{facility}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => {
+                        setHotelData({
+                          ...hotelData,
+                          rooms: [...hotelData.rooms, {
+                            name: '',
+                            capacity: '',
+                            bedType: '',
+                            hasBathroom: false,
+                            hasBalcony: false,
+                            balconyView: '',
+                            facilities: []
+                          }]
+                        });
+                      }}
+                      className="w-full px-6 py-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-300"
+                    >
+                      Add Another Room
+                    </button>
                   </div>
                 </PageTransition>
               )}
@@ -296,30 +465,67 @@ const Home = () => {
               {step === 4 && (
                 <PageTransition key="step4" direction="right">
                   <div className="space-y-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {hotelData.rooms.map((room, index) => (
+                        <div key={index} className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                          <h3 className="text-xl font-semibold mb-4">{room.name}</h3>
+                          <div className="space-y-4">
+                            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const newRooms = [...hotelData.rooms];
+                                  newRooms[index].photos = Array.from(e.target.files);
+                                  setHotelData({ ...hotelData, rooms: newRooms });
+                                }}
+                                className="hidden"
+                                id={`room-photos-${index}`}
+                              />
+                              <label
+                                htmlFor={`room-photos-${index}`}
+                                className="cursor-pointer text-gray-600 hover:text-blue-500"
+                              >
+                                Click to upload photos
+                                <p className="text-sm text-gray-400 mt-2">Max 5MB per image</p>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </PageTransition>
+              )}
+
+              {step === 5 && (
+                <PageTransition key="step5" direction="right">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {languages.map((language) => (
+                        <label key={language} className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                          <input
+                            type="checkbox"
+                            checked={hotelData.languages.includes(language)}
+                            onChange={(e) => {
+                              const newLanguages = e.target.checked
+                                ? [...hotelData.languages, language]
+                                : hotelData.languages.filter(l => l !== language);
+                              setHotelData({ ...hotelData, languages: newLanguages });
+                            }}
+                            className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                          />
+                          <span>{language}</span>
+                        </label>
+                      ))}
+                    </div>
                     <FloatingLabel>
                       <input
                         type="text"
-                        value={hotelData.roomType}
-                        onChange={(e) => setHotelData({ ...hotelData, roomType: e.target.value })}
-                        placeholder="Room Type (e.g., Deluxe Suite)"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                      />
-                    </FloatingLabel>
-                    <FloatingLabel>
-                      <input
-                        type="number"
-                        value={hotelData.price}
-                        onChange={(e) => setHotelData({ ...hotelData, price: e.target.value })}
-                        placeholder="Price per night"
-                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
-                      />
-                    </FloatingLabel>
-                    <FloatingLabel>
-                      <input
-                        type="number"
-                        value={hotelData.capacity}
-                        onChange={(e) => setHotelData({ ...hotelData, capacity: e.target.value })}
-                        placeholder="Room Capacity"
+                        value={hotelData.otherLanguage}
+                        onChange={(e) => setHotelData({ ...hotelData, otherLanguage: e.target.value })}
+                        placeholder="Other Language (if any)"
                         className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
                       />
                     </FloatingLabel>
@@ -327,27 +533,286 @@ const Home = () => {
                 </PageTransition>
               )}
 
-              {step === 5 && (
-                <PageTransition key="step5" direction="right">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {facilitiesOptions.map((facility) => (
-                      <motion.div
-                        key={facility.name}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <label className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl cursor-pointer border border-gray-200 hover:bg-gray-100 transition-all duration-300">
+              {step === 6 && (
+                <PageTransition key="step6" direction="right">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FloatingLabel>
+                        <input
+                          type="time"
+                          value={hotelData.checkInTime}
+                          onChange={(e) => setHotelData({ ...hotelData, checkInTime: e.target.value })}
+                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-800"
+                        />
+                        <span className="text-sm text-gray-500">Check-In Time</span>
+                      </FloatingLabel>
+                      <FloatingLabel>
+                        <input
+                          type="time"
+                          value={hotelData.checkOutTime}
+                          onChange={(e) => setHotelData({ ...hotelData, checkOutTime: e.target.value })}
+                          className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-gray-800"
+                        />
+                        <span className="text-sm text-gray-500">Check-Out Time</span>
+                      </FloatingLabel>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        { label: 'Pets Allowed', value: 'petsAllowed' },
+                        { label: 'Smoking Allowed', value: 'smokingAllowed' },
+                        { label: 'Alcohol Allowed', value: 'alcoholAllowed' },
+                        { label: 'Noise Restrictions', value: 'noiseRestrictions' }
+                      ].map((rule) => (
+                        <label key={rule.value} className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
                           <input
                             type="checkbox"
-                            checked={hotelData.facilities.includes(facility.name)}
-                            onChange={() => handleFacilityChange(facility.name)}
+                            checked={hotelData[rule.value]}
+                            onChange={(e) => setHotelData({ ...hotelData, [rule.value]: e.target.checked })}
                             className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
                           />
-                          <span className="text-lg">{facility.icon}</span>
-                          <span className="text-gray-700">{facility.name}</span>
+                          <span>{rule.label}</span>
                         </label>
-                      </motion.div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+                </PageTransition>
+              )}
+
+              {step === 7 && (
+                <PageTransition key="step7" direction="right">
+                  <div className="space-y-6">
+                    <FloatingLabel>
+                      <input
+                        type="number"
+                        value={hotelData.pricePerNight}
+                        onChange={(e) => setHotelData({ ...hotelData, pricePerNight: e.target.value })}
+                        placeholder="Price Per Night (₹)"
+                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                      />
+                    </FloatingLabel>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Discounts</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { label: 'Long Stay Discount', value: 'longStay' },
+                          { label: 'Early Bird Discount', value: 'earlyBird' },
+                          { label: 'Last Minute Discount', value: 'lastMinute' }
+                        ].map((discount) => (
+                          <label key={discount.value} className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                            <input
+                              type="checkbox"
+                              checked={hotelData.discounts[discount.value]}
+                              onChange={(e) => {
+                                const newDiscounts = { ...hotelData.discounts };
+                                newDiscounts[discount.value] = e.target.checked;
+                                setHotelData({ ...hotelData, discounts: newDiscounts });
+                              }}
+                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span>{discount.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Refund Policy</h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        {refundPolicies.map((policy) => (
+                          <label key={policy} className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                            <input
+                              type="radio"
+                              name="refundPolicy"
+                              checked={hotelData.refundPolicy === policy}
+                              onChange={() => setHotelData({ ...hotelData, refundPolicy: policy })}
+                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span>{policy}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </PageTransition>
+              )}
+
+              {step === 8 && (
+                <PageTransition key="step8" direction="right">
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Who can book?</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        {allowedGuestTypes.map((type) => (
+                          <label key={type} className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                            <input
+                              type="checkbox"
+                              checked={hotelData.allowedGuests.includes(type)}
+                              onChange={(e) => {
+                                const newAllowedGuests = e.target.checked
+                                  ? [...hotelData.allowedGuests, type]
+                                  : hotelData.allowedGuests.filter(g => g !== type);
+                                setHotelData({ ...hotelData, allowedGuests: newAllowedGuests });
+                              }}
+                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span>{type}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Booking Type</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <label className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                          <input
+                            type="checkbox"
+                            checked={hotelData.instantBooking}
+                            onChange={(e) => setHotelData({ ...hotelData, instantBooking: e.target.checked })}
+                            className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                          />
+                          <span>Instant Booking</span>
+                        </label>
+                        <label className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                          <input
+                            type="checkbox"
+                            checked={hotelData.manualApproval}
+                            onChange={(e) => setHotelData({ ...hotelData, manualApproval: e.target.checked })}
+                            className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                          />
+                          <span>Manual Approval</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </PageTransition>
+              )}
+
+              {step === 9 && (
+                <PageTransition key="step9" direction="right">
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Payment Methods</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        {paymentMethodOptions.map((method) => (
+                          <label key={method} className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                            <input
+                              type="checkbox"
+                              checked={hotelData.paymentMethods.includes(method)}
+                              onChange={(e) => {
+                                const newPaymentMethods = e.target.checked
+                                  ? [...hotelData.paymentMethods, method]
+                                  : hotelData.paymentMethods.filter(m => m !== method);
+                                setHotelData({ ...hotelData, paymentMethods: newPaymentMethods });
+                              }}
+                              className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span>{method}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <FloatingLabel>
+                      <input
+                        type="text"
+                        value={hotelData.panGstId}
+                        onChange={(e) => setHotelData({ ...hotelData, panGstId: e.target.value })}
+                        placeholder="PAN/GST ID"
+                        className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                      />
+                    </FloatingLabel>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Bank Details</h3>
+                      <div className="space-y-4">
+                        <FloatingLabel>
+                          <input
+                            type="text"
+                            value={hotelData.bankDetails.accountName}
+                            onChange={(e) => setHotelData({
+                              ...hotelData,
+                              bankDetails: { ...hotelData.bankDetails, accountName: e.target.value }
+                            })}
+                            placeholder="Account Holder Name"
+                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                          />
+                        </FloatingLabel>
+                        <FloatingLabel>
+                          <input
+                            type="text"
+                            value={hotelData.bankDetails.accountNumber}
+                            onChange={(e) => setHotelData({
+                              ...hotelData,
+                              bankDetails: { ...hotelData.bankDetails, accountNumber: e.target.value }
+                            })}
+                            placeholder="Account Number"
+                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                          />
+                        </FloatingLabel>
+                        <FloatingLabel>
+                          <input
+                            type="text"
+                            value={hotelData.bankDetails.ifscCode}
+                            onChange={(e) => setHotelData({
+                              ...hotelData,
+                              bankDetails: { ...hotelData.bankDetails, ifscCode: e.target.value }
+                            })}
+                            placeholder="IFSC Code"
+                            className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-gray-800"
+                          />
+                        </FloatingLabel>
+                      </div>
+                    </div>
+                  </div>
+                </PageTransition>
+              )}
+
+              {step === 10 && (
+                <PageTransition key="step10" direction="right">
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Upload Documents</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            onChange={(e) => setHotelData({ ...hotelData, idProof: e.target.files[0] })}
+                            className="hidden"
+                            id="id-proof"
+                          />
+                          <label
+                            htmlFor="id-proof"
+                            className="cursor-pointer text-gray-600 hover:text-blue-500"
+                          >
+                            Upload ID Proof
+                          </label>
+                        </div>
+                        <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            onChange={(e) => setHotelData({ ...hotelData, ownershipProof: e.target.files[0] })}
+                            className="hidden"
+                            id="ownership-proof"
+                          />
+                          <label
+                            htmlFor="ownership-proof"
+                            className="cursor-pointer text-gray-600 hover:text-blue-500"
+                          >
+                            Upload Ownership Proof
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <label className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <input
+                          type="checkbox"
+                          checked={hotelData.termsAccepted}
+                          onChange={(e) => setHotelData({ ...hotelData, termsAccepted: e.target.checked })}
+                          className="h-5 w-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                        />
+                        <span>I confirm all details are correct and accept TripNGrub's terms and policies</span>
+                      </label>
+                    </div>
                   </div>
                 </PageTransition>
               )}
@@ -369,7 +834,7 @@ const Home = () => {
                   Back
                 </motion.button>
               )}
-              {step < 5 ? (
+              {step < 10 ? (
                 <motion.button
                   onClick={handleNext}
                   whileHover={{ scale: 1.05 }}
