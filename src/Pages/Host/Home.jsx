@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { BrowserMultiFormatReader } from '@zxing/browser';
 
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -25,7 +26,6 @@ const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }
         const data = await response.json();
         if (data.display_name) {
           setAddress(data.display_name);
-          // Extract address components
           const address = data.address || {};
           setAddressDetails({
             addressLine1: address.road || '',
@@ -47,9 +47,9 @@ const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }
 
 const StepIndicator = ({ currentStep, totalSteps }) => {
   return (
-    <div className="fixed top-0 left-0 w-full z-50 bg-gray-100 h-2">
+    <div className="fixed top-0 left-0 w-full z-50 bg-gray-100 h-1">
       <motion.div
-        className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
+        className="h-full bg-[#FF5A5F]"
         initial={{ width: 0 }}
         animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -93,31 +93,31 @@ const InputField = ({ type = 'text', value, onChange, placeholder, className = '
     value={value}
     onChange={onChange}
     placeholder={placeholder}
-    className={`w-full px-6 py-4 bg-white border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-300 placeholder-gray-400 text-gray-800 shadow-sm hover:shadow-md ${className}`}
+    className={`w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF5A5F]/20 focus:border-[#FF5A5F] transition-all duration-300 placeholder-gray-400 text-gray-800 ${className}`}
     {...props}
   />
 );
 
 const Checkbox = ({ checked, onChange, label, className = '' }) => (
-  <label className={`flex items-center space-x-3 p-4 bg-white rounded-xl cursor-pointer border-2 border-gray-200 hover:border-indigo-500 transition-all duration-300 ${className}`}>
+  <label className={`flex items-center space-x-3 p-4 bg-white rounded-lg cursor-pointer border border-gray-300 hover:border-[#FF5A5F] transition-all duration-300 ${className}`}>
     <input
       type="checkbox"
       checked={checked}
       onChange={onChange}
-      className="h-5 w-5 rounded text-indigo-500 focus:ring-indigo-500 border-gray-300"
+      className="h-5 w-5 rounded text-[#FF5A5F] focus:ring-[#FF5A5F] border-gray-300"
     />
     <span className="text-gray-700">{label}</span>
   </label>
 );
 
 const RadioButton = ({ checked, onChange, label, name, className = '' }) => (
-  <label className={`flex items-center space-x-3 p-4 bg-white rounded-xl cursor-pointer border-2 border-gray-200 hover:border-indigo-500 transition-all duration-300 ${className}`}>
+  <label className={`flex items-center space-x-3 p-4 bg-white rounded-lg cursor-pointer border border-gray-300 hover:border-[#FF5A5F] transition-all duration-300 ${className}`}>
     <input
       type="radio"
       name={name}
       checked={checked}
       onChange={onChange}
-      className="h-5 w-5 rounded-full text-indigo-500 focus:ring-indigo-500 border-gray-300"
+      className="h-5 w-5 rounded-full text-[#FF5A5F] focus:ring-[#FF5A5F] border-gray-300"
     />
     <span className="text-gray-700">{label}</span>
   </label>
@@ -125,17 +125,17 @@ const RadioButton = ({ checked, onChange, label, name, className = '' }) => (
 
 const Button = ({ children, onClick, variant = 'primary', className = '', ...props }) => {
   const variants = {
-    primary: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600',
+    primary: 'bg-[#FF5A5F] text-white hover:bg-[#FF5A5F]/90',
     secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-    success: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600'
+    success: 'bg-[#00A699] text-white hover:bg-[#00A699]/90'
   };
 
   return (
     <motion.button
       onClick={onClick}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className={`px-8 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md ${variants[variant]} ${className}`}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className={`px-6 py-3 rounded-lg transition-all duration-300 font-medium ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
@@ -212,8 +212,49 @@ const Home = () => {
     // Step 10: Verification
     idProof: null,
     ownershipProof: null,
-    termsAccepted: false
+    termsAccepted: false,
+    
+    // Add new payment state
+    appOwnerPayment: {
+      amount: '',
+      upiId: '',
+      qrCodeScanned: false,
+      transactionId: ''
+    }
   });
+
+  // Add ref for video element
+  const videoRef = React.useRef(null);
+  const [isScanning, setIsScanning] = React.useState(false);
+
+  // Initialize camera when component mounts
+  React.useEffect(() => {
+    let stream = null;
+
+    const startCamera = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          setIsScanning(true);
+        }
+      } catch (err) {
+        console.error('Error accessing camera:', err);
+      }
+    };
+
+    if (step === 11 && !isScanning) {
+      startCamera();
+    }
+
+    // Cleanup camera when component unmounts or step changes
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        setIsScanning(false);
+      }
+    };
+  }, [step]);
 
   const propertyTypes = [
     'Hotel', 'Apartment', 'Hut House', 'Resort', 'Beach House', 'Villa'
@@ -232,7 +273,7 @@ const Home = () => {
   const paymentMethodOptions = ['UPI', 'Bank Transfer', 'Cash at Check-In', 'Online'];
 
   const handleNext = () => {
-    if (step < 10) {
+    if (step < 11) {
       setStep(step + 1);
     }
   };
@@ -249,19 +290,19 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <StepIndicator currentStep={step} totalSteps={10} />
+    <div className="min-h-screen bg-gray-50">
+      <StepIndicator currentStep={step} totalSteps={11} />
       
       <div className="min-h-screen flex items-center justify-center p-4">
         <motion.div 
-          className="w-full max-w-4xl"
+          className="w-full max-w-6xl"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100">
+          <div className="bg-white rounded-2xl p-8 shadow-sm">
             <motion.h1 
-              className="text-4xl font-bold mb-8 text-gray-800 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+              className="text-3xl font-bold mb-8 text-gray-800"
               initial={{ y: -50 }}
               animate={{ y: 0 }}
               transition={{ type: "spring", stiffness: 100 }}
@@ -276,6 +317,7 @@ const Home = () => {
               {step === 8 && "Booking Preferences"}
               {step === 9 && "Payment Setup"}
               {step === 10 && "Verification"}
+              {step === 11 && "App Owner Payment"}
             </motion.h1>
 
             <AnimatePresence mode="wait">
@@ -312,8 +354,11 @@ const Home = () => {
               {step === 2 && (
                 <PageTransition key="step2" direction="right">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-sm">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-800">Address Details</h3>
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-800">Where's your place located?</h3>
+                        <p className="text-gray-600">Enter your address and we'll help you set up your listing.</p>
+                      </div>
                       <div className="space-y-4">
                         <FloatingLabel>
                           <InputField
@@ -370,20 +415,20 @@ const Home = () => {
                       </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-sm h-full">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-800">Select Location on Map</h3>
-                      <p className="text-sm text-gray-500 mb-4">Click on the map to select your property's location. The address will be automatically filled.</p>
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-800">Pin your location</h3>
+                      <p className="text-gray-600">Click on the map to select your property's location.</p>
                       <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="h-[calc(100%-6rem)] w-full rounded-xl overflow-hidden shadow-md"
+                        className="h-[400px] w-full rounded-lg overflow-hidden shadow-sm"
                       >
                         <MapContainer
                           center={[11.9416, 79.8083]}
                           zoom={13}
                           style={{ height: '100%', width: '100%' }}
-                          className="rounded-xl"
+                          className="rounded-lg"
                         >
                           <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -881,6 +926,139 @@ const Home = () => {
                   </div>
                 </PageTransition>
               )}
+
+              {step === 11 && (
+                <PageTransition key="step11" direction="right">
+                  <div className="space-y-8">
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-semibold text-gray-800">App Owner Payment</h3>
+                      <p className="text-gray-600">Complete the payment to activate your listing. You can pay through UPI or scan the QR code.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                          <h4 className="text-lg font-semibold mb-4">Payment Details</h4>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                                <InputField
+                                  type="number"
+                                  value={hotelData.appOwnerPayment.amount}
+                                  onChange={(e) => setHotelData({
+                                    ...hotelData,
+                                    appOwnerPayment: { ...hotelData.appOwnerPayment, amount: e.target.value }
+                                  })}
+                                  placeholder="Enter amount"
+                                  className="pl-8"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
+                              <InputField
+                                type="text"
+                                value={hotelData.appOwnerPayment.upiId}
+                                onChange={(e) => setHotelData({
+                                  ...hotelData,
+                                  appOwnerPayment: { ...hotelData.appOwnerPayment, upiId: e.target.value }
+                                })}
+                                placeholder="Enter UPI ID"
+                              />
+                            </div>
+                            <div className="pt-4">
+                              <Button
+                                onClick={() => {
+                                  // Handle UPI payment
+                                  console.log('Processing UPI payment...');
+                                }}
+                                variant="primary"
+                                className="w-full"
+                              >
+                                Pay Now
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                          <h4 className="text-lg font-semibold mb-4">Scan QR Code</h4>
+                          <div className="space-y-4">
+                            <div className="aspect-square w-full max-w-md mx-auto bg-gray-100 rounded-lg overflow-hidden relative flex items-center justify-center">
+                              <div className="w-48 h-48 bg-white p-4 rounded-lg shadow-sm">
+                                <img 
+                                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=hotelbooking@upi&pn=Hotel%20Booking&am=1000&cu=INR" 
+                                  alt="UPI QR Code"
+                                  className="w-full h-full"
+                                />
+                              </div>
+                              <div className="absolute inset-0 border-4 border-[#FF5A5F] rounded-lg pointer-events-none"></div>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-gray-600">Scan this QR code with any UPI app</p>
+                              <p className="text-sm text-gray-500 mt-1">Amount: ₹1000 (One-time activation fee)</p>
+                            </div>
+                            <div className="flex items-center justify-center space-x-4">
+                              <Button
+                                onClick={() => {
+                                  setHotelData({
+                                    ...hotelData,
+                                    appOwnerPayment: {
+                                      ...hotelData.appOwnerPayment,
+                                      qrCodeScanned: true,
+                                      transactionId: `TXN${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+                                    }
+                                  });
+                                }}
+                                variant="primary"
+                              >
+                                Mark as Paid
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  // Handle payment verification
+                                  console.log('Verifying payment...');
+                                }}
+                                variant="secondary"
+                              >
+                                Verify Payment
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-6 rounded-lg">
+                      <h4 className="text-lg font-semibold mb-4">Payment Information</h4>
+                      <ul className="space-y-2 text-gray-600">
+                        <li className="flex items-center">
+                          <svg className="w-5 h-5 text-[#FF5A5F] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          One-time payment for listing activation
+                        </li>
+                        <li className="flex items-center">
+                          <svg className="w-5 h-5 text-[#FF5A5F] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          Secure payment processing
+                        </li>
+                        <li className="flex items-center">
+                          <svg className="w-5 h-5 text-[#FF5A5F] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          Instant confirmation
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </PageTransition>
+              )}
             </AnimatePresence>
 
             <motion.div 
@@ -897,7 +1075,7 @@ const Home = () => {
                   Back
                 </Button>
               )}
-              {step < 10 ? (
+              {step < 11 ? (
                 <Button
                   onClick={handleNext}
                   variant="primary"
@@ -911,7 +1089,7 @@ const Home = () => {
                   variant="success"
                   className="ml-auto"
                 >
-                  Submit
+                  Complete Registration
                 </Button>
               )}
             </motion.div>
