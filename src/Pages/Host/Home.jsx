@@ -232,7 +232,7 @@ const Home = () => {
     
     // Add new payment state
     appOwnerPayment: {
-      amount: '',
+      amount: '1500',
       upiId: '',
       qrCodeScanned: false,
       transactionId: ''
