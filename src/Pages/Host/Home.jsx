@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { BrowserMultiFormatReader } from '@zxing/browser';
+import { Check, X } from 'lucide-react';
 
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -111,15 +112,30 @@ const Checkbox = ({ checked, onChange, label, className = '' }) => (
 );
 
 const RadioButton = ({ checked, onChange, label, name, className = '' }) => (
-  <label className={`flex items-center space-x-3 p-4 bg-white rounded-lg cursor-pointer border border-gray-300 hover:border-[#FF5A5F] transition-all duration-300 ${className}`}>
-    <input
-      type="radio"
-      name={name}
-      checked={checked}
-      onChange={onChange}
-      className="h-5 w-5 rounded-full text-[#FF5A5F] focus:ring-[#FF5A5F] border-gray-300"
-    />
-    <span className="text-gray-700">{label}</span>
+  <label className={`flex items-center space-x-3 p-4 bg-white rounded-lg cursor-pointer border transition-all duration-300 ${
+    checked 
+      ? 'border-[#FF5A5F] bg-[#FF5A5F]/5' 
+      : 'border-gray-300 hover:border-[#FF5A5F]'
+  } ${className}`}>
+    <div className="relative">
+      <input
+        type="radio"
+        name={name}
+        checked={checked}
+        onChange={onChange}
+        className="sr-only"
+      />
+      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+        checked 
+          ? 'border-[#FF5A5F] bg-[#FF5A5F]' 
+          : 'border-gray-300'
+      }`}>
+        {checked && <Check className="w-3 h-3 text-white" />}
+      </div>
+    </div>
+    <span className={`font-medium ${
+      checked ? 'text-[#FF5A5F]' : 'text-gray-700'
+    }`}>{label}</span>
   </label>
 );
 
@@ -335,8 +351,8 @@ const Home = () => {
                       {propertyTypes.map((type) => (
                         <motion.div
                           key={type}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                         >
                           <RadioButton
                             checked={hotelData.propertyType === type}
@@ -991,7 +1007,7 @@ const Home = () => {
                             <div className="aspect-square w-full max-w-md mx-auto bg-gray-100 rounded-lg overflow-hidden relative flex items-center justify-center">
                               <div className="w-48 h-48 bg-white p-4 rounded-lg shadow-sm">
                                 <img 
-                                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=hotelbooking@upi&pn=Hotel%20Booking&am=1000&cu=INR" 
+                                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=athrimr-2@okicici&pn=Hotel%20Booking&am=1000&cu=INR" 
                                   alt="UPI QR Code"
                                   className="w-full h-full"
                                 />

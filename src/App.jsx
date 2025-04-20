@@ -27,6 +27,7 @@ import AuthLogin from './Pages/auth/SignIn';
 import AuthRegister from './Pages/auth/SignupForm';
 // Host Rooms  Imports
 import Hosthome from './Pages/Host/Home'
+import HostUserDashboard from './Pages/Host/HostUserDashboard';
 function App() {
   return (
     <>
@@ -61,6 +62,7 @@ function App() {
           {/*  Host Rooms  Routes */}
 
           <Route path="/Hosthome" element={<Hosthome />}/>
+          <Route path="/hostuserdashboard" element={<HostUserDashboard />}/>
 
         
 
