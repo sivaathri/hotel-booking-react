@@ -164,7 +164,7 @@ function SignupForm() {
         alert("Registration successful! You will be redirected to login page.");
         // Redirect to login page after 2 seconds
         setTimeout(() => {
-          navigate("/login");
+          navigate("/user-dashboard");
         }, 2000);
       }
     } catch (error) {
