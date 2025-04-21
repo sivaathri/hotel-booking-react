@@ -1,4 +1,4 @@
-const User = require('../models/userModel');
+const User = require('./userModel');
 
 exports.register = async (req, res) => {
   try {
