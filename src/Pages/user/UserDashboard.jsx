@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, LogOut, Monitor, Users, ChevronDown, Edit, Plus, Check, X, Mail, Phone, Calendar, MapPin, Lock, BookOpen, Search, Filter, ChevronRight, Star, MapPin as MapPinIcon, Clock, CreditCard, Smartphone, Laptop, Tablet, Globe, Trash2, AlertTriangle, UserPlus, UserMinus, UserCheck, Heart, Shield } from 'lucide-react';
+import axios from 'axios';
 
 const MyBookings = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -644,7 +645,9 @@ export default function UserDashboard() {
   const [currentField, setCurrentField] = useState('');
   const [selectedMenu, setSelectedMenu] = useState('Profile');
   const [profileData, setProfileData] = useState({
-    name: 'athri',
+    name: '',
+    email: '',
+    mobile: '',
     birthday: '',
     gender: '',
     maritalStatus: '',
@@ -652,18 +655,81 @@ export default function UserDashboard() {
     pincode: '',
     state: ''
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+          // Redirect to login if no token
+          window.location.href = '/';
+          return;
+        }
+
+        const response = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 200) {
+          const userData = response.data;
+          setProfileData({
+            name: userData.username || '',
+            email: userData.email || '',
+            mobile: userData.mobile || '',
+            birthday: userData.birthday || '',
+            gender: userData.gender || '',
+            maritalStatus: userData.maritalStatus || '',
+            address: userData.address || '',
+            pincode: userData.pincode || '',
+            state: userData.state || ''
+          });
+        }
+      } catch (error) {
+        setError('Failed to fetch user data');
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleAddClick = (field) => {
     setCurrentField(field);
     setIsModalOpen(true);
   };
 
-  const handleUpdate = (value) => {
-    setProfileData(prev => ({
-      ...prev,
-      [currentField.toLowerCase().replace(' ', '')]: value
-    }));
-    setIsModalOpen(false);
+  const handleUpdate = async (value) => {
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const fieldName = currentField.toLowerCase().replace(' ', '');
+      
+      const response = await axios.put(
+        'http://localhost:5000/api/users/profile',
+        { [fieldName]: value },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setProfileData(prev => ({
+          ...prev,
+          [fieldName]: value
+        }));
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Failed to update profile');
+    }
   };
 
   const Modal = ({ isOpen, onClose, onUpdate, field }) => {
@@ -722,12 +788,14 @@ export default function UserDashboard() {
           <div className="w-full lg:w-1/4">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 mb-6 flex flex-col items-center shadow-lg">
               <div className="bg-gradient-to-br from-purple-500 to-blue-600 w-48 h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden group">
-                <span className="text-white text-7xl font-bold transform group-hover:scale-110 transition-transform">A</span>
+                <span className="text-white text-7xl font-bold transform group-hover:scale-110 transition-transform">
+                  {profileData.name.charAt(0).toUpperCase()}
+                </span>
                 <button className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-3 hover:bg-white/30 transition-all">
                   <Edit className="w-5 h-5 text-white" />
                 </button>
               </div>
-              <h2 className="text-3xl font-bold mb-2 text-gray-800">athri</h2>
+              <h2 className="text-3xl font-bold mb-2 text-gray-800">{profileData.name}</h2>
               <p className="text-gray-500 text-sm uppercase tracking-wider">PERSONAL PROFILE</p>
             </div>
 
@@ -803,7 +871,15 @@ export default function UserDashboard() {
 
           {/* Right Content */}
           <div className="w-full lg:w-3/4">
-            {selectedMenu === 'My Bookings' ? (
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              </div>
+            ) : error ? (
+              <div className="bg-red-50 text-red-600 p-4 rounded-xl">
+                {error}
+              </div>
+            ) : selectedMenu === 'My Bookings' ? (
               <MyBookings />
             ) : selectedMenu === 'Logged In Devices' ? (
               <LoggedInDevices />
