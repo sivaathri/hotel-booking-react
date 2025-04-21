@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 function SignupForm() {
   const navigate = useNavigate();
@@ -173,6 +174,64 @@ function SignupForm() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // Send the Google credential to your backend
+      const response = await axios.post('http://localhost:5000/api/auth/google', {
+        credential: credentialResponse.credential
+      });
+
+      if (response.status === 201) {
+        // Show success message
+        alert("Registration successful! You will be redirected to login page.");
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Google authentication failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError("Google authentication failed. Please try again.");
+  };
+
+  const handleAppleSuccess = async (response) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // Send the Apple authentication response to your backend
+      const response = await axios.post('http://localhost:5000/api/auth/apple', {
+        credential: response.credential
+      });
+
+      if (response.status === 201) {
+        // Show success message
+        alert("Registration successful! You will be redirected to login page.");
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Apple authentication failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAppleError = () => {
+    setError("Apple authentication failed. Please try again.");
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <input
@@ -297,17 +356,44 @@ function SignupForm() {
 
       <div className="my-4 text-center text-gray-400 text-sm">or</div>
 
-      <button
-        type="button"
-        className="flex items-center justify-center gap-2 border w-full py-2 rounded mb-3 hover:bg-gray-100 transition"
-      >
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-        Continue with Google
-      </button>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <div className="w-full">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            useOneTap
+            theme="filled_blue"
+            size="large"
+            width="100%"
+            text="continue_with"
+            shape="rectangular"
+            logo_alignment="left"
+            context="signup"
+          />
+        </div>
+      </GoogleOAuthProvider>
 
       <button
         type="button"
-        className="flex items-center justify-center gap-2 border w-full py-2 rounded hover:bg-gray-100 transition"
+        className="flex items-center justify-center gap-2 border w-full py-2 rounded hover:bg-gray-100 transition mt-3"
+        onClick={() => {
+          // Initialize Apple sign-in
+          if (window.AppleID) {
+            window.AppleID.auth.signIn({
+              clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
+              scope: 'name email',
+              redirectURI: window.location.origin,
+              state: 'origin:web',
+              usePopup: true,
+              responseMode: 'form_post',
+              responseType: 'code id_token'
+            })
+            .then(handleAppleSuccess)
+            .catch(handleAppleError);
+          } else {
+            setError("Apple sign-in is not available. Please try another method.");
+          }
+        }}
       >
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
