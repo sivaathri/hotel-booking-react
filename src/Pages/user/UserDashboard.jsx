@@ -668,7 +668,7 @@ export default function UserDashboard() {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/users/profile', {
+        const response = await axios.get('http://localhost:5000/api/auth/3', {
           headers: {
             Authorization: `Bearer ${token}`
           }
