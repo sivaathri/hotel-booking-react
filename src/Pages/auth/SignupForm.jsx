@@ -3,6 +3,7 @@ import React, { useState } from "react";
 function SignupForm() {
   const [mobile, setMobile] = useState("");
   const [isOtpEnabled, setIsOtpEnabled] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleMobileChange = (e) => {
     const value = e.target.value;
@@ -16,18 +17,53 @@ function SignupForm() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((prevState) => !prevState);
+  };
+
   return (
     <form>
-      <input type="text" placeholder="Username" className="border-1 w-full mb-3 p-2" />
-      <input type="email" placeholder="Email" className="border-1 w-full mb-3 p-2" />
-      <input type="password" placeholder="Password" className="border-1 w-full mb-3 p-2" />
+      <input
+        type="text"
+        placeholder="Username"
+        className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+        required
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+      />
       
+      <div className="relative mb-3">
+        <input
+          type={passwordVisible ? "text" : "password"}
+          placeholder="Password"
+          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+        />
+        <button
+          type="button"
+          className="absolute right-3 top-3 text-gray-500"
+          onClick={togglePasswordVisibility}
+        >
+          {passwordVisible ? (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 11c0-1.21-.51-2.42-1.42-3.42M15 9c-1.2 0-2.4.49-3.42 1.42M9 15c1.2 0 2.4-.49 3.42-1.42M9 9C7.8 9 6.6 9.49 5.58 10.42M13 5C12.21 5 11.47 5.15 10.78 5.42M3 5l18 18"/>
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.5 0 8.5 3.58 8.5 8s-4 8-8.5 8-8.5-3.58-8.5-8 4-8 8.5-8zm0 3a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5z"/>
+            </svg>
+          )}
+        </button>
+      </div>
+
       <input
         type="number"
         placeholder="Mobile Number"
         value={mobile}
         onChange={handleMobileChange}
-        className="border-1 w-full mb-3 p-2"
+        className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
       />
 
       <button
