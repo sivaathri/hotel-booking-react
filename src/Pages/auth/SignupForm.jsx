@@ -4,16 +4,47 @@ function SignupForm() {
   const [mobile, setMobile] = useState("");
   const [isOtpEnabled, setIsOtpEnabled] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [mobileError, setMobileError] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
+
+  const validatePassword = (value) => {
+    return {
+      hasChar: /[a-zA-Z]/.test(value),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|&lt;&gt;]/.test(value),
+      hasNumber: /[0-9]/.test(value),
+    };
+  };
 
   const handleMobileChange = (e) => {
     const value = e.target.value;
     setMobile(value);
 
-    // Enable OTP if it's a 10-digit number (you can customize the logic)
-    if (/^\d{10}$/.test(value)) {
+    // Validate mobile number length
+    if (value.length > 10) {
+      setMobileError("Mobile number cannot exceed 10 digits");
+      setIsOtpEnabled(false);
+    } else if (value.length === 10) {
+      setMobileError("");
       setIsOtpEnabled(true);
     } else {
+      setMobileError("");
       setIsOtpEnabled(false);
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+  };
+
+  const handlePasswordFocus = () => {
+    setShowPasswordRequirements(true);
+  };
+
+  const handlePasswordBlur = () => {
+    if (!password) {
+      setShowPasswordRequirements(false);
     }
   };
 
@@ -39,6 +70,10 @@ function SignupForm() {
         <input
           type={passwordVisible ? "text" : "password"}
           placeholder="Password"
+          value={password}
+          onChange={handlePasswordChange}
+          onFocus={handlePasswordFocus}
+          onBlur={handlePasswordBlur}
           className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
         />
         <button
@@ -57,14 +92,30 @@ function SignupForm() {
           )}
         </button>
       </div>
+      {showPasswordRequirements && (
+        <div className="mb-3 space-y-1">
+          <p className={`text-sm ${validatePassword(password).hasChar ? 'text-green-500' : 'text-gray-500'}`}>
+            ✓ At least one character (a-z or A-Z)
+          </p>
+          <p className={`text-sm ${validatePassword(password).hasSpecialChar ? 'text-green-500' : 'text-gray-500'}`}>
+            ✓ At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)
+          </p>
+          <p className={`text-sm ${validatePassword(password).hasNumber ? 'text-green-500' : 'text-gray-500'}`}>
+            ✓ At least one number (0-9)
+          </p>
+        </div>
+      )}
 
       <input
         type="number"
         placeholder="Mobile Number"
         value={mobile}
         onChange={handleMobileChange}
-        className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+        className="w-full mb-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
       />
+      {mobileError && (
+        <p className="text-red-500 text-sm mb-3">{mobileError}</p>
+      )}
 
       <button
         type="button"
