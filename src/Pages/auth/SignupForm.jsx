@@ -1,12 +1,28 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function SignupForm() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    mobile: ""
+  });
   const [mobile, setMobile] = useState("");
   const [isOtpEnabled, setIsOtpEnabled] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [mobileError, setMobileError] = useState("");
   const [password, setPassword] = useState("");
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [otpError, setOtpError] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const validatePassword = (value) => {
     return {
@@ -14,6 +30,14 @@ function SignupForm() {
       hasSpecialChar: /[!@#$%^&*(),.?":{}|&lt;&gt;]/.test(value),
       hasNumber: /[0-9]/.test(value),
     };
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleMobileChange = (e) => {
@@ -36,6 +60,10 @@ function SignupForm() {
   const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
+    setFormData(prev => ({
+      ...prev,
+      password: value
+    }));
   };
 
   const handlePasswordFocus = () => {
@@ -52,18 +80,118 @@ function SignupForm() {
     setPasswordVisible((prevState) => !prevState);
   };
 
+  const generateOtp = () => {
+    // Generate a random 4-digit number between 1000 and 9999
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    setGeneratedOtp(otp);
+    return otp;
+  };
+
+  const handleSendOtp = async () => {
+    try {
+      // Generate OTP
+      const newOtp = generateOtp();
+      
+      // Here you would typically make an API call to your backend to send OTP
+      // For now, we'll simulate it with a timeout and log the OTP to console
+      console.log(`OTP for ${mobile}: ${newOtp}`); // For testing purposes
+      
+      setIsOtpSent(true);
+      setOtpError("");
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In a real implementation, you would handle the API response here
+    } catch (error) {
+      setOtpError("Failed to send OTP. Please try again.");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    try {
+      if (otp.length !== 4) {
+        setOtpError("OTP must be 4 digits");
+        return;
+      }
+      
+      // Verify the entered OTP against the generated OTP
+      if (otp === generatedOtp) {
+        setIsOtpVerified(true);
+        setOtpError("");
+      } else {
+        setOtpError("Invalid OTP. Please try again.");
+      }
+    } catch (error) {
+      setOtpError("Invalid OTP. Please try again.");
+    }
+  };
+
+  const handleOtpChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= 4 && /^\d*$/.test(value)) {
+      setOtp(value);
+      setOtpError("");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isOtpVerified) {
+      setError("Please verify your mobile number first");
+      return;
+    }
+
+    // Validate password
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.hasChar || !passwordValidation.hasSpecialChar || !passwordValidation.hasNumber) {
+      setError("Password must meet all requirements");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      
+      const response = await axios.post('http://localhost:5000/api/auth/register', {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        mobile: mobile
+      });
+
+      if (response.status === 201) {
+        // Show success message
+        alert("Registration successful! You will be redirected to login page.");
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <input
         type="text"
+        name="username"
         placeholder="Username"
+        value={formData.username}
+        onChange={handleInputChange}
         className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
         required
       />
       <input
         type="email"
+        name="email"
         placeholder="Email"
+        value={formData.email}
+        onChange={handleInputChange}
         className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+        required
       />
       
       <div className="relative mb-3">
@@ -117,16 +245,54 @@ function SignupForm() {
         <p className="text-red-500 text-sm mb-3">{mobileError}</p>
       )}
 
-      <button
-        type="button"
-        className={`bg-blue-500 text-white py-2 px-4 rounded w-full mb-3 ${isOtpEnabled ? "opacity-100" : "opacity-50 cursor-not-allowed"}`}
-        disabled={!isOtpEnabled}
-      >
-        Get OTP
-      </button>
+      {!isOtpSent ? (
+        <button
+          type="button"
+          className={`bg-blue-500 text-white py-2 px-4 rounded w-full mb-3 ${isOtpEnabled ? "opacity-100" : "opacity-50 cursor-not-allowed"}`}
+          disabled={!isOtpEnabled}
+          onClick={handleSendOtp}
+        >
+          Get OTP
+        </button>
+      ) : !isOtpVerified ? (
+        <div className="mb-3">
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="Enter 4-digit OTP"
+              value={otp}
+              onChange={handleOtpChange}
+              className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+              maxLength={4}
+            />
+            <button
+              type="button"
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+              onClick={handleVerifyOtp}
+            >
+              Verify
+            </button>
+          </div>
+          {otpError && (
+            <p className="text-red-500 text-sm">{otpError}</p>
+          )}
+        </div>
+      ) : (
+        <div className="mb-3 text-green-500 text-sm">
+          ✓ Mobile number verified
+        </div>
+      )}
 
-      <button type="submit" className="bg-[#FEA116] text-white py-2 px-4 rounded w-full">
-        Sign Up
+      {error && (
+        <p className="text-red-500 text-sm mb-3">{error}</p>
+      )}
+
+      <button 
+        type="submit" 
+        className={`bg-[#FEA116] text-white py-2 px-4 rounded w-full ${!isOtpVerified ? "opacity-50 cursor-not-allowed" : ""} ${loading ? "opacity-70" : ""}`}
+        disabled={!isOtpVerified || loading}
+      >
+        {loading ? "Signing up..." : "Sign Up"}
       </button>
 
       <div className="my-4 text-center text-gray-400 text-sm">or</div>
