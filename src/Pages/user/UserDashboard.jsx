@@ -774,14 +774,14 @@ export default function UserDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Navigation */}
         <div className="flex items-center mb-8">
-          <div className="relative">
-            <button className="flex items-center bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-6 py-3 shadow-sm hover:shadow-md transition-all">
+          <div className="relative group">
+            <button className="flex items-center bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl px-6 py-3 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
               <span className="font-medium text-gray-700">My Account</span>
-              <ChevronDown className="ml-2 w-5 h-5" />
+              <ChevronDown className="ml-2 w-5 h-5 transform group-hover:rotate-180 transition-transform duration-300" />
             </button>
           </div>
           <div className="flex items-center ml-4">
@@ -793,24 +793,26 @@ export default function UserDashboard() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Sidebar */}
           <div className="w-full lg:w-1/4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 mb-6 flex flex-col items-center shadow-lg">
-              <div className="bg-gradient-to-br from-purple-500 to-blue-600 w-48 h-48 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden group">
-                <span className="text-white text-7xl font-bold transform group-hover:scale-110 transition-transform">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 mb-6 flex flex-col items-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 w-48 h-48 rounded-3xl mb-6 flex items-center justify-center relative overflow-hidden group">
+                <span className="text-white text-7xl font-bold transform group-hover:scale-110 transition-transform duration-500">
                   {profileData.name.charAt(0).toUpperCase()}
                 </span>
-                <button className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-3 hover:bg-white/30 transition-all">
+                <button className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-3 hover:bg-white/30 transition-all duration-300 transform hover:scale-110">
                   <Edit className="w-5 h-5 text-white" />
                 </button>
               </div>
-              <h2 className="text-3xl font-bold mb-2 text-gray-800">{profileData.name}</h2>
+              <h2 className="text-3xl font-bold mb-2 text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {profileData.name}
+              </h2>
               <p className="text-gray-500 text-sm uppercase tracking-wider">PERSONAL PROFILE</p>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl">
               <div 
-                className={`p-6 flex items-center cursor-pointer transition-colors ${
+                className={`p-6 flex items-center cursor-pointer transition-all duration-300 ${
                   selectedMenu === 'Profile' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-600' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
                     : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setSelectedMenu('Profile')}
@@ -821,7 +823,7 @@ export default function UserDashboard() {
               <div 
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${
                   selectedMenu === 'My Bookings' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-600' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
                     : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setSelectedMenu('My Bookings')}
@@ -832,7 +834,7 @@ export default function UserDashboard() {
               <div 
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${
                   selectedMenu === 'Login Details' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-600' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
                     : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setSelectedMenu('Login Details')}
@@ -843,7 +845,7 @@ export default function UserDashboard() {
               <div 
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${
                   selectedMenu === 'Co-Travellers' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-600' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
                     : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setSelectedMenu('Co-Travellers')}
@@ -854,7 +856,7 @@ export default function UserDashboard() {
               <div 
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${
                   selectedMenu === 'Logged In Devices' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-600' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
                     : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setSelectedMenu('Logged In Devices')}
@@ -865,7 +867,7 @@ export default function UserDashboard() {
               <div 
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${
                   selectedMenu === 'Logout' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-600' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
                     : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setShowLogoutConfirm(true)}
@@ -880,10 +882,10 @@ export default function UserDashboard() {
           <div className="w-full lg:w-3/4">
             {loading ? (
               <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
               </div>
             ) : error ? (
-              <div className="bg-red-50 text-red-600 p-4 rounded-xl">
+              <div className="bg-red-50 text-red-600 p-4 rounded-2xl shadow-lg">
                 {error}
               </div>
             ) : selectedMenu === 'My Bookings' ? (
@@ -895,48 +897,48 @@ export default function UserDashboard() {
             ) : (
               <>
                 {/* AI Assistant */}
-                <div className="bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl p-8 mb-8 shadow-lg">
+                <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-3xl p-8 mb-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-6">
-                        <div className="bg-purple-600 w-8 h-3 rounded-full"></div>
+                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-6 animate-pulse">
+                        <div className="bg-white w-8 h-3 rounded-full"></div>
                       </div>
                       <div>
                         <h3 className="text-white text-2xl font-semibold mb-2">Need help planning your next adventure?</h3>
                         <p className="text-white/80">Myra will help you out with any query related to your Travel</p>
                       </div>
                     </div>
-                    <button className="bg-white/20 backdrop-blur-sm text-white py-3 px-6 rounded-xl hover:bg-white/30 transition-all">
+                    <button className="bg-white/20 backdrop-blur-sm text-white py-3 px-6 rounded-xl hover:bg-white/30 transition-all duration-300 transform hover:scale-105">
                       Chat with Myra
                     </button>
                   </div>
                 </div>
 
                 {/* Profile Completion */}
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-lg">
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                   <h3 className="text-xl font-semibold mb-4 text-gray-800">Complete your Profile</h3>
                   <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-                    <div className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full w-2/5"></div>
+                    <div className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full w-2/5 animate-pulse"></div>
                   </div>
                   <p className="text-gray-600 mb-6">Get the best out of MakeMyTrip by adding the remaining details!</p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gray-50 rounded-xl p-4 flex items-center hover:bg-gray-100 transition-colors">
-                      <button className="flex items-center bg-blue-500 text-white rounded-full p-2 mr-3">
+                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
+                      <button className="flex items-center bg-blue-500 text-white rounded-full p-2 mr-3 hover:bg-blue-600 transition-colors duration-300">
                         <Mail className="w-5 h-5" />
                       </button>
                       <span className="text-gray-700">Add your Email ID</span>
                     </div>
                     
-                    <div className="bg-gray-50 rounded-xl p-4 flex items-center">
+                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center">
                       <button className="flex items-center bg-green-500 text-white rounded-full p-2 mr-3">
                         <Phone className="w-5 h-5" />
                       </button>
-                      <span className="text-blue-500">Verified mobile Number</span>
+                      <span className="text-green-500">Verified mobile Number</span>
                     </div>
                     
-                    <div className="bg-gray-50 rounded-xl p-4 flex items-center hover:bg-gray-100 transition-colors">
-                      <button className="flex items-center bg-blue-500 text-white rounded-full p-2 mr-3">
+                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
+                      <button className="flex items-center bg-blue-500 text-white rounded-full p-2 mr-3 hover:bg-blue-600 transition-colors duration-300">
                         <Plus className="w-5 h-5" />
                       </button>
                       <span className="text-gray-700">Complete Basic Info</span>
@@ -945,10 +947,12 @@ export default function UserDashboard() {
                 </div>
 
                 {/* Profile Details */}
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Profile Details</h2>
-                    <button className="flex items-center text-blue-500 border-2 border-blue-500 rounded-xl px-6 py-2 hover:bg-blue-50 transition-colors">
+                    <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      Profile Details
+                    </h2>
+                    <button className="flex items-center text-blue-500 border-2 border-blue-500 rounded-xl px-6 py-2 hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1">
                       <Edit className="w-5 h-5 mr-2" />
                       EDIT
                     </button>
@@ -956,12 +960,12 @@ export default function UserDashboard() {
                   <p className="text-gray-600 mb-8">Basic info, for a faster booking experience</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                       <p className="text-gray-500 text-sm mb-2">NAME</p>
                       <p className="font-medium text-gray-800">{profileData.name}</p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                       <p className="text-gray-500 text-sm mb-2">BIRTHDAY</p>
                       {profileData.birthday ? (
                         <p className="font-medium text-gray-800">{profileData.birthday}</p>
@@ -976,7 +980,7 @@ export default function UserDashboard() {
                       )}
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                       <p className="text-gray-500 text-sm mb-2">GENDER</p>
                       {profileData.gender ? (
                         <p className="font-medium text-gray-800">{profileData.gender}</p>
@@ -991,7 +995,7 @@ export default function UserDashboard() {
                       )}
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                       <p className="text-gray-500 text-sm mb-2">MARITAL STATUS</p>
                       {profileData.maritalStatus ? (
                         <p className="font-medium text-gray-800">{profileData.maritalStatus}</p>
@@ -1006,7 +1010,7 @@ export default function UserDashboard() {
                       )}
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                       <p className="text-gray-500 text-sm mb-2">YOUR ADDRESS</p>
                       {profileData.address ? (
                         <p className="font-medium text-gray-800">{profileData.address}</p>
@@ -1021,7 +1025,7 @@ export default function UserDashboard() {
                       )}
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                       <p className="text-gray-500 text-sm mb-2">PINCODE</p>
                       {profileData.pincode ? (
                         <p className="font-medium text-gray-800">{profileData.pincode}</p>
@@ -1036,7 +1040,7 @@ export default function UserDashboard() {
                       )}
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                       <p className="text-gray-500 text-sm mb-2">STATE</p>
                       {profileData.state ? (
                         <p className="font-medium text-gray-800">{profileData.state}</p>
@@ -1067,7 +1071,7 @@ export default function UserDashboard() {
         {/* Logout Confirmation Modal */}
         {showLogoutConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-8 w-96 shadow-2xl transform transition-all duration-300">
+            <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-96 shadow-2xl transform transition-all duration-300">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-800">Confirm Logout</h3>
                 <button onClick={() => setShowLogoutConfirm(false)} className="text-gray-500 hover:text-gray-700 transition-colors">
@@ -1084,7 +1088,7 @@ export default function UserDashboard() {
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
+                  className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
                 >
                   Logout
                 </button>

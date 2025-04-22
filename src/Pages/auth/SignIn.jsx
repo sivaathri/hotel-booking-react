@@ -25,8 +25,21 @@ const SignIn = () => {
     setLoading(true);
     console.log('Starting login process...');
 
+    // Check for admin credentials
+    if (formData.email === 'admin@gmail.com' && formData.password === 'Admin@123') {
+      console.log('Admin login detected, redirecting to admin dashboard...');
+      // Store admin token
+      if (stayLoggedIn) {
+        localStorage.setItem('token', 'admin-token');
+      } else {
+        sessionStorage.setItem('token', 'admin-token');
+      }
+      window.location.href = '/admin/dashboard';
+      return;
+    }
+
     try {
-      console.log('Making API request...');
+      console.log('Making API request for regular user...');
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email: formData.email,
         password: formData.password
