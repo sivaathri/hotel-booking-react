@@ -644,6 +644,7 @@ export default function UserDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentField, setCurrentField] = useState('');
   const [selectedMenu, setSelectedMenu] = useState('Profile');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [profileData, setProfileData] = useState({
     name: '',
     email: '',
@@ -730,6 +731,12 @@ export default function UserDashboard() {
       console.error('Error updating profile:', error);
       setError('Failed to update profile');
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    window.location.href = '/';
   };
 
   const Modal = ({ isOpen, onClose, onUpdate, field }) => {
@@ -861,7 +868,7 @@ export default function UserDashboard() {
                     ? 'bg-gradient-to-r from-purple-500 to-blue-600' 
                     : 'hover:bg-gray-50'
                 }`}
-                onClick={() => setSelectedMenu('Logout')}
+                onClick={() => setShowLogoutConfirm(true)}
               >
                 <LogOut className={`mr-4 w-6 h-6 ${selectedMenu === 'Logout' ? 'text-white' : 'text-gray-500'}`} />
                 <span className={`${selectedMenu === 'Logout' ? 'text-white font-medium' : 'text-gray-700'}`}>Logout</span>
@@ -1056,6 +1063,35 @@ export default function UserDashboard() {
             )}
           </div>
         </div>
+
+        {/* Logout Confirmation Modal */}
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-8 w-96 shadow-2xl transform transition-all duration-300">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-800">Confirm Logout</h3>
+                <button onClick={() => setShowLogoutConfirm(false)} className="text-gray-500 hover:text-gray-700 transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-gray-600 mb-6">Are you sure you want to logout?</p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
