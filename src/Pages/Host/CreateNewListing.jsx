@@ -2,10 +2,55 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiHome, FiMapPin, FiDollarSign, FiImage, FiInfo, FiCheck, FiClock, FiCalendar, FiCreditCard, FiShield } from 'react-icons/fi';
 import HostHeader from './HostHeader';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }) => {
+  useMapEvents({
+    async click(e) {
+      const newPosition = e.latlng;
+      setPosition(newPosition);
+      
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newPosition.lat}&lon=${newPosition.lng}&zoom=18&addressdetails=1`
+        );
+        const data = await response.json();
+        if (data.display_name) {
+          setAddress(data.display_name);
+          const address = data.address || {};
+          setAddressDetails({
+            addressLine1: address.road || '',
+            addressLine2: address.house_number || '',
+            city: address.city || address.town || address.village || '',
+            state: address.state || '',
+            country: address.country || '',
+            postalCode: address.postcode || ''
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching address:', error);
+      }
+    },
+  });
+
+  return position ? <Marker position={position} /> : null;
+};
 
 const CreateNewListing = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [showMap, setShowMap] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [formData, setFormData] = useState({
     // Step 1: Basic Information
     propertyName: '',
@@ -17,7 +62,8 @@ const CreateNewListing = () => {
     city: '',
     state: '',
     country: '',
-    mapLocation: { lat: null, lng: null },
+    postalCode: '',
+    mapLocation: null,
     
     // Step 3: Rooms Setup
     rooms: [{
@@ -270,12 +316,21 @@ const CreateNewListing = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Pin Location on Map</label>
-                <button className="w-full p-4 border rounded-lg flex items-center justify-center gap-2 hover:border-gray-400">
+                <button
+                  className="w-full p-4 border rounded-lg flex items-center justify-center gap-2 hover:border-gray-400"
+                  onClick={() => setShowMap(true)}
+                >
                   <FiMapPin />
                   Select Location on Map
                 </button>
+                {formData.mapLocation && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Selected Location: {formData.city}, {formData.state}, {formData.country}
+                  </p>
+                )}
               </div>
             </div>
+            {renderMap()}
           </div>
         );
       case 3:
@@ -801,6 +856,51 @@ const CreateNewListing = () => {
       default:
         return null;
     }
+  };
+
+  const renderMap = () => {
+    if (!showMap) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-4 rounded-lg w-4/5 h-4/5">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Select Location</h3>
+            <button
+              onClick={() => setShowMap(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ×
+            </button>
+          </div>
+          <div className="h-[calc(100%-40px)] w-full rounded-lg overflow-hidden">
+            <MapContainer
+              center={selectedLocation || [11.9139, 79.8145]}
+              zoom={13}
+              style={{ height: '100%', width: '100%' }}
+              className="rounded-lg"
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <LocationMarker
+                position={selectedLocation}
+                setPosition={(pos) => {
+                  setSelectedLocation(pos);
+                  setFormData(prev => ({
+                    ...prev,
+                    mapLocation: { lat: pos.lat, lng: pos.lng }
+                  }));
+                }}
+                setAddress={(addr) => setFormData(prev => ({ ...prev, address: addr }))}
+                setAddressDetails={(details) => setFormData(prev => ({ ...prev, ...details }))}
+              />
+            </MapContainer>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
