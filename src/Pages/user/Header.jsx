@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import SignupForm from "../auth/SignupForm";
 import SignIn from "../auth/SignIn";
+import axios from "axios";
 
 const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
@@ -10,6 +11,7 @@ const Header = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [userName, setUserName] = useState("");
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -20,7 +22,7 @@ const Header = () => {
         spinner.style.display = "none";
       }
     }, 1000);
-  
+
     const handleResize = () => {
       if (window.innerWidth >= 992) {
         setIsNavOpen(true);
@@ -28,20 +30,39 @@ const Header = () => {
         setIsNavOpen(false);
       }
     };
-  
-    // Check authentication status
+
+    // Check authentication status and fetch user data
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     setIsAuthenticated(!!token);
-  
+    console.log(token);
+
+    if (token) {
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get('http://localhost:5000/api/auth/3', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (response.status === 200) {
+            setUserName(response.data.username || '');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      };
+      fetchUserData();
+    }
+
     handleResize(); // Initial check
     window.addEventListener("resize", handleResize);
-  
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
+
 
   const toggleNav = () => {
     setIsNavOpen(prevState => !prevState);
@@ -127,8 +148,8 @@ const Header = () => {
               >
                 <span className="navbar-toggler-icon"></span>
               </button>
-              <div 
-                className={`navbar-collapse ${isNavOpen ? 'show' : 'collapse'}`} 
+              <div
+                className={`navbar-collapse ${isNavOpen ? 'show' : 'collapse'}`}
                 id="navbarCollapse"
               >
                 <div className="navbar-nav me-auto py-0">
@@ -203,36 +224,73 @@ const Header = () => {
                         <i className="fas fa-home me-2"></i> Join our Hoterlier
                       </Link>
                       <div className="position-relative">
-                        <button
-                          onClick={() => setShowUserMenu(!showUserMenu)}
-                          className="btn btn-outline-light rounded-circle p-2"
-                          style={{ width: '40px', height: '40px' }}
-                        >
-                          <i className="fas fa-user"></i>
-                        </button>
+                        <div className="flex items-center justify-between h-12 px-2  border border-gray-300 rounded-full shadow-sm">
+                          {/* Hamburger Menu Icon */}
+                          {/* <button
+                            className="p-2 focus:outline-none"
+                            onClick={() => setShowUserMenu(!showUserMenu)}
+                          >
+                            <i className="fas fa-bars text-gray-700"></i>
+                          </button> */}
+
+
+                          {/* Profile Icon with Badge */}
+                          <div className="relative">
+                            <button>
+                              <div className="w-8 h-8 bg-black text-white flex items-center  justify-center rounded-full text-sm font-semibold"
+                                onClick={() => setShowUserMenu(!showUserMenu)}
+                              >
+                                {userName ? userName.charAt(0).toUpperCase() : 'S'}
+                              </div>
+                            </button>
+
+                            <span className="absolute -top-4 -right-1 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                              2
+                            </span>
+                          </div>
+                        </div>
                         {showUserMenu && (
-                          <div className="position-absolute top-100 end-0 mt-2 bg-white rounded shadow-lg" style={{ minWidth: '200px', zIndex: 1000 }}>
-                            <div className="p-3 border-bottom">
-                              <Link to="/user-dashboard" className="text-dark text-decoration-none d-block mb-2">
-                                <i className="fas fa-tachometer-alt me-2"></i> Dashboard
+                          <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-lg z-50 border border-gray-200 overflow-hidden animate-fade-in">
+                            {/* Top Section - User Info */}
+                            <div className="px-5 py-4 bg-gray-50 border-b border-gray-200">
+                              <p className="text-xs text-gray-500">Signed in as</p>
+                              <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
+                            </div>
+
+                            {/* Links Section */}
+                            <div className="flex flex-col divide-y divide-gray-100">
+                              <Link
+                                to="/user-dashboard"
+                                className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                              >
+                                <i className="fas fa-tachometer-alt w-5 mr-3 text-gray-500"></i> Dashboard
                               </Link>
-                              <Link to="/user-profile" className="text-dark text-decoration-none d-block mb-2">
-                                <i className="fas fa-user-circle me-2"></i> Profile
+                              <Link
+                                to="/user-profile"
+                                className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                              >
+                                <i className="fas fa-user-circle w-5 mr-3 text-gray-500"></i> Profile
                               </Link>
-                              <Link to="/my-bookings" className="text-dark text-decoration-none d-block">
-                                <i className="fas fa-calendar-check me-2"></i> My Bookings
+                              <Link
+                                to="/my-bookings"
+                                className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                              >
+                                <i className="fas fa-calendar-check w-5 mr-3 text-gray-500"></i> My Bookings
                               </Link>
                             </div>
-                            <div className="p-3">
+
+                            {/* Logout Section */}
+                            <div className="px-5 py-3">
                               <button
                                 onClick={handleLogout}
-                                className="btn btn-outline-danger w-100"
+                                className="flex items-center w-full text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors py-2 px-2 rounded-md"
                               >
-                                <i className="fas fa-sign-out-alt me-2"></i> Logout
+                                <i className="fas fa-sign-out-alt w-5 mr-3"></i> Logout
                               </button>
                             </div>
                           </div>
                         )}
+
                       </div>
                     </>
                   ) : (
@@ -284,7 +342,7 @@ const Header = () => {
                       </button>
                       <h2 className="text-lg font-bold mb-4">Sign In</h2>
                       {/* Replace below with your signin form */}
-                    <SignIn/>
+                      <SignIn />
                     </div>
                   </div>
                 )}
