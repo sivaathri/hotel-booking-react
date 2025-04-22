@@ -36,7 +36,7 @@ const Footer = () => {
               type="email"
               placeholder="Enter your email address"
               required
-              className="border-2 border-orange-300 focus:border-orange-500 focus:ring-orange-200 focus:outline-none px-5 py-3 w-full max-w-md rounded-l-full shadow-sm transition-all duration-300"
+              className="border-2 border-orange-300 focus:border-orange-500 focus:ring-orange-200 focus:outline-none px-5 py-3 w-full max-w-md rounded-l-full shadow-sm transition-all duration-300 text-black"
             />
             <button className="border-2 focus:ring-orange-200 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-r-full font-medium transition-all duration-300 shadow-md hover:shadow-lg">
               SUBMIT
@@ -51,7 +51,7 @@ const Footer = () => {
               Download Hotelier –{" "}
               <span className="font-semibold">Premium Version</span>, build a
               professional website for your hotel business and grab the
-              attention of new visitors upon your site’s launch.
+              attention of new visitors upon your site's launch.
             </p>
           </div>
 
