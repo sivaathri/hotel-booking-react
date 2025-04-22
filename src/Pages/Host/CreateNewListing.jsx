@@ -124,6 +124,11 @@ const CreateNewListing = () => {
     // Step 11: App Owner Payment
     paymentMethod: '',
     paymentStatus: 'pending',
+    cardDetails: {
+      cardNumber: '',
+      expiryDate: '',
+      cvv: ''
+    }
   });
 
   const propertyTypes = [
@@ -916,6 +921,11 @@ const CreateNewListing = () => {
                       <label className="block text-sm font-medium mb-2">Card Number</label>
                       <input
                         type="text"
+                        value={formData.cardDetails.cardNumber}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          cardDetails: { ...prev.cardDetails, cardNumber: e.target.value }
+                        }))}
                         className="w-full p-2 border rounded-lg"
                         placeholder="Enter card number"
                       />
@@ -925,6 +935,11 @@ const CreateNewListing = () => {
                         <label className="block text-sm font-medium mb-2">Expiry Date</label>
                         <input
                           type="text"
+                          value={formData.cardDetails.expiryDate}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            cardDetails: { ...prev.cardDetails, expiryDate: e.target.value }
+                          }))}
                           className="w-full p-2 border rounded-lg"
                           placeholder="MM/YY"
                         />
@@ -933,6 +948,11 @@ const CreateNewListing = () => {
                         <label className="block text-sm font-medium mb-2">CVV</label>
                         <input
                           type="text"
+                          value={formData.cardDetails.cvv}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            cardDetails: { ...prev.cardDetails, cvv: e.target.value }
+                          }))}
                           className="w-full p-2 border rounded-lg"
                           placeholder="CVV"
                         />
