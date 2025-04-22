@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { QRCodeSVG } from 'qrcode.react';
 import { FiGrid } from "react-icons/fi"
+import axios from 'axios';
 
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -203,19 +204,33 @@ const CreateNewListing = () => {
   const paymentOptions = ['UPI', 'Bank Transfer', 'Cash at Check-In', 'Online'];
   const refundPolicies = ['Fully Refundable', 'Partial Refund', 'Non-refundable'];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < 11) {
       setStep(step + 1);
     } else {
       // Handle payment completion
       if (formData.paymentMethod) {
-        setPaymentSuccess(true);
-        setShowSuccessAnimation(true);
-        
-        // After animation completes, navigate to dashboard
-        setTimeout(() => {
-          navigate('/host/dashboard');
-        }, 3000);
+        try {
+          // Save listing data to database
+          const response = await axios.post('http://localhost:5000/api/listings', formData, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authentication token
+            }
+          });
+
+          if (response.status === 201) {
+            setPaymentSuccess(true);
+            setShowSuccessAnimation(true);
+            
+            // After animation completes, navigate to dashboard
+            setTimeout(() => {
+              navigate('/host/dashboard');
+            }, 3000);
+          }
+        } catch (error) {
+          console.error('Error saving listing:', error);
+          alert('Error saving listing. Please try again.');
+        }
       }
     }
   };
