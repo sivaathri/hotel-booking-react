@@ -6,6 +6,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from 'react-leaf
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { QRCodeSVG } from 'qrcode.react';
+import {  FiGrid } from "react-icons/fi"
 
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -489,193 +490,258 @@ const CreateNewListing = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-semibold">Rooms Setup</h2>
-            <div className="space-y-6">
-              {formData.rooms.map((room, index) => (
-                <div key={index} className="border p-4 rounded-lg space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Room {index + 1}</h3>
-                    {index > 0 && (
-                      <button
-                        onClick={() => setFormData(prev => ({
+          <h2 className="text-2xl font-semibold flex items-center gap-2 text-gray-800">
+            <FiGrid className="text-blue-600" />
+            Rooms Setup
+          </h2>
+        
+          <div className="space-y-6">
+            {formData.rooms.map((room, index) => (
+              <div
+                key={index}
+                className="border p-4 rounded-xl space-y-4 transition-shadow shadow-sm hover:shadow-lg bg-white"
+              >
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Room {index + 1}</h3>
+                  {index > 0 && (
+                    <button
+                      onClick={() =>
+                        setFormData((prev) => ({
                           ...prev,
-                          rooms: prev.rooms.filter((_, i) => i !== index)
-                        }))}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Floor</label>
-                      <select
-                        value={room.floor}
-                        onChange={(e) => handleRoomChange(index, 'floor', e.target.value)}
-                        className="w-full p-2 border rounded-lg"
-                      >
-                        <option value="">Select Floor</option>
-                        {floorTypes.map(type => (
-                          <option key={type} value={type}>{type}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">BHK Type</label>
-                      <select
-                        value={room.bhk}
-                        onChange={(e) => handleRoomChange(index, 'bhk', e.target.value)}
-                        className="w-full p-2 border rounded-lg"
-                      >
-                        <option value="">Select BHK Type</option>
-                        {bhkTypes.map(type => (
-                          <option key={type} value={type}>{type}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Room Name/Type</label>
-                    <input
-                      type="text"
-                      value={room.name}
-                      onChange={(e) => handleRoomChange(index, 'name', e.target.value)}
-                      className="w-full p-2 border rounded-lg"
-                      placeholder="e.g., Deluxe Room, Family Suite"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Capacity</label>
-                    <input
-                      type="number"
-                      value={room.capacity}
-                      onChange={(e) => handleRoomChange(index, 'capacity', e.target.value)}
-                      className="w-full p-2 border rounded-lg"
-                      placeholder="Number of guests"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Bed Type</label>
-                    <div className="grid grid-cols-3 gap-4">
-                      {bedTypes.map(type => (
-                        <button
-                          key={type}
-                          className={`p-2 border rounded-lg text-center ${
-                            room.bedType === type ? 'border-black bg-gray-100' : 'hover:border-gray-400'
-                          }`}
-                          onClick={() => handleRoomChange(index, 'bedType', type)}
-                        >
-                          {type}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={room.hasBathroom}
-                          onChange={(e) => handleRoomChange(index, 'hasBathroom', e.target.checked)}
-                        />
-                        Attached Bathroom
-                      </label>
-                    </div>
-                    <div>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={room.hasBalcony}
-                          onChange={(e) => handleRoomChange(index, 'hasBalcony', e.target.checked)}
-                        />
-                        Balcony/View
-                      </label>
-                    </div>
-                  </div>
-                  {room.hasBalcony && (
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Balcony View</label>
-                      <input
-                        type="text"
-                        value={room.balconyView}
-                        onChange={(e) => handleRoomChange(index, 'balconyView', e.target.value)}
-                        className="w-full p-2 border rounded-lg"
-                        placeholder="e.g., Sea, Garden, City"
-                      />
-                    </div>
+                          rooms: prev.rooms.filter((_, i) => i !== index),
+                        }))
+                      }
+                      className="text-red-500 hover:text-red-700 font-medium"
+                    >
+                      Remove
+                    </button>
                   )}
+                </div>
+        
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Facilities</label>
-                    <div className="grid grid-cols-2 gap-4">
-                      {roomFacilities.map(facility => (
-                        <label key={facility} className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={room.facilities.includes(facility)}
-                            onChange={() => {
-                              const newFacilities = room.facilities.includes(facility)
-                                ? room.facilities.filter(f => f !== facility)
-                                : [...room.facilities, facility];
-                              handleRoomChange(index, 'facilities', newFacilities);
-                            }}
-                          />
-                          {facility}
-                        </label>
+                    <label className="block text-sm font-medium mb-2">Floor</label>
+                    <select
+                      value={room.floor}
+                      onChange={(e) => handleRoomChange(index, "floor", e.target.value)}
+                      className="w-full p-2 border rounded-lg"
+                    >
+                      <option value="">Select Floor</option>
+                      {floorTypes.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
                       ))}
-                    </div>
+                    </select>
+                  </div>
+        
+                  <div>
+                    <label className="block text-sm font-medium mb-2">BHK Type</label>
+                    <select
+                      value={room.bhk}
+                      onChange={(e) => handleRoomChange(index, "bhk", e.target.value)}
+                      className="w-full p-2 border rounded-lg"
+                    >
+                      <option value="">Select BHK Type</option>
+                      {bhkTypes.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-              ))}
-              <button
-                onClick={addNewRoom}
-                className="w-full p-4 border rounded-lg flex items-center justify-center gap-2 hover:border-gray-400"
-              >
-                <FiHome />
-                Add Another Room
-              </button>
-            </div>
+        
+                <div>
+                  <label className="block text-sm font-medium mb-2">Room Name/Type</label>
+                  <input
+                    type="text"
+                    value={room.name}
+                    onChange={(e) => handleRoomChange(index, "name", e.target.value)}
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="e.g., Deluxe Room, Family Suite"
+                  />
+                </div>
+        
+                <div>
+                  <label className="block text-sm font-medium mb-2">Capacity</label>
+                  <input
+                    type="number"
+                    value={room.capacity}
+                    onChange={(e) => handleRoomChange(index, "capacity", e.target.value)}
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="Number of guests"
+                  />
+                </div>
+        
+                <div>
+                  <label className="block text-sm font-medium mb-2">Bed Type</label>
+                  <div className="grid grid-cols-3 gap-4">
+                    {bedTypes.map((type) => (
+                      <button
+                        key={type}
+                        className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${
+                          room.bedType === type
+                            ? "border-blue-600 bg-blue-50 text-blue-600"
+                            : "hover:border-gray-400 text-gray-700"
+                        }`}
+                        onClick={() => handleRoomChange(index, "bedType", type)}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+        
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={room.hasBathroom}
+                        onChange={(e) =>
+                          handleRoomChange(index, "hasBathroom", e.target.checked)
+                        }
+                      />
+                      Attached Bathroom
+                    </label>
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={room.hasBalcony}
+                        onChange={(e) =>
+                          handleRoomChange(index, "hasBalcony", e.target.checked)
+                        }
+                      />
+                      Balcony/View
+                    </label>
+                  </div>
+                </div>
+        
+                {room.hasBalcony && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Balcony View</label>
+                    <input
+                      type="text"
+                      value={room.balconyView}
+                      onChange={(e) =>
+                        handleRoomChange(index, "balconyView", e.target.value)
+                      }
+                      className="w-full p-2 border rounded-lg"
+                      placeholder="e.g., Sea, Garden, City"
+                    />
+                  </div>
+                )}
+        
+        <div>
+  <label className="block text-sm font-medium mb-3 text-gray-800">
+    Facilities
+  </label>
+  <div className="flex flex-wrap gap-3">
+    {roomFacilities.map((facility) => {
+      const isSelected = room.facilities.includes(facility);
+      return (
+        <button
+          key={facility}
+          onClick={() => {
+            const newFacilities = isSelected
+              ? room.facilities.filter((f) => f !== facility)
+              : [...room.facilities, facility];
+            handleRoomChange(index, "facilities", newFacilities);
+          }}
+          type="button"
+          className={`px-4 py-2 rounded-full border transition-all duration-200 text-sm font-medium 
+            ${
+              isSelected
+                ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-400"
+            }`}
+        >
+          {facility}
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+              </div>
+            ))}
+        
+            <button
+              onClick={addNewRoom}
+              className="w-full p-4 border border-dashed rounded-xl flex items-center justify-center gap-2 hover:border-blue-400 hover:bg-blue-50 transition-all text-blue-600 font-medium"
+            >
+              <FiHome className="text-xl" />
+              Add Another Room
+            </button>
           </div>
+        </div>
         );
       case 4:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold">Room Photos</h2>
             <div className="space-y-4">
-              <p className="text-sm text-gray-600">Upload multiple images per room (Max size: 5MB per image)</p>
+              <p className="text-sm text-gray-600">Upload 5 separate images for each room (Max size: 5MB per image)</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {formData.roomPhotos.map((photo, index) => (
-                  <div key={index} className="relative">
-                    <img src={URL.createObjectURL(photo)} alt={`Room photo ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
-                    <button
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        roomPhotos: prev.roomPhotos.filter((_, i) => i !== index)
-                      }))}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-                <label className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-gray-400">
-                  <FiImage className="text-2xl" />
-                  <span className="text-sm">Upload Photos</span>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files);
-                      setFormData(prev => ({
-                        ...prev,
-                        roomPhotos: [...prev.roomPhotos, ...files]
-                      }));
-                    }}
-                  />
-                </label>
+                {Array.from({ length: 5 }).map((_, index) => {
+                  const photo = formData.roomPhotos[index];
+                  return (
+                    <div key={index} className="relative">
+                      {photo ? (
+                        <>
+                          <img src={URL.createObjectURL(photo)} alt={`Room photo ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                          <button
+                            onClick={() => setFormData(prev => ({
+                              ...prev,
+                              roomPhotos: prev.roomPhotos.filter((_, i) => i !== index)
+                            }))}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          >
+                            ×
+                          </button>
+                        </>
+                      ) : (
+                        <label className="border-2 border-dashed rounded-lg p-4 h-48 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-gray-400">
+                          <FiImage className="text-2xl" />
+                          <span className="text-sm">Upload Photo {index + 1}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (!file) return;
+
+                              // Check file size
+                              if (file.size > 5 * 1024 * 1024) {
+                                alert('File exceeds the 5MB size limit');
+                                return;
+                              }
+
+                              setFormData(prev => {
+                                const newPhotos = [...prev.roomPhotos];
+                                newPhotos[index] = file;
+                                return {
+                                  ...prev,
+                                  roomPhotos: newPhotos
+                                };
+                              });
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
+              {formData.roomPhotos.length > 0 && (
+                <p className="text-sm text-gray-600">
+                  {formData.roomPhotos.length} photo(s) uploaded. {5 - formData.roomPhotos.length} photo(s) remaining.
+                </p>
+              )}
             </div>
           </div>
         );
