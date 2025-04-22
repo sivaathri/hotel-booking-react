@@ -135,7 +135,7 @@ const Home = () => {
             data-bs-slide="prev"
           >
             <span
-              className="mr-30 carousel-control-prev-icon"
+              className="mr-10 carousel-control-prev-icon"
               aria-hidden="true"
             ></span>
             <span className="visually-hidden">Previous</span>
@@ -148,7 +148,7 @@ const Home = () => {
             data-bs-slide="next"
           >
             <span
-              className="ml-30 carousel-control-next-icon"
+              className="ml-10 carousel-control-next-icon"
               aria-hidden="true"
             ></span>
             <span className="visually-hidden">Next</span>
