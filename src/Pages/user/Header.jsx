@@ -9,6 +9,7 @@ const Header = () => {
   const [isSigninOpen, setSigninOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -198,19 +199,41 @@ const Header = () => {
                 <div className="d-flex align-items-center">
                   {isAuthenticated ? (
                     <>
-                      <Link
-                        to="/Hosthome"
-                        className="text-light me-3 bg-transparent border-0 p-0 text-decoration-none"
-                        style={{ cursor: 'pointer' }}
-                      >
-                        Join our Hoterlier
+                      <Link to="/Hosthome" className="btn btn-warning me-3 rounded-0 py-2 px-4">
+                        <i className="fas fa-home me-2"></i> Join our Hoterlier
                       </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="btn btn-outline-light rounded-0 py-2 px-4"
-                      >
-                        Logout
-                      </button>
+                      <div className="position-relative">
+                        <button
+                          onClick={() => setShowUserMenu(!showUserMenu)}
+                          className="btn btn-outline-light rounded-circle p-2"
+                          style={{ width: '40px', height: '40px' }}
+                        >
+                          <i className="fas fa-user"></i>
+                        </button>
+                        {showUserMenu && (
+                          <div className="position-absolute top-100 end-0 mt-2 bg-white rounded shadow-lg" style={{ minWidth: '200px', zIndex: 1000 }}>
+                            <div className="p-3 border-bottom">
+                              <Link to="/user-dashboard" className="text-dark text-decoration-none d-block mb-2">
+                                <i className="fas fa-tachometer-alt me-2"></i> Dashboard
+                              </Link>
+                              <Link to="/user-profile" className="text-dark text-decoration-none d-block mb-2">
+                                <i className="fas fa-user-circle me-2"></i> Profile
+                              </Link>
+                              <Link to="/my-bookings" className="text-dark text-decoration-none d-block">
+                                <i className="fas fa-calendar-check me-2"></i> My Bookings
+                              </Link>
+                            </div>
+                            <div className="p-3">
+                              <button
+                                onClick={handleLogout}
+                                className="btn btn-outline-danger w-100"
+                              >
+                                <i className="fas fa-sign-out-alt me-2"></i> Logout
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </>
                   ) : (
                     <>

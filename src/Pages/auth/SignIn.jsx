@@ -23,14 +23,19 @@ const SignIn = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    console.log('Starting login process...');
 
     try {
+      console.log('Making API request...');
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email: formData.email,
         password: formData.password
       });
 
+      console.log('Login response:', response);
+
       if (response.status === 200) {
+        console.log('Login successful, storing token...');
         // Store the token if stayLoggedIn is true
         if (stayLoggedIn) {
           localStorage.setItem('token', response.data.token);
@@ -38,10 +43,12 @@ const SignIn = () => {
           sessionStorage.setItem('token', response.data.token);
         }
         
-        // Redirect to user dashboard
-        navigate('/user-dashboard');
+        console.log('Token stored, attempting navigation...');
+        // Force navigation to home page
+        window.location.href = '/';
       }
     } catch (error) {
+      console.error('Login error:', error);
       setError(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
