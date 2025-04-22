@@ -26,6 +26,7 @@ import UserProfile from './Pages/user/UserProfile';
 import AuthLogin from './Pages/auth/SignIn';
 import AuthRegister from './Pages/auth/SignupForm';
 // Host Rooms  Imports
+import HostHeader from './Pages/Host/HostHeader';
 import Hosthome from './Pages/Host/Home'
 import HostUserDashboard from './Pages/Host/HostUserDashboard';
 function App() {
@@ -60,7 +61,7 @@ function App() {
 
 
           {/*  Host Rooms  Routes */}
-
+          <Route path="/HostHeader" element={<HostHeader />}/>
           <Route path="/Hosthome" element={<Hosthome />}/>
           <Route path="/hostuserdashboard" element={<HostUserDashboard />}/>
 
