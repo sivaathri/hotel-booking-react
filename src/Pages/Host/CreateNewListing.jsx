@@ -206,32 +206,64 @@ const CreateNewListing = () => {
 
   const handleNext = async () => {
     if (step < 11) {
-      setStep(step + 1);
+        setStep(step + 1);
     } else {
-      // Handle payment completion
-      if (formData.paymentMethod) {
-        try {
-          // Save listing data to database
-          const response = await axios.post('http://localhost:5000/api/listings', formData, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authentication token
-            }
-          });
+        // Handle payment completion
+        if (formData.paymentMethod) {
+            try {
+                // Create FormData object for file uploads
+                const formDataToSend = new FormData();
+                
+                // Append all form data
+                Object.keys(formData).forEach(key => {
+                    if (key === 'rooms' || key === 'languages' || key === 'allowedGuests' || 
+                        key === 'paymentMethods' || key === 'discounts' || key === 'bankDetails') {
+                        formDataToSend.append(key, JSON.stringify(formData[key]));
+                    } else if (key === 'mapLocation' && formData[key]) {
+                        formDataToSend.append('mapLocationLat', formData[key].lat);
+                        formDataToSend.append('mapLocationLng', formData[key].lng);
+                    } else if (key !== 'roomPhotos' && key !== 'idProof' && key !== 'propertyProof') {
+                        formDataToSend.append(key, formData[key]);
+                    }
+                });
 
-          if (response.status === 201) {
-            setPaymentSuccess(true);
-            setShowSuccessAnimation(true);
-            
-            // After animation completes, navigate to dashboard
-            setTimeout(() => {
-              navigate('/host/dashboard');
-            }, 3000);
-          }
-        } catch (error) {
-          console.error('Error saving listing:', error);
-          alert('Error saving listing. Please try again.');
+                // Append files
+                if (formData.idProof) {
+                    formDataToSend.append('idProof', formData.idProof);
+                }
+                if (formData.propertyProof) {
+                    formDataToSend.append('propertyProof', formData.propertyProof);
+                }
+                if (formData.roomPhotos && formData.roomPhotos.length > 0) {
+                    formData.roomPhotos.forEach((photo, index) => {
+                        formDataToSend.append('roomPhotos', photo);
+                    });
+                }
+
+                // Save listing data to database
+                const response = await axios.post('http://localhost:5000/api/hosting', formDataToSend, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                if (response.status === 201) {
+                    setPaymentSuccess(true);
+                    setShowSuccessAnimation(true);
+                    
+                    // After animation completes, navigate to dashboard
+                    setTimeout(() => {
+                        navigate('/host/dashboard');
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('Error saving listing:', error);
+                alert('Error saving listing. Please try again.');
+            }
+        } else {
+            alert('Please select a payment method to complete the listing.');
         }
-      }
     }
   };
 
