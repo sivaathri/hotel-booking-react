@@ -15,7 +15,7 @@ const HostHeader = () => {
     if (token) {
       const fetchUserData = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/auth/3', {
+          const response = await axios.get('http://localhost:5000/api/auth/profile', {
             headers: {
               Authorization: `Bearer ${token}`
             }
