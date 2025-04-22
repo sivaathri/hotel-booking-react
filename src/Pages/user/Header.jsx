@@ -220,7 +220,7 @@ const Header = () => {
                 <div className="d-flex align-items-center">
                   {isAuthenticated ? (
                     <>
-                      <Link to="/Hosthome" className="btn btn-warning me-3 rounded-0 py-2 px-4">
+                      <Link to="/HostHeader" className="btn btn-warning me-3 rounded-0 py-2 px-4">
                         <i className="fas fa-home me-2"></i> Join our Hoterlier
                       </Link>
                       <div className="position-relative">
