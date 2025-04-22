@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const routes = require('./routes/route')
+const routes = require('./routes/route');
+
+
 // Load environment variables
 dotenv.config();
 
@@ -54,7 +56,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api', routes)
+app.use('/api', routes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
