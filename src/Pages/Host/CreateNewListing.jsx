@@ -5,6 +5,7 @@ import HostHeader from './HostHeader';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { QRCodeSVG } from 'qrcode.react';
 
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -118,7 +119,11 @@ const CreateNewListing = () => {
     // Step 10: Verification
     idProof: null,
     propertyProof: null,
-    termsAccepted: false
+    termsAccepted: false,
+    
+    // Step 11: App Owner Payment
+    paymentMethod: '',
+    paymentStatus: 'pending',
   });
 
   const propertyTypes = [
@@ -151,7 +156,7 @@ const CreateNewListing = () => {
   const refundPolicies = ['Fully Refundable', 'Partial Refund', 'Non-refundable'];
 
   const handleNext = () => {
-    if (step < 10) {
+    if (step < 11) {
       setStep(step + 1);
     } else {
       // Handle form submission
@@ -866,6 +871,98 @@ const CreateNewListing = () => {
             </div>
           </div>
         );
+      case 11:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold">App Owner Payment</h2>
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-lg font-medium">Payment Amount: ₹1500</p>
+                <p className="text-sm text-gray-600">This is a one-time payment for listing your property on TripNGrub</p>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Choose Payment Method</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    className={`p-4 border rounded-lg text-center ${
+                      formData.paymentMethod === 'debit_card'
+                        ? 'border-black bg-gray-100'
+                        : 'hover:border-gray-400'
+                    }`}
+                    onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'debit_card' }))}
+                  >
+                    <FiCreditCard className="mx-auto mb-2" />
+                    Debit Card
+                  </button>
+                  
+                  <button
+                    className={`p-4 border rounded-lg text-center ${
+                      formData.paymentMethod === 'upi'
+                        ? 'border-black bg-gray-100'
+                        : 'hover:border-gray-400'
+                    }`}
+                    onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'upi' }))}
+                  >
+                    <FiShield className="mx-auto mb-2" />
+                    UPI Payment
+                  </button>
+                </div>
+
+                {formData.paymentMethod === 'debit_card' && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Card Number</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-lg"
+                        placeholder="Enter card number"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Expiry Date</label>
+                        <input
+                          type="text"
+                          className="w-full p-2 border rounded-lg"
+                          placeholder="MM/YY"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">CVV</label>
+                        <input
+                          type="text"
+                          className="w-full p-2 border rounded-lg"
+                          placeholder="CVV"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {formData.paymentMethod === 'upi' && (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-2">Scan the QR code to pay</p>
+                      <div className="bg-white p-4 rounded-lg inline-block">
+                        <QRCodeSVG
+                          value={`upi://pay?pa=athrimr-2@okicici&pn=TripNGrub&am=1500&cu=INR`}
+                          size={192}
+                          level="H"
+                          includeMargin={true}
+                          className="w-48 h-48"
+                        />
+                      </div>
+                      <p className="mt-2 text-sm text-gray-600">UPI ID: athrimr-2@okicici</p>
+                      <p className="mt-1 text-sm text-gray-600">Amount: ₹1500</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -923,12 +1020,12 @@ const CreateNewListing = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-semibold">Create your listing</h1>
-            <span className="text-gray-500">Step {step} of 10</span>
+            <span className="text-gray-500">Step {step} of 11</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-black h-2 rounded-full"
-              style={{ width: `${(step / 10) * 100}%` }}
+              style={{ width: `${(step / 11) * 100}%` }}
             />
           </div>
         </div>
@@ -949,7 +1046,7 @@ const CreateNewListing = () => {
             onClick={handleNext}
             className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
           >
-            {step === 10 ? 'Submit Listing' : 'Next'}
+            {step === 11 ? 'Complete Payment' : 'Next'}
           </button>
         </div>
       </div>
