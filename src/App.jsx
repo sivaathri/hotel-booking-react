@@ -31,6 +31,8 @@ import Hosthome from './Pages/Host/Home'
 import HostUserDashboard from './Pages/Host/HostUserDashboard';
 import Listings from './Pages/Host/Listings';
 import CreateListing from './Pages/Host/CreateListing';
+import CreateNewListing from './Pages/Host/CreateNewListing';
+
 function App() {
   return (
     <>
@@ -39,14 +41,6 @@ function App() {
           {/* HOme Screen Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/About" element={<About />} />
-
-
-
-
-
-
-
-
           <Route path="/rooms" element={<UserRoomList />} />
           <Route path="/rooms/:id" element={<RoomDetails />} />
           <Route path="/book/:id" element={<UserBookRoom />} />
@@ -61,15 +55,13 @@ function App() {
           <Route path="/login" element={<AuthLogin />} />
           <Route path="/register" element={<AuthRegister />} />
 
-
           {/*  Host Rooms  Routes */}
           <Route path="/HostHeader" element={<HostHeader />}/>
           <Route path="/Hosthome" element={<Hosthome />}/>
           <Route path="/hostuserdashboard" element={<HostUserDashboard />}/>
           <Route path="/listings" element={<Listings />}/>
           <Route path="/create-listing" element={<CreateListing />}/>
-
-        
+          <Route path="/create-new-listing" element={<CreateNewListing />}/>
 
           <Route path="/admin/customers" element={<CustomersList />} />
           <Route path="/admin/invoices" element={<InvoiceList />} />
