@@ -1362,37 +1362,46 @@ const CreateNewListing = () => {
   return (
     <>
       <HostHeader />
-      <div className="max-w-3xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-semibold">Create your listing</h1>
-            <span className="text-gray-500">Step {step} of 11</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-black h-2 rounded-full"
-              style={{ width: `${(step / 11) * 100}%` }}
-            />
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-4xl font-bold text-gray-900">Create your listing</h1>
+                <span className="text-lg font-medium text-gray-600">Step {step} of 11</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-in-out"
+                  style={{ width: `${(step / 11) * 100}%` }}
+                />
+              </div>
+            </div>
 
-        {renderStep()}
+            <div className="min-h-[600px]">
+              {renderStep()}
+            </div>
 
-        <div className="flex justify-between mt-8">
-          <button
-            onClick={handleBack}
-            className={`px-6 py-2 border rounded-lg ${step === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'
-              }`}
-            disabled={step === 1}
-          >
-            Back
-          </button>
-          <button
-            onClick={handleNext}
-            className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
-          >
-            {step === 11 ? 'Complete Payment' : 'Next'}
-          </button>
+            <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+              <button
+                onClick={handleBack}
+                className={`px-8 py-3 border-2 rounded-xl text-lg font-medium transition-all duration-200 ${
+                  step === 1 
+                    ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' 
+                    : 'border-gray-400 text-gray-700 hover:bg-gray-50 hover:border-gray-500'
+                }`}
+                disabled={step === 1}
+              >
+                Back
+              </button>
+              <button
+                onClick={handleNext}
+                className="px-8 py-3 bg-blue-600 text-white rounded-xl text-lg font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                {step === 11 ? 'Complete Payment' : 'Next'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </>
