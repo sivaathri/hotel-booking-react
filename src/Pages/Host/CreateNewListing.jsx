@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiHome, FiMapPin, FiDollarSign, FiImage, FiInfo, FiCheck, FiClock, FiCalendar, FiCreditCard, FiShield } from 'react-icons/fi';
 import HostHeader from './HostHeader';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { QRCodeSVG } from 'qrcode.react';
@@ -69,6 +69,8 @@ const CreateNewListing = () => {
     // Step 3: Rooms Setup
     rooms: [{
       name: '',
+      floor: '',
+      bhk: '',
       capacity: '',
       bedType: '',
       hasBathroom: false,
@@ -141,6 +143,8 @@ const CreateNewListing = () => {
   ];
 
   const bedTypes = ['Queen', 'King', 'Twin'];
+  const floorTypes = ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor', '7th Floor', '8th Floor', '9th Floor', '10th Floor'];
+  const bhkTypes = ['1 BHK', '2 BHK', '3 BHK', '4 BHK', '5 BHK', 'Studio'];
   const roomFacilities = [
     'Private Bathroom',
     'Bathtub',
@@ -215,6 +219,8 @@ const CreateNewListing = () => {
       ...prev,
       rooms: [...prev.rooms, {
         name: '',
+        floor: '',
+        bhk: '',
         capacity: '',
         bedType: '',
         hasBathroom: false,
@@ -337,8 +343,16 @@ const CreateNewListing = () => {
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Pin Location on Map</label>
+              <div className="text-sm text-gray-600 mt-2">
+                <p>Make it clear to guests where your place is located. We'll only share your exact address after they've made a reservation.</p>
+                <button 
+                  className="text-black underline hover:text-gray-700 mt-1"
+                  onClick={() => window.open('https://www.tripngrub.com/help/location-privacy', '_blank')}
+                >
+                  Learn more
+                </button>
+              </div>
+              <div className="flex gap-4">
                 <button
                   className="w-full p-4 border rounded-lg flex items-center justify-center gap-2 hover:border-gray-400"
                   onClick={() => setShowMap(true)}
@@ -346,12 +360,128 @@ const CreateNewListing = () => {
                   <FiMapPin />
                   Select Location on Map
                 </button>
-                {formData.mapLocation && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Selected Location: {formData.city}, {formData.state}, {formData.country}
-                  </p>
-                )}
+                <button
+                  className="w-full p-4 border rounded-lg flex items-center justify-center gap-2 hover:border-gray-400"
+                  onClick={async () => {
+                    // Validate required fields
+                    if (!formData.city || !formData.country) {
+                      alert('Please enter at least the city and country');
+                      return;
+                    }
+
+                    // Construct address parts with better formatting
+                    const addressParts = [
+                      formData.addressLine1,
+                      formData.addressLine2,
+                      formData.city,
+                      formData.state,
+                      formData.country,
+                      formData.postalCode
+                    ].filter(part => part && part.trim() !== '');
+
+                    // First try: Full address with postal code
+                    const fullAddress = addressParts.join(', ');
+                    console.log('Searching for full address:', fullAddress);
+
+                    try {
+                      // Try with full address first using Nominatim
+                      const response = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1&addressdetails=1`,
+                        {
+                          headers: {
+                            'User-Agent': 'TripNGrub/1.0 (https://tripngrub.com)',
+                            'Accept-Language': 'en-US,en;q=0.9'
+                          }
+                        }
+                      );
+                      const data = await response.json();
+                      console.log('Nominatim geocoding response:', data);
+
+                      if (data && data[0]) {
+                        const result = data[0];
+                        const { lat, lon } = result;
+                        const address = result.address || {};
+                        
+                        // Validate the result matches our input
+                        const isMatch = (
+                          (!formData.city || address.city?.toLowerCase() === formData.city.toLowerCase()) &&
+                          (!formData.state || address.state?.toLowerCase() === formData.state.toLowerCase()) &&
+                          (!formData.country || address.country?.toLowerCase() === formData.country.toLowerCase()) &&
+                          (!formData.postalCode || address.postcode === formData.postalCode)
+                        );
+
+                        if (isMatch) {
+                          const newLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
+                          console.log('Found matching location:', newLocation);
+                          
+                          setSelectedLocation(newLocation);
+                          setFormData(prev => ({
+                            ...prev,
+                            mapLocation: newLocation
+                          }));
+                          setShowMap(true);
+                          return;
+                        }
+                      }
+
+                      // If full address fails, try with just city and postal code
+                      const cityPostal = `${formData.city}, ${formData.postalCode}`;
+                      console.log('Trying city and postal code:', cityPostal);
+                      
+                      const cityResponse = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityPostal)}&limit=1&addressdetails=1`,
+                        {
+                          headers: {
+                            'User-Agent': 'TripNGrub/1.0 (https://tripngrub.com)',
+                            'Accept-Language': 'en-US,en;q=0.9'
+                          }
+                        }
+                      );
+                      const cityData = await cityResponse.json();
+                      console.log('City/postal geocoding response:', cityData);
+
+                      if (cityData && cityData[0]) {
+                        const result = cityData[0];
+                        const { lat, lon } = result;
+                        const address = result.address || {};
+                        
+                        // Validate the result matches our input
+                        const isMatch = (
+                          (!formData.city || address.city?.toLowerCase() === formData.city.toLowerCase()) &&
+                          (!formData.postalCode || address.postcode === formData.postalCode)
+                        );
+
+                        if (isMatch) {
+                          const newLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
+                          console.log('Found matching city location:', newLocation);
+                          
+                          setSelectedLocation(newLocation);
+                          setFormData(prev => ({
+                            ...prev,
+                            mapLocation: newLocation
+                          }));
+                          setShowMap(true);
+                          return;
+                        }
+                      }
+
+                      // If all attempts fail
+                      alert(`Could not find an exact match for: ${fullAddress}\nPlease verify the address details and try again.`);
+                    } catch (error) {
+                      console.error('Error geocoding address:', error);
+                      alert('Error finding location. Please try again.');
+                    }
+                  }}
+                >
+                  <FiMapPin />
+                  Show Address on Map
+                </button>
               </div>
+              {formData.mapLocation && (
+                <p className="mt-2 text-sm text-gray-600">
+                  Selected Location: {formData.city}, {formData.state}, {formData.country}
+                </p>
+              )}
             </div>
             {renderMap()}
           </div>
@@ -379,25 +509,51 @@ const CreateNewListing = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Room Name/Type</label>
-                      <input
-                        type="text"
-                        value={room.name}
-                        onChange={(e) => handleRoomChange(index, 'name', e.target.value)}
+                      <label className="block text-sm font-medium mb-2">Floor</label>
+                      <select
+                        value={room.floor}
+                        onChange={(e) => handleRoomChange(index, 'floor', e.target.value)}
                         className="w-full p-2 border rounded-lg"
-                        placeholder="e.g., Deluxe Room, Family Suite"
-                      />
+                      >
+                        <option value="">Select Floor</option>
+                        {floorTypes.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Capacity</label>
-                      <input
-                        type="number"
-                        value={room.capacity}
-                        onChange={(e) => handleRoomChange(index, 'capacity', e.target.value)}
+                      <label className="block text-sm font-medium mb-2">BHK Type</label>
+                      <select
+                        value={room.bhk}
+                        onChange={(e) => handleRoomChange(index, 'bhk', e.target.value)}
                         className="w-full p-2 border rounded-lg"
-                        placeholder="Number of guests"
-                      />
+                      >
+                        <option value="">Select BHK Type</option>
+                        {bhkTypes.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Room Name/Type</label>
+                    <input
+                      type="text"
+                      value={room.name}
+                      onChange={(e) => handleRoomChange(index, 'name', e.target.value)}
+                      className="w-full p-2 border rounded-lg"
+                      placeholder="e.g., Deluxe Room, Family Suite"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Capacity</label>
+                    <input
+                      type="number"
+                      value={room.capacity}
+                      onChange={(e) => handleRoomChange(index, 'capacity', e.target.value)}
+                      className="w-full p-2 border rounded-lg"
+                      placeholder="Number of guests"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">Bed Type</label>
@@ -1014,13 +1170,22 @@ const CreateNewListing = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
+              {selectedLocation && (
+                <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
+                  <Popup>
+                    {formData.addressLine1} {formData.addressLine2}<br />
+                    {formData.city}, {formData.state}<br />
+                    {formData.country} {formData.postalCode}
+                  </Popup>
+                </Marker>
+              )}
               <LocationMarker
                 position={selectedLocation}
                 setPosition={(pos) => {
                   setSelectedLocation(pos);
                   setFormData(prev => ({
                     ...prev,
-                    mapLocation: { lat: pos.lat, lng: pos.lng }
+                    mapLocation: pos
                   }));
                 }}
                 setAddress={(addr) => setFormData(prev => ({ ...prev, address: addr }))}
