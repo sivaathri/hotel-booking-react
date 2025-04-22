@@ -56,7 +56,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-orange-400 font-bold mb-4">CONTACT</h4>
+            <h4 className="text-white font-bold mb-4">CONTACT</h4>
             <p className="flex items-center mb-2">
               <span className="mr-2">📍</span> 123 Street, New York, USA
             </p>
@@ -66,24 +66,10 @@ const Footer = () => {
             <p className="flex items-center mb-4">
               <span className="mr-2">✉️</span> info@example.com
             </p>
-            <div className="flex gap-4">
-              <button className="w-8 h-8 rounded-full bg-white text-black">
-                🐦
-              </button>
-              <button className="w-8 h-8 rounded-full bg-white text-black">
-                📘
-              </button>
-              <button className="w-8 h-8 rounded-full bg-white text-black">
-                📸
-              </button>
-              <button className="w-8 h-8 rounded-full bg-white text-black">
-                💼
-              </button>
-            </div>
           </div>
 
           <div>
-            <h4 className="text-orange-400 font-bold mb-4">COMPANY</h4>
+            <h4 className="text-white font-bold mb-4">COMPANY</h4>
             <ul className="space-y-2">
               <li>› About Us</li>
               <li>› Contact Us</li>
@@ -94,13 +80,9 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-orange-400 font-bold mb-4">SERVICES</h4>
+            <h4 className="text-white font-bold mb-4">SERVICES</h4>
             <ul className="space-y-2">
               <li>› Food & Restaurant</li>
-              <li>› Spa & Fitness</li>
-              <li>› Sports & Gaming</li>
-              <li>› Event & Party</li>
-              <li>› GYM & Yoga</li>
             </ul>
           </div>
         </div>
