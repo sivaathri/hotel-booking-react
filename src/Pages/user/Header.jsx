@@ -263,19 +263,19 @@ const Header = () => {
                                 to="/user-dashboard"
                                 className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                               >
-                                <i className="fas fa-tachometer-alt w-5 mr-3 text-gray-500"></i> Dashboard
+                                Dashboard
                               </Link>
                               <Link
                                 to="/user-profile"
                                 className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                               >
-                                <i className="fas fa-user-circle w-5 mr-3 text-gray-500"></i> Profile
+                                Profile
                               </Link>
                               <Link
                                 to="/my-bookings"
                                 className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                               >
-                                <i className="fas fa-calendar-check w-5 mr-3 text-gray-500"></i> My Bookings
+                                My Bookings
                               </Link>
                             </div>
 
