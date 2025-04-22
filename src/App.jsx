@@ -29,6 +29,8 @@ import AuthRegister from './Pages/auth/SignupForm';
 import HostHeader from './Pages/Host/HostHeader';
 import Hosthome from './Pages/Host/Home'
 import HostUserDashboard from './Pages/Host/HostUserDashboard';
+import Listings from './Pages/Host/Listings';
+import CreateListing from './Pages/Host/CreateListing';
 function App() {
   return (
     <>
@@ -64,6 +66,8 @@ function App() {
           <Route path="/HostHeader" element={<HostHeader />}/>
           <Route path="/Hosthome" element={<Hosthome />}/>
           <Route path="/hostuserdashboard" element={<HostUserDashboard />}/>
+          <Route path="/listings" element={<Listings />}/>
+          <Route path="/create-listing" element={<CreateListing />}/>
 
         
 
