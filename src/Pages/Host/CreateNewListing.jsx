@@ -6,7 +6,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from 'react-leaf
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { QRCodeSVG } from 'qrcode.react';
-import {  FiGrid } from "react-icons/fi"
+import { FiGrid } from "react-icons/fi"
 
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -21,7 +21,7 @@ const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }
     async click(e) {
       const newPosition = e.latlng;
       setPosition(newPosition);
-      
+
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newPosition.lat}&lon=${newPosition.lng}&zoom=18&addressdetails=1`
@@ -57,7 +57,7 @@ const CreateNewListing = () => {
     // Step 1: Basic Information
     propertyName: '',
     propertyType: '',
-    
+
     // Step 2: Location
     addressLine1: '',
     addressLine2: '',
@@ -66,7 +66,7 @@ const CreateNewListing = () => {
     country: '',
     postalCode: '',
     mapLocation: null,
-    
+
     // Step 3: Rooms Setup
     rooms: [{
       name: '',
@@ -79,14 +79,14 @@ const CreateNewListing = () => {
       balconyView: '',
       facilities: []
     }],
-    
+
     // Step 4: Room Photos
     roomPhotos: [],
-    
+
     // Step 5: Language Preference
     languages: [],
     otherLanguage: '',
-    
+
     // Step 6: House Rules
     checkInTime: '',
     checkOutTime: '',
@@ -94,7 +94,7 @@ const CreateNewListing = () => {
     smokingAllowed: false,
     alcoholAllowed: false,
     noiseRestrictions: false,
-    
+
     // Step 7: Pricing & Availability
     pricePerNight: '',
     discounts: {
@@ -104,12 +104,12 @@ const CreateNewListing = () => {
     },
     refundPolicy: '',
     availabilityCalendar: [],
-    
+
     // Step 8: Guest Booking Preferences
     allowedGuests: [],
     instantBooking: false,
     manualApproval: false,
-    
+
     // Step 9: Payment Setup
     paymentMethods: [],
     panGstId: '',
@@ -118,12 +118,12 @@ const CreateNewListing = () => {
       ifscCode: '',
       accountHolderName: ''
     },
-    
+
     // Step 10: Verification
     idProof: null,
     propertyProof: null,
     termsAccepted: false,
-    
+
     // Step 11: App Owner Payment
     paymentMethod: '',
     paymentStatus: 'pending',
@@ -209,7 +209,7 @@ const CreateNewListing = () => {
   const handleRoomChange = (index, field, value) => {
     setFormData(prev => ({
       ...prev,
-      rooms: prev.rooms.map((room, i) => 
+      rooms: prev.rooms.map((room, i) =>
         i === index ? { ...room, [field]: value } : room
       )
     }));
@@ -256,11 +256,10 @@ const CreateNewListing = () => {
                   {propertyTypes.map(type => (
                     <button
                       key={type}
-                      className={`p-4 border rounded-lg text-center ${
-                        formData.propertyType === type
+                      className={`p-4 border rounded-lg text-center ${formData.propertyType === type
                           ? 'border-black bg-gray-100'
                           : 'hover:border-gray-400'
-                      }`}
+                        }`}
                       onClick={() => setFormData(prev => ({ ...prev, propertyType: type }))}
                     >
                       <FiHome className="mx-auto mb-2" />
@@ -346,7 +345,7 @@ const CreateNewListing = () => {
               </div>
               <div className="text-sm text-gray-600 mt-2">
                 <p>Make it clear to guests where your place is located. We'll only share your exact address after they've made a reservation.</p>
-                <button 
+                <button
                   className="text-black underline hover:text-gray-700 mt-1"
                   onClick={() => window.open('https://www.tripngrub.com/help/location-privacy', '_blank')}
                 >
@@ -402,7 +401,7 @@ const CreateNewListing = () => {
                         const result = data[0];
                         const { lat, lon } = result;
                         const address = result.address || {};
-                        
+
                         // Validate the result matches our input
                         const isMatch = (
                           (!formData.city || address.city?.toLowerCase() === formData.city.toLowerCase()) &&
@@ -414,7 +413,7 @@ const CreateNewListing = () => {
                         if (isMatch) {
                           const newLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
                           console.log('Found matching location:', newLocation);
-                          
+
                           setSelectedLocation(newLocation);
                           setFormData(prev => ({
                             ...prev,
@@ -428,7 +427,7 @@ const CreateNewListing = () => {
                       // If full address fails, try with just city and postal code
                       const cityPostal = `${formData.city}, ${formData.postalCode}`;
                       console.log('Trying city and postal code:', cityPostal);
-                      
+
                       const cityResponse = await fetch(
                         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityPostal)}&limit=1&addressdetails=1`,
                         {
@@ -445,7 +444,7 @@ const CreateNewListing = () => {
                         const result = cityData[0];
                         const { lat, lon } = result;
                         const address = result.address || {};
-                        
+
                         // Validate the result matches our input
                         const isMatch = (
                           (!formData.city || address.city?.toLowerCase() === formData.city.toLowerCase()) &&
@@ -455,7 +454,7 @@ const CreateNewListing = () => {
                         if (isMatch) {
                           const newLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
                           console.log('Found matching city location:', newLocation);
-                          
+
                           setSelectedLocation(newLocation);
                           setFormData(prev => ({
                             ...prev,
@@ -490,194 +489,192 @@ const CreateNewListing = () => {
       case 3:
         return (
           <div className="space-y-6">
-          <h2 className="text-2xl font-semibold flex items-center gap-2 text-gray-800">
-            <FiGrid className="text-blue-600" />
-            Rooms Setup
-          </h2>
-        
-          <div className="space-y-6">
-            {formData.rooms.map((room, index) => (
-              <div
-                key={index}
-                className="border p-4 rounded-xl space-y-4 transition-shadow shadow-sm hover:shadow-lg bg-white"
-              >
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">Room {index + 1}</h3>
-                  {index > 0 && (
-                    <button
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          rooms: prev.rooms.filter((_, i) => i !== index),
-                        }))
-                      }
-                      className="text-red-500 hover:text-red-700 font-medium"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-        
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Floor</label>
-                    <select
-                      value={room.floor}
-                      onChange={(e) => handleRoomChange(index, "floor", e.target.value)}
-                      className="w-full p-2 border rounded-lg"
-                    >
-                      <option value="">Select Floor</option>
-                      {floorTypes.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-        
-                  <div>
-                    <label className="block text-sm font-medium mb-2">BHK Type</label>
-                    <select
-                      value={room.bhk}
-                      onChange={(e) => handleRoomChange(index, "bhk", e.target.value)}
-                      className="w-full p-2 border rounded-lg"
-                    >
-                      <option value="">Select BHK Type</option>
-                      {bhkTypes.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-        
-                <div>
-                  <label className="block text-sm font-medium mb-2">Room Name/Type</label>
-                  <input
-                    type="text"
-                    value={room.name}
-                    onChange={(e) => handleRoomChange(index, "name", e.target.value)}
-                    className="w-full p-2 border rounded-lg"
-                    placeholder="e.g., Deluxe Room, Family Suite"
-                  />
-                </div>
-        
-                <div>
-                  <label className="block text-sm font-medium mb-2">Capacity</label>
-                  <input
-                    type="number"
-                    value={room.capacity}
-                    onChange={(e) => handleRoomChange(index, "capacity", e.target.value)}
-                    className="w-full p-2 border rounded-lg"
-                    placeholder="Number of guests"
-                  />
-                </div>
-        
-                <div>
-                  <label className="block text-sm font-medium mb-2">Bed Type</label>
-                  <div className="grid grid-cols-3 gap-4">
-                    {bedTypes.map((type) => (
+            <h2 className="text-2xl font-semibold flex items-center gap-2 text-gray-800">
+              <FiGrid className="text-blue-600" />
+              Rooms Setup
+            </h2>
+
+            <div className="space-y-6">
+              {formData.rooms.map((room, index) => (
+                <div
+                  key={index}
+                  className="border p-4 rounded-xl space-y-4 transition-shadow shadow-sm hover:shadow-lg bg-white"
+                >
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">Room {index + 1}</h3>
+                    {index > 0 && (
                       <button
-                        key={type}
-                        className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${
-                          room.bedType === type
-                            ? "border-blue-600 bg-blue-50 text-blue-600"
-                            : "hover:border-gray-400 text-gray-700"
-                        }`}
-                        onClick={() => handleRoomChange(index, "bedType", type)}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            rooms: prev.rooms.filter((_, i) => i !== index),
+                          }))
+                        }
+                        className="text-red-500 hover:text-red-700 font-medium"
                       >
-                        {type}
+                        Remove
                       </button>
-                    ))}
+                    )}
                   </div>
-                </div>
-        
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={room.hasBathroom}
-                        onChange={(e) =>
-                          handleRoomChange(index, "hasBathroom", e.target.checked)
-                        }
-                      />
-                      Attached Bathroom
-                    </label>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Floor</label>
+                      <select
+                        value={room.floor}
+                        onChange={(e) => handleRoomChange(index, "floor", e.target.value)}
+                        className="w-full p-2 border rounded-lg"
+                      >
+                        <option value="">Select Floor</option>
+                        {floorTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">BHK Type</label>
+                      <select
+                        value={room.bhk}
+                        onChange={(e) => handleRoomChange(index, "bhk", e.target.value)}
+                        className="w-full p-2 border rounded-lg"
+                      >
+                        <option value="">Select BHK Type</option>
+                        {bhkTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
+
                   <div>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={room.hasBalcony}
-                        onChange={(e) =>
-                          handleRoomChange(index, "hasBalcony", e.target.checked)
-                        }
-                      />
-                      Balcony/View
-                    </label>
-                  </div>
-                </div>
-        
-                {room.hasBalcony && (
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Balcony View</label>
+                    <label className="block text-sm font-medium mb-2">Room Name/Type</label>
                     <input
                       type="text"
-                      value={room.balconyView}
-                      onChange={(e) =>
-                        handleRoomChange(index, "balconyView", e.target.value)
-                      }
+                      value={room.name}
+                      onChange={(e) => handleRoomChange(index, "name", e.target.value)}
                       className="w-full p-2 border rounded-lg"
-                      placeholder="e.g., Sea, Garden, City"
+                      placeholder="e.g., Deluxe Room, Family Suite"
                     />
                   </div>
-                )}
-        
-        <div>
-  <label className="block text-sm font-medium mb-3 text-gray-800">
-    Facilities
-  </label>
-  <div className="flex flex-wrap gap-3">
-    {roomFacilities.map((facility) => {
-      const isSelected = room.facilities.includes(facility);
-      return (
-        <button
-          key={facility}
-          onClick={() => {
-            const newFacilities = isSelected
-              ? room.facilities.filter((f) => f !== facility)
-              : [...room.facilities, facility];
-            handleRoomChange(index, "facilities", newFacilities);
-          }}
-          type="button"
-          className={`px-4 py-2 rounded-full border transition-all duration-200 text-sm font-medium 
-            ${
-              isSelected
-                ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-400"
-            }`}
-        >
-          {facility}
-        </button>
-      );
-    })}
-  </div>
-</div>
 
-              </div>
-            ))}
-        
-            <button
-              onClick={addNewRoom}
-              className="w-full p-4 border border-dashed rounded-xl flex items-center justify-center gap-2 hover:border-blue-400 hover:bg-blue-50 transition-all text-blue-600 font-medium"
-            >
-              <FiHome className="text-xl" />
-              Add Another Room
-            </button>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Capacity</label>
+                    <input
+                      type="number"
+                      value={room.capacity}
+                      onChange={(e) => handleRoomChange(index, "capacity", e.target.value)}
+                      className="w-full p-2 border rounded-lg"
+                      placeholder="Number of guests"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Bed Type</label>
+                    <div className="grid grid-cols-3 gap-4">
+                      {bedTypes.map((type) => (
+                        <button
+                          key={type}
+                          className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${room.bedType === type
+                              ? "border-blue-600 bg-blue-50 text-blue-600"
+                              : "hover:border-gray-400 text-gray-700"
+                            }`}
+                          onClick={() => handleRoomChange(index, "bedType", type)}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={room.hasBathroom}
+                          onChange={(e) =>
+                            handleRoomChange(index, "hasBathroom", e.target.checked)
+                          }
+                        />
+                        Attached Bathroom
+                      </label>
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={room.hasBalcony}
+                          onChange={(e) =>
+                            handleRoomChange(index, "hasBalcony", e.target.checked)
+                          }
+                        />
+                        Balcony/View
+                      </label>
+                    </div>
+                  </div>
+
+                  {room.hasBalcony && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Balcony View</label>
+                      <input
+                        type="text"
+                        value={room.balconyView}
+                        onChange={(e) =>
+                          handleRoomChange(index, "balconyView", e.target.value)
+                        }
+                        className="w-full p-2 border rounded-lg"
+                        placeholder="e.g., Sea, Garden, City"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-medium mb-3 text-gray-800">
+                      Facilities
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {roomFacilities.map((facility) => {
+                        const isSelected = room.facilities.includes(facility);
+                        return (
+                          <button
+                            key={facility}
+                            onClick={() => {
+                              const newFacilities = isSelected
+                                ? room.facilities.filter((f) => f !== facility)
+                                : [...room.facilities, facility];
+                              handleRoomChange(index, "facilities", newFacilities);
+                            }}
+                            type="button"
+                            className={`px-4 py-2 rounded-full border transition-all duration-200 text-sm font-medium 
+            ${isSelected
+                                ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-400"
+                              }`}
+                          >
+                            {facility}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                </div>
+              ))}
+
+              <button
+                onClick={addNewRoom}
+                className="w-full p-4 border border-dashed rounded-xl flex items-center justify-center gap-2 hover:border-blue-400 hover:bg-blue-50 transition-all text-blue-600 font-medium"
+              >
+                <FiHome className="text-xl" />
+                Add Another Room
+              </button>
+            </div>
           </div>
-        </div>
         );
       case 4:
         return (
@@ -849,21 +846,48 @@ const CreateNewListing = () => {
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold">Pricing & Availability</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Price Per Night (₹)</label>
-                <div className="flex items-center gap-2">
-                  <FiDollarSign />
-                  <input
-                    type="number"
-                    name="pricePerNight"
-                    value={formData.pricePerNight}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-lg"
-                    placeholder="Enter price per night"
-                  />
-                </div>
+
+            {/* Room Summary Section */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="text-lg font-medium mb-4">Room Summary</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Floor</th>
+
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Rooms Type</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Capacity</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Bed Type</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Price/Night (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {formData.rooms.map((room, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-gray-900">{room.floor || '-'}</td>
+
+                        <td className="px-4 py-3 text-sm text-gray-900">{room.bhk || '-'}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{room.capacity ? `${room.capacity} persons` : '-'}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{room.bedType || '-'}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          <input
+                            type="number"
+                            value={room.price || ''}
+                            onChange={(e) => handleRoomChange(index, "price", e.target.value)}
+                            className="w-24 p-1 border rounded"
+                            placeholder="Enter price"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+              <p className="mt-2 text-sm text-gray-600">Total Rooms: {formData.rooms.length}</p>
+            </div>
+
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Discounts</label>
                 <div className="grid grid-cols-2 gap-4">
@@ -908,9 +932,8 @@ const CreateNewListing = () => {
                   {refundPolicies.map(policy => (
                     <button
                       key={policy}
-                      className={`p-2 border rounded-lg text-center ${
-                        formData.refundPolicy === policy ? 'border-black bg-gray-100' : 'hover:border-gray-400'
-                      }`}
+                      className={`p-2 border rounded-lg text-center ${formData.refundPolicy === policy ? 'border-black bg-gray-100' : 'hover:border-gray-400'
+                        }`}
                       onClick={() => setFormData(prev => ({ ...prev, refundPolicy: policy }))}
                     >
                       {policy}
@@ -1107,29 +1130,27 @@ const CreateNewListing = () => {
                 <p className="text-lg font-medium">Payment Amount: ₹1500</p>
                 <p className="text-sm text-gray-600">This is a one-time payment for listing your property on TripNGrub</p>
               </div>
-              
+
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Choose Payment Method</h3>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <button
-                    className={`p-4 border rounded-lg text-center ${
-                      formData.paymentMethod === 'debit_card'
+                    className={`p-4 border rounded-lg text-center ${formData.paymentMethod === 'debit_card'
                         ? 'border-black bg-gray-100'
                         : 'hover:border-gray-400'
-                    }`}
+                      }`}
                     onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'debit_card' }))}
                   >
                     <FiCreditCard className="mx-auto mb-2" />
                     Debit Card
                   </button>
-                  
+
                   <button
-                    className={`p-4 border rounded-lg text-center ${
-                      formData.paymentMethod === 'upi'
+                    className={`p-4 border rounded-lg text-center ${formData.paymentMethod === 'upi'
                         ? 'border-black bg-gray-100'
                         : 'hover:border-gray-400'
-                    }`}
+                      }`}
                     onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'upi' }))}
                   >
                     <FiShield className="mx-auto mb-2" />
@@ -1286,9 +1307,8 @@ const CreateNewListing = () => {
         <div className="flex justify-between mt-8">
           <button
             onClick={handleBack}
-            className={`px-6 py-2 border rounded-lg ${
-              step === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'
-            }`}
+            className={`px-6 py-2 border rounded-lg ${step === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400'
+              }`}
             disabled={step === 1}
           >
             Back
