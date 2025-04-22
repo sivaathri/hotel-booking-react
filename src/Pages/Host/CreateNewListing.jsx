@@ -304,15 +304,28 @@ const CreateNewListing = () => {
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Country</label>
-                <input
-                  type="text"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-lg"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Country</label>
+                  <input
+                    type="text"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Zip/Postal Code</label>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="Enter zip/postal code"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Pin Location on Map</label>
