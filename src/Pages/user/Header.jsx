@@ -8,6 +8,7 @@ const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
   const [isSigninOpen, setSigninOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -27,6 +28,10 @@ const Header = () => {
       }
     };
   
+    // Check authentication status
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    setIsAuthenticated(!!token);
+  
     handleResize(); // Initial check
     window.addEventListener("resize", handleResize);
   
@@ -39,6 +44,13 @@ const Header = () => {
 
   const toggleNav = () => {
     setIsNavOpen(prevState => !prevState);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    setIsAuthenticated(false);
+    window.location.href = '/';
   };
 
   return (
@@ -184,25 +196,38 @@ const Header = () => {
                   )}
                 </div>
                 <div className="d-flex align-items-center">
-                  <Link
-                    to="/Hosthome"
-                    className="text-light me-3 bg-transparent border-0 p-0 text-decoration-none"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Join our Hoterlier
-                  </Link>
-                  <button
-                    onClick={() => setSignupOpen(true)}
-                    className="btn btn-outline-light me-3 rounded-0 py-2 px-4"
-                  >
-                    Sign Up
-                  </button>
-                  <button
-                    onClick={() => setSigninOpen(true)}
-                    className="btn btn-outline-light rounded-0 py-2 px-4"
-                  >
-                    Sign In
-                  </button>
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        to="/Hosthome"
+                        className="text-light me-3 bg-transparent border-0 p-0 text-decoration-none"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        Join our Hoterlier
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="btn btn-outline-light rounded-0 py-2 px-4"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setSignupOpen(true)}
+                        className="btn btn-outline-light me-3 rounded-0 py-2 px-4"
+                      >
+                        Sign Up
+                      </button>
+                      <button
+                        onClick={() => setSigninOpen(true)}
+                        className="btn btn-outline-light rounded-0 py-2 px-4"
+                      >
+                        Sign In
+                      </button>
+                    </>
+                  )}
                 </div>
 
                 {isSignupOpen && (
