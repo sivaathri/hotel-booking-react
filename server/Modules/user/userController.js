@@ -155,7 +155,7 @@ exports.updateProfile = async (req, res) => {
 
 exports.all = async (req, res) => {
   try {
-    const users = await userModel.getAll();
+    const users = await User.getAll();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: 'Error getting all users', error: error.message });

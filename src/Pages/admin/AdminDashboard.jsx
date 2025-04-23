@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaBed, FaBookmark, FaCheck, FaClock,FaUserFriends } from 'react-icons/fa';
-import axios from 'axios';
 import { API_URL } from '../../config/api.config';
+import { getAuthToken } from '../../utils/getAuthToken'; // adjust the path as needed
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
+const token = getAuthToken()
   const stats = [
     {
       title: 'Users',
@@ -59,6 +59,30 @@ const AdminDashboard = () => {
     },
     // Add more booking data as needed
   ];
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/auth/all`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Replace with your actual token
+          },
+        });
+  
+        const data = await response.json();
+        console.log('Fetched Users:', data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+
 
   return (
     <div className="min-h-screen bg-gray-50">
