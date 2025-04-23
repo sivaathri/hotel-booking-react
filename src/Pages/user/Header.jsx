@@ -272,7 +272,7 @@ const Header = () => {
 
 
 
-                              <Link to="/account" className="px-4 py-3 hover:bg-gray-100">
+                              <Link to="/user-dashboard" className="px-4 py-3 hover:bg-gray-100">
                                 Account
                               </Link>
 
