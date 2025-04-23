@@ -13,7 +13,7 @@ import {
   Legend,
 } from 'chart.js';
 import CustomersList from './CustomersList';
-
+import { motion, AnimatePresence } from "framer-motion";
 // Register ChartJS components
 ChartJS.register(
   CategoryScale,
@@ -304,19 +304,31 @@ const AdminDashboard = () => {
 
       {/* User Modal */}
       {showUserModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white max-w-5xl w-full rounded-xl shadow-lg p-8 relative">
-            <button
-              onClick={() => setShowUserModal(false)}
-              className="absolute top-4 right-6 text-gray-600 hover:text-red-600 text-2xl"
-            >
-              &times;
-            </button>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">User Details</h2>
-            <CustomersList />
-          </div>
-        </div>
-      )}
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    onClick={() => setShowUserModal(false)}
+  >
+    <AnimatePresence>
+      <motion.div
+        className="bg-white max-w-5xl w-full rounded-xl shadow-lg p-8 relative"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <button
+          onClick={() => setShowUserModal(false)}
+          className="absolute top-4 right-6 text-gray-600 hover:text-red-600 text-2xl"
+        >
+          &times;
+        </button>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">User Details</h2>
+        <CustomersList />
+      </motion.div>
+    </AnimatePresence>
+  </div>
+)}
     </div>
   );
 };
