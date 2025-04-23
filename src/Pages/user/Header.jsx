@@ -342,7 +342,7 @@ const Header = () => {
                       </button>
 
                       {/* Sign Up Form */}
-                      <SignupForm setSignupOpen={(value) => {
+                      <SignupForm setSigninOpen={setSigninOpen} setSignupOpen={(value) => {
                         setSignupOpen(value);
                         if (!value) {
                           setSigninOpen(true);
