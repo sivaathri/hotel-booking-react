@@ -3,7 +3,19 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
   try {
-    const { username, email, password, mobile } = req.body;
+    const { 
+      username, 
+      email, 
+      password, 
+      mobile,
+      date_of_birth,
+      gender,
+      marital_status,
+      address,
+      pincode,
+      state,
+      role
+    } = req.body;
     
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
@@ -11,8 +23,21 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new user
-    const userId = await User.create({ username, email, password, mobile });
+    // Create new user with all fields
+    const userId = await User.create({ 
+      username, 
+      email, 
+      password, 
+      mobile,
+      date_of_birth,
+      gender,
+      marital_status,
+      address,
+      pincode,
+      state,
+      role
+    });
+    
     res.status(201).json({ message: 'User created successfully', userId });
   } catch (error) {
     res.status(500).json({ message: 'Error creating user', error: error.message });
@@ -32,6 +57,7 @@ exports.getUser = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
+ 
   try {
     const updated = await User.update(req.params.id, req.body);
     if (!updated) {
@@ -108,11 +134,13 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const updates = req.body;
-    
-    // Remove any sensitive fields that shouldn't be updated directly
-    delete updates.password;
-    delete updates.email;
+    const updates = {
+      ...req.body,
+      // Remove sensitive fields that shouldn't be updated directly
+      password: undefined,
+      email: undefined,
+      role: undefined
+    };
     
     const updated = await User.update(userId, updates);
     if (!updated) {
