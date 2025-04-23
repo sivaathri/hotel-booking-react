@@ -151,13 +151,14 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error updating profile', error: error.message });
   }
-}; 
+};
 
-exports.all = async (req, res) => {
+exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.getAll();
-    res.status(200).json(users);
+    res.json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Error getting all users', error: error.message });
+    res.status(500).json({ message: 'Error fetching users', error: error.message });
   }
-};
+}; 
+

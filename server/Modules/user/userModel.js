@@ -85,10 +85,9 @@ class User {
   }
 
   static async getAll() {
-    const [rows] = await db.execute('SELECT * FROM users');
+    const [rows] = await db.execute('SELECT id, username, email, role, mobile, date_of_birth, gender, marital_status, address, pincode, state FROM users');
     return rows;
   }
-
 }
 
 module.exports = User; 
