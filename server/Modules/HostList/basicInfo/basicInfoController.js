@@ -1,4 +1,4 @@
-const BasicInfo = require('./hostListModels')
+const BasicInfo = require('./basicInfoModels')
 
 // Get all properties
 const getAllProperties = async (req, res) => {
