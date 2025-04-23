@@ -83,6 +83,12 @@ class User {
     const [result] = await db.execute('DELETE FROM users WHERE id = ?', [id]);
     return result.affectedRows;
   }
+
+  static async getAll() {
+    const [rows] = await db.execute('SELECT * FROM users');
+    return rows;
+  }
+
 }
 
 module.exports = User; 

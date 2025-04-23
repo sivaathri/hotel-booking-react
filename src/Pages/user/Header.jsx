@@ -220,9 +220,17 @@ const Header = () => {
                 <div className="d-flex align-items-center">
                   {isAuthenticated ? (
                     <>
-                      <Link to="/HostHeader" className="btn btn-warning me-3 rounded-0 py-2 px-4">
-                        <i className="fas fa-home me-2"></i> Join our Hoterlier
+                      <Link
+                        to="/HostHeader"
+                        className="relative  inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 px-6 py-3 font-semibold text-white shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
+                      >
+                        <span className="relative ml z-10 flex items-center">
+                          <i className="fas fa-home mr-2"></i>
+                          Join our Hotelier
+                        </span>
+                        <span className="absolute inset-0 z-0 bg-white opacity-10 blur-lg"></span>
                       </Link>
+
                       <div className="position-relative">
                         <div className="flex items-center justify-between h-12 px-2  border border-gray-300 rounded-full shadow-sm">
                           {/* Hamburger Menu Icon */}

@@ -1,11 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaBed, FaBookmark, FaCheck, FaClock } from 'react-icons/fa';
-
+import { FaBed, FaBookmark, FaCheck, FaClock,FaUserFriends } from 'react-icons/fa';
+import axios from 'axios';
+import { API_URL } from '../../config/api.config';
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const stats = [
+    {
+      title: 'Users',
+      count: '3',
+      icon: <FaUserFriends className="w-5 h-5" />,
+      color: 'bg-purple-100 text-purple-600',
+      link: 'View Details'
+    },    
     {
       title: 'Room Types',
       count: '3',

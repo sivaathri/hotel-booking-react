@@ -4,7 +4,7 @@ import axios from 'axios';
 import { API_URL } from '../../config/api.config';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
 
-const SignIn = ({setSigninOpen}) => {
+const SignIn = ({ setSigninOpen }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -32,18 +32,50 @@ const SignIn = ({setSigninOpen}) => {
     setLoading(true);
     console.log('Starting login process...');
 
-    // Check for admin credentials
-    if (formData.email === 'admin@gmail.com' && formData.password === 'Admin@123') {
-      console.log('Admin login detected, redirecting to admin dashboard...');
-      // Store admin token
-      if (stayLoggedIn) {
-        localStorage.setItem('token', 'admin-token');
-      } else {
-        sessionStorage.setItem('token', 'admin-token');
+    // Check for admin credentials    
+    try {
+      console.log('Making API request for regular user...');
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        email: formData.email,
+        password: formData.password
+      });
+
+      console.log('Login response:', response);
+
+      if (response.status === 200) {
+        console.log('Login successful, storing token...');
+
+        const { token, user } = response.data; // assuming `user` object is returned
+
+        if (stayLoggedIn) {
+          localStorage.setItem('token', token);
+        } else {
+          sessionStorage.setItem('token', token);
+        }
+
+        console.log('Token stored, checking for admin...');
+
+        // Check for specific admin credentials
+        if (
+          formData.email === 'admin@gmail.com' &&
+          formData.password === 'Admin@123'
+        ) {
+          console.log('Admin detected, redirecting...');
+          window.location.href = '/admin/dashboard'; // or your admin route
+        } else {
+          console.log('Regular user, redirecting to home...');
+          window.location.href = '/';
+        }
       }
-      window.location.href = '/admin/dashboard';
-      return;
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
+
+    return;
+
 
     try {
       console.log('Making API request for regular user...');
@@ -62,7 +94,7 @@ const SignIn = ({setSigninOpen}) => {
         } else {
           sessionStorage.setItem('token', response.data.token);
         }
-        
+
         console.log('Token stored, attempting navigation...');
         // Force navigation to home page
         window.location.href = '/';
