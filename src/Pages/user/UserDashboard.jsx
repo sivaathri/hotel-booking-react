@@ -417,20 +417,20 @@ const LoggedInDevices = () => {
   );
 };
 
-
-
 export default function UserDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentField, setCurrentField] = useState('');
   const [selectedMenu, setSelectedMenu] = useState('Profile');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState({
+    id: '',
     name: '',
     email: '',
     mobile: '',
-    birthday: '',
+    date_of_birth: '',
     gender: '',
-    maritalStatus: '',
+    marital_status: '',
     address: '',
     pincode: '',
     state: ''
@@ -456,18 +456,21 @@ export default function UserDashboard() {
 
         if (response.status === 200) {
           const userData = response.data;
+          console.log('User ID:', userData.id);
           setProfileData({
+            id: userData._id || userData.id,
             name: userData.username || '',
             email: userData.email || '',
             mobile: userData.mobile || '',
-            birthday: userData.birthday || '',
+            date_of_birth: userData.date_of_birth || '',
             gender: userData.gender || '',
-            maritalStatus: userData.maritalStatus || '',
+            marital_status: userData.marital_status || '',
             address: userData.address || '',
             pincode: userData.pincode || '',
             state: userData.state || ''
           });
         }
+      
       } catch (error) {
         setError('Failed to fetch user data');
         console.error('Error fetching user data:', error);
@@ -488,10 +491,16 @@ export default function UserDashboard() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const fieldName = currentField.toLowerCase().replace(' ', '');
+      
+      if (!profileData.id) {
+        throw new Error('User ID not found');
+      }
 
       const response = await axios.put(
-        `${API_URL}/users/profile`,
-        { [fieldName]: value },
+        `${API_URL}/auth/${profileData.id}`,
+        { 
+          [fieldName]: value 
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -509,7 +518,7 @@ export default function UserDashboard() {
     } catch (error) {
       console.error('Error updating profile:', error);
       setError('Failed to update profile');
-      alert('Failed to update profile');
+      alert('Failed to update profile: ' + (error.message || 'Unknown error'));
     }
   };
 
@@ -533,7 +542,7 @@ export default function UserDashboard() {
               <X className="w-6 h-6" />
             </button>
           </div>
-          {field.toLowerCase() === 'birthday' ? (
+          {field.toLowerCase() === 'date_of_birth' ? (
             <input
               type="date"
               value={inputValue}
@@ -695,11 +704,11 @@ export default function UserDashboard() {
                 </div> */}
 
                 {/* Profile Completion */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="bg-white/90  w-200 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                   <h3 className="text-xl font-semibold mb-4 text-gray-800">Complete your Profile</h3>
                   <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
                     {(() => {
-                      const totalFields = 7; // name, email, mobile, birthday, gender, maritalStatus, address
+                      const totalFields = 7; // name, email, mobile, date_of_birth, gender, marital_status, address
                       const completedFields = Object.values(profileData).filter(value => value !== '').length;
                       const completionPercentage = (completedFields / totalFields) * 100;
 
@@ -716,7 +725,7 @@ export default function UserDashboard() {
 
                       return (
                         <div className={`bg-gradient-to-r ${colorClass} h-3 rounded-full transition-all duration-500`}
-                          style={{ width: `${completionPercentage}%` }}></div>
+                          style={{ width: '100%' }}></div>
                       );
                     })()}
                   </div>
@@ -737,12 +746,7 @@ export default function UserDashboard() {
                       <span className="ml-2 text-green-500">{profileData.mobile}</span>
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <button className="flex items-center bg-blue-500 text-white rounded-full p-2 mr-3 hover:bg-blue-600 transition-colors duration-300">
-                        <Plus className="w-5 h-5" />
-                      </button>
-                      <span className="text-gray-700">Complete Basic Info</span>
-                    </div>
+                  
                   </div>
                 </div>
 
@@ -752,9 +756,16 @@ export default function UserDashboard() {
                     <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                       Profile Details
                     </h2>
-                    <button className="flex items-center   border-blue-500 rounded-xl px-6 py-2 hover:bg-yellow-50 transition-all duration-300 transform hover:-translate-y-1">
+                    <button 
+                      onClick={() => setIsEditMode(!isEditMode)}
+                      className={`flex items-center  rounded-xl px-6 py-2 transition-all duration-300 transform hover:-translate-y-1 ${
+                        isEditMode 
+                          ? 'bg-green-500 text-white border-green-500 hover:bg-green-600' 
+                          : 'border-blue-500 hover:bg-yellow-50'
+                      }`}
+                    >
                       <Edit className="w-5 h-5 mr-2" />
-                      EDIT
+                      {isEditMode ? 'SAVE' : 'EDIT'}
                     </button>
                   </div>
                   <p className="text-gray-600 mb-8">Basic info, for a faster booking experience</p>
@@ -763,26 +774,60 @@ export default function UserDashboard() {
                     {/* Profile Info Cards */}
                     {[
                       { label: 'NAME', value: profileData.name, key: 'name', icon: null },
-                      { label: 'BIRTHDAY', value: profileData.birthday, key: 'birthday', icon: <Calendar className="w-5 h-5 mr-2" /> },
+                      { label: 'date_of_birth', value: profileData.date_of_birth, key: 'date_of_birth', icon: <Calendar className="w-5 h-5 mr-2" /> },
                       { label: 'GENDER', value: profileData.gender, key: 'gender', icon: <Plus className="w-5 h-5 mr-2" /> },
-                      { label: 'MARITAL STATUS', value: profileData.maritalStatus, key: 'maritalStatus', icon: <Plus className="w-5 h-5 mr-2" /> },
+                      { label: 'MARITAL STATUS', value: profileData.marital_status, key: 'marital_status', icon: <Plus className="w-5 h-5 mr-2" /> },
                       { label: 'YOUR ADDRESS', value: profileData.address, key: 'address', icon: <MapPin className="w-5 h-5 mr-2" /> },
                       { label: 'PINCODE', value: profileData.pincode, key: 'pincode', icon: <Plus className="w-5 h-5 mr-2" /> },
                       { label: 'STATE', value: profileData.state, key: 'state', icon: <Plus className="w-5 h-5 mr-2" /> },
                     ].map(({ label, value, key, icon }) => (
                       <div key={key} className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
                         <p className="text-gray-500 text-sm mb-2">{label}</p>
-                        {value ? (
+                        {isEditMode ? (
+                          key === 'gender' ? (
+                            <select
+                              value={value || ''}
+                              onChange={(e) => setProfileData(prev => ({ ...prev, [key]: e.target.value }))}
+                              className="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                            >
+                              <option value="">Select Gender</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                              <option value="Other">Other</option>
+                              <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                          ) : key === 'marital_status' ? (
+                            <select
+                              value={value || ''}
+                              onChange={(e) => setProfileData(prev => ({ ...prev, [key]: e.target.value }))}
+                              className="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                            >
+                              <option value="">Select Marital Status</option>
+                              <option value="Single">Single</option>
+                              <option value="Married">Married</option>
+                              <option value="Divorced">Divorced</option>
+                              <option value="Widowed">Widowed</option>
+                              <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                          ) : (
+                            <input
+                              type={key === 'date_of_birth' ? 'date' : 'text'}
+                              value={value || ''}
+                              onChange={(e) => setProfileData(prev => ({ ...prev, [key]: e.target.value }))}
+                              className="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                              placeholder={`Enter your ${label.toLowerCase()}`}
+                            />
+                          )
+                        ) : value ? (
                           <p className="font-medium text-gray-800">{value}</p>
                         ) : (
                           <button
-                          onClick={() => handleAddClick(key)}
-                          className="flex items-center hover:text-black-600 transition-colors"
-                          style={{ color: '#ffc107' }} // Setting the text color to #ffc107
-                        >
-                          {icon} Add {label}
-                        </button>
-                        
+                            onClick={() => handleAddClick(key)}
+                            className="flex items-center hover:text-black-600 transition-colors"
+                            style={{ color: '#ffc107' }}
+                          >
+                            {icon} Add {label}
+                          </button>
                         )}
                       </div>
                     ))}
