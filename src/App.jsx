@@ -33,6 +33,9 @@ import Listings from './Pages/Host/Listings';
 import CreateListing from './Pages/Host/CreateListing';
 import CreateNewListing from './Pages/Host/CreateNewListing';
 
+// Protected Routes
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <>
@@ -46,7 +49,11 @@ function App() {
           <Route path="/book/:id" element={<UserBookRoom />} />
           <Route path="/register" element={<Register />} />
           {/* <Route path="/login" element={<UserLogin />} /> */}
-          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/user-dashboard" element={
+            <ProtectedRoute>
+              <UserDashboard />
+            </ProtectedRoute>
+          } />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/book-room" element={<BookingRoom />} />
           <Route path="/user-profile" element={<UserProfile />} />
@@ -56,12 +63,41 @@ function App() {
           <Route path="/register" element={<AuthRegister />} />
 
           {/*  Host Rooms  Routes */}
-          <Route path="/HostHeader" element={<HostHeader />}/>
-          <Route path="/Hosthome" element={<Hosthome />}/>
-          <Route path="/hostuserdashboard" element={<HostUserDashboard />}/>
-          <Route path="/listings" element={<Listings />}/>
-          <Route path="/create-listing" element={<CreateListing />}/>
-          <Route path="/create-new-listing" element={<CreateNewListing />}/>
+          <Route path="/HostHeader" element={
+            <ProtectedRoute>
+              <HostHeader />
+            </ProtectedRoute>
+          } />
+          <Route path="/Hosthome" element={
+            <ProtectedRoute>
+              <Hosthome />
+            </ProtectedRoute>
+          } />
+          <Route path="/hostuserdashboard" element={
+            <ProtectedRoute>
+              <HostUserDashboard />
+            </ProtectedRoute>
+
+
+          } />
+          <Route path="/listings" element={
+            <ProtectedRoute>
+              <Listings />
+            </ProtectedRoute>
+          } />
+          <Route path="/create-listing" element={
+            <ProtectedRoute>
+              <CreateListing />
+            </ProtectedRoute>
+
+
+          } />
+          <Route path="/create-new-listing" element={
+            <ProtectedRoute>
+              <CreateNewListing />
+            </ProtectedRoute>
+
+          } />
 
           <Route path="/admin/customers" element={<CustomersList />} />
           <Route path="/admin/invoices" element={<InvoiceList />} />
