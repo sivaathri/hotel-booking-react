@@ -5,7 +5,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { API_URL } from '../../config/api.config';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaUser, FaMobile } from 'react-icons/fa';
 
-function SignupForm() {
+function SignupForm({ setSignupOpen }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -402,9 +402,15 @@ function SignupForm() {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <a href="/login" className="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
+              <button
+                onClick={() => {
+                  setSignupOpen(false);
+                  // The sign-in form will be opened by the parent component
+                }}
+                className="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out"
+              >
                 Sign in
-              </a>
+              </button>
             </p>
           </div>
 

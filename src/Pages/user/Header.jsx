@@ -313,7 +313,7 @@ const Header = () => {
 
                 {isSignupOpen && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white rounded-2xl p-8 w-full max-w-xl mt-5 shadow-2xl relative animate-fade-in">
+                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-fade-in">
                       {/* Close Button */}
                       <button
                         onClick={() => setSignupOpen(false)}
@@ -323,7 +323,12 @@ const Header = () => {
                       </button>
 
                       {/* Sign Up Form */}
-                      <SignupForm />
+                      <SignupForm setSignupOpen={(value) => {
+                        setSignupOpen(value);
+                        if (!value) {
+                          setSigninOpen(true);
+                        }
+                      }} />
                     </div>
                   </div>
                 )}
