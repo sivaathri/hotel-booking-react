@@ -4,7 +4,7 @@ const cors = require('cors')
 router.use(cors())
 // Routes
 const userRoutes = require('../Modules/user/userRoutes');
-const hostListRoutes = require('../Modules/HostList/hostListRoutes');
+const hostListRoutes = require('../Modules/HostList/basicInfo/hostListRoutes');
 
 // API Routes
 router.use('/auth', userRoutes)

@@ -1,4 +1,4 @@
-const db = require('../../config/db')
+const db = require('../../../config/db')
 
 class BasicInfo {
   // Get all properties
