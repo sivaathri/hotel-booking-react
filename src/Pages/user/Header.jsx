@@ -217,14 +217,14 @@ const Header = () => {
                     </Link>
                   )}
                 </div>
-                <div className="d-flex align-items-center">
+                <div className="d-flex gap-3 align-items-center">
                   {isAuthenticated ? (
                     <>
                       <Link
                         to="/HostHeader"
                         className="relative  inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 px-6 py-3 font-semibold text-white shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
                       >
-                        <span className="relative ml z-10 flex items-center">
+                        <span className="relative z-10 flex items-center">
                           <i className="fas fa-home mr-2"></i>
                           Join our Hotelier
                         </span>
