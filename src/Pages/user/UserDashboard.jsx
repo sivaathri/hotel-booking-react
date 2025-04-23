@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, LogOut, Monitor, Users, ChevronDown, Edit, Plus, Check, X, Mail, Phone, Calendar, MapPin, Lock, BookOpen, Search, Filter, ChevronRight, Star, MapPin as MapPinIcon, Clock, CreditCard, Smartphone, Laptop, Tablet, Globe, Trash2, AlertTriangle, UserPlus, UserMinus, UserCheck, Heart, Shield } from 'lucide-react';
 import axios from 'axios';
 import Header from '../.././Pages/user/Header';
+import { API_URL } from '../../config/api.config';
 const MyBookings = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [hoveredBooking, setHoveredBooking] = useState(null);
@@ -192,8 +193,8 @@ const MyBookings = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full mr-2 animate-pulse ${booking.status === 'confirmed' ? 'bg-green-500' :
-                    booking.status === 'pending' ? 'bg-yellow-500' :
-                      booking.status === 'completed' ? 'bg-blue-500' : 'bg-red-500'
+                  booking.status === 'pending' ? 'bg-yellow-500' :
+                    booking.status === 'completed' ? 'bg-blue-500' : 'bg-red-500'
                   }`}></div>
                 <span className="text-sm font-medium">
                   {booking.status === 'confirmed' ? 'Confirmed' :
@@ -240,8 +241,8 @@ const MyBookings = () => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-6 py-3 font-medium relative transition-all duration-300 ${activeTab === tab
-                ? 'text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'text-blue-600'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -447,7 +448,7 @@ export default function UserDashboard() {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/auth/profile', {
+        const response = await axios.get(`${API_URL}/auth/profile`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -489,7 +490,7 @@ export default function UserDashboard() {
       const fieldName = currentField.toLowerCase().replace(' ', '');
 
       const response = await axios.put(
-        'http://localhost:5000/api/users/profile',
+        `${API_URL}/users/profile`,
         { [fieldName]: value },
         {
           headers: {
@@ -508,6 +509,7 @@ export default function UserDashboard() {
     } catch (error) {
       console.error('Error updating profile:', error);
       setError('Failed to update profile');
+      alert('Failed to update profile');
     }
   };
 
@@ -531,31 +533,48 @@ export default function UserDashboard() {
               <X className="w-6 h-6" />
             </button>
           </div>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 mb-6 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            placeholder={`Enter your ${field.toLowerCase()}`}
-          />
-          <div className="flex justify-end">
+          {field.toLowerCase() === 'birthday' ? (
+            <input
+              type="date"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 mb-6 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+            />
+          ) : (
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 mb-6 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+              placeholder={`Enter your ${field.toLowerCase()}`}
+            />
+          )}
+          <div className="flex mt-2 justify-end">
             <button
               onClick={() => onUpdate(inputValue)}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
+              className="text-black font-semibold px-6 py-2 transition-all duration-300"
+              style={{
+                borderRadius: '8px',
+                backgroundColor: '#ffc107',
+              }}
+              onMouseEnter={e => (e.target.style.backgroundColor = '#e0ac00')}
+              onMouseLeave={e => (e.target.style.backgroundColor = '#ffc107')}
             >
               Save Changes
             </button>
           </div>
+
         </div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6">
-
-      <Header />
-      <div className="max-w-7xl mt-10 mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <Header />
+      </div>
+      <div className="max-w-7xl mx-auto pt-24 p-6">
         {/* Header Navigation */}
         <div className="flex items-center mb-8">
           <div className="relative group">
@@ -564,7 +583,7 @@ export default function UserDashboard() {
               <ChevronDown className="ml-2 w-5 h-5 transform group-hover:rotate-180 transition-transform duration-300" />
             </button>
           </div>
-         
+
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -589,8 +608,8 @@ export default function UserDashboard() {
             <div className="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl">
               <div
                 className={`p-6 flex items-center cursor-pointer transition-all duration-300 ${selectedMenu === 'Profile'
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    : 'hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                  : 'hover:bg-gray-50'
                   }`}
                 onClick={() => setSelectedMenu('Profile')}
               >
@@ -599,8 +618,8 @@ export default function UserDashboard() {
               </div>
               <div
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${selectedMenu === 'My Bookings'
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    : 'hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                  : 'hover:bg-gray-50'
                   }`}
                 onClick={() => setSelectedMenu('My Bookings')}
               >
@@ -609,19 +628,19 @@ export default function UserDashboard() {
               </div>
               <div
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${selectedMenu === 'Login Details'
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    : 'hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                  : 'hover:bg-gray-50'
                   }`}
                 onClick={() => setSelectedMenu('Login Details')}
               >
                 <Lock className={`mr-4 w-6 h-6 ${selectedMenu === 'Login Details' ? 'text-white' : 'text-gray-500'}`} />
                 <span className={`${selectedMenu === 'Login Details' ? 'text-white font-medium' : 'text-gray-700'}`}>Login Details</span>
               </div>
-              
+
               <div
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${selectedMenu === 'Logged In Devices'
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    : 'hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                  : 'hover:bg-gray-50'
                   }`}
                 onClick={() => setSelectedMenu('Logged In Devices')}
               >
@@ -630,8 +649,8 @@ export default function UserDashboard() {
               </div>
               <div
                 className={`border-t border-gray-100 p-6 flex items-center cursor-pointer transition-colors ${selectedMenu === 'Logout'
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                    : 'hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                  : 'hover:bg-gray-50'
                   }`}
                 onClick={() => setShowLogoutConfirm(true)}
               >
@@ -647,15 +666,15 @@ export default function UserDashboard() {
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
               </div>
-            ) : error ? (
-              <div className="bg-red-50 text-red-600 p-4 rounded-2xl shadow-lg">
-                {error}
-              </div>
+              // ) : error ? (
+              //   <div className="bg-red-50 text-red-600 p-4 rounded-2xl shadow-lg">
+              //     {error}
+              //   </div>
             ) : selectedMenu === 'My Bookings' ? (
               <MyBookings />
             ) : selectedMenu === 'Logged In Devices' ? (
               <LoggedInDevices />
-            )  : (
+            ) : (
               <>
                 {/* AI Assistant */}
                 {/* <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-3xl p-8 mb-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
@@ -733,7 +752,7 @@ export default function UserDashboard() {
                     <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                       Profile Details
                     </h2>
-                    <button className="flex items-center text-blue-500 border-2 border-blue-500 rounded-xl px-6 py-2 hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1">
+                    <button className="flex items-center   border-blue-500 rounded-xl px-6 py-2 hover:bg-yellow-50 transition-all duration-300 transform hover:-translate-y-1">
                       <Edit className="w-5 h-5 mr-2" />
                       EDIT
                     </button>
@@ -741,101 +760,32 @@ export default function UserDashboard() {
                   <p className="text-gray-600 mb-8">Basic info, for a faster booking experience</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <p className="text-gray-500 text-sm mb-2">NAME</p>
-                      <p className="font-medium text-gray-800">{profileData.name}</p>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <p className="text-gray-500 text-sm mb-2">BIRTHDAY</p>
-                      {profileData.birthday ? (
-                        <p className="font-medium text-gray-800">{profileData.birthday}</p>
-                      ) : (
-                        <button
-                       
-                          onClick={() => handleAddClick('BIRTHDAY')}
-                          className="text-blue-500 flex items-center hover:text-blue-600 transition-colors"
+                    {/* Profile Info Cards */}
+                    {[
+                      { label: 'NAME', value: profileData.name, key: 'name', icon: null },
+                      { label: 'BIRTHDAY', value: profileData.birthday, key: 'birthday', icon: <Calendar className="w-5 h-5 mr-2" /> },
+                      { label: 'GENDER', value: profileData.gender, key: 'gender', icon: <Plus className="w-5 h-5 mr-2" /> },
+                      { label: 'MARITAL STATUS', value: profileData.maritalStatus, key: 'maritalStatus', icon: <Plus className="w-5 h-5 mr-2" /> },
+                      { label: 'YOUR ADDRESS', value: profileData.address, key: 'address', icon: <MapPin className="w-5 h-5 mr-2" /> },
+                      { label: 'PINCODE', value: profileData.pincode, key: 'pincode', icon: <Plus className="w-5 h-5 mr-2" /> },
+                      { label: 'STATE', value: profileData.state, key: 'state', icon: <Plus className="w-5 h-5 mr-2" /> },
+                    ].map(({ label, value, key, icon }) => (
+                      <div key={key} className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
+                        <p className="text-gray-500 text-sm mb-2">{label}</p>
+                        {value ? (
+                          <p className="font-medium text-gray-800">{value}</p>
+                        ) : (
+                          <button
+                          onClick={() => handleAddClick(key)}
+                          className="flex items-center hover:text-black-600 transition-colors"
+                          style={{ color: '#ffc107' }} // Setting the text color to #ffc107
                         >
-                          <Calendar className="w-5 h-5 mr-2" />
-                          Add Birthday
+                          {icon} Add {label}
                         </button>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <p className="text-gray-500 text-sm mb-2">GENDER</p>
-                      {profileData.gender ? (
-                        <p className="font-medium text-gray-800">{profileData.gender}</p>
-                      ) : (
-                        <button
-                          onClick={() => handleAddClick('GENDER')}
-                          className="text-blue-500 flex items-center hover:text-blue-600 transition-colors"
-                        >
-                          <Plus className="w-5 h-5 mr-2" />
-                          Add Gender
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <p className="text-gray-500 text-sm mb-2">MARITAL STATUS</p>
-                      {profileData.maritalStatus ? (
-                        <p className="font-medium text-gray-800">{profileData.maritalStatus}</p>
-                      ) : (
-                        <button
-                          onClick={() => handleAddClick('MARITAL STATUS')}
-                          className="text-blue-500 flex items-center hover:text-blue-600 transition-colors"
-                        >
-                          <Plus className="w-5 h-5 mr-2" />
-                          Add Status
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <p className="text-gray-500 text-sm mb-2">YOUR ADDRESS</p>
-                      {profileData.address ? (
-                        <p className="font-medium text-gray-800">{profileData.address}</p>
-                      ) : (
-                        <button
-                          onClick={() => handleAddClick('YOUR ADDRESS')}
-                          className="text-blue-500 flex items-center hover:text-blue-600 transition-colors"
-                        >
-                          <MapPin className="w-5 h-5 mr-2" />
-                          Add Address
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <p className="text-gray-500 text-sm mb-2">PINCODE</p>
-                      {profileData.pincode ? (
-                        <p className="font-medium text-gray-800">{profileData.pincode}</p>
-                      ) : (
-                        <button
-                          onClick={() => handleAddClick('PINCODE')}
-                          className="text-blue-500 flex items-center hover:text-blue-600 transition-colors"
-                        >
-                          <Plus className="w-5 h-5 mr-2" />
-                          Add Pincode
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1">
-                      <p className="text-gray-500 text-sm mb-2">STATE</p>
-                      {profileData.state ? (
-                        <p className="font-medium text-gray-800">{profileData.state}</p>
-                      ) : (
-                        <button
-                          onClick={() => handleAddClick('STATE')}
-                          className="text-blue-500 flex items-center hover:text-blue-600 transition-colors"
-                        >
-                          <Plus className="w-5 h-5 mr-2" />
-                          Add State
-                        </button>
-                      )}
-                    </div>
+                        
+                        )}
+                      </div>
+                    ))}
                   </div>
 
                   <Modal
@@ -845,6 +795,7 @@ export default function UserDashboard() {
                     field={currentField}
                   />
                 </div>
+
               </>
             )}
           </div>

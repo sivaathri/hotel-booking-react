@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { API_URL } from '../../config/api.config';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaUser, FaMobile } from 'react-icons/fa';
 
-function SignupForm() {
+function SignupForm({ setSignupOpen }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -152,7 +154,7 @@ function SignupForm() {
       setLoading(true);
       setError("");
       
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post(`${API_URL}/auth/register`, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -180,7 +182,7 @@ function SignupForm() {
       setError("");
 
       // Send the Google credential to your backend
-      const response = await axios.post('http://localhost:5000/api/auth/google', {
+      const response = await axios.post(`${API_URL}/auth/google`, {
         credential: credentialResponse.credential
       });
 
@@ -209,7 +211,7 @@ function SignupForm() {
       setError("");
 
       // Send the Apple authentication response to your backend
-      const response = await axios.post('http://localhost:5000/api/auth/apple', {
+      const response = await axios.post(`${API_URL}/auth/apple`, {
         credential: response.credential
       });
 
@@ -233,176 +235,242 @@ function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        value={formData.username}
-        onChange={handleInputChange}
-        className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-        required
-      />
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleInputChange}
-        className="w-full mb-3 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-        required
-      />
-      
-      <div className="relative mb-3">
-        <input
-          type={passwordVisible ? "text" : "password"}
-          placeholder="Password"
-          value={password}
-          onChange={handlePasswordChange}
-          onFocus={handlePasswordFocus}
-          onBlur={handlePasswordBlur}
-          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-        />
-        <button
-          type="button"
-          className="absolute right-3 top-3 text-gray-500"
-          onClick={togglePasswordVisibility}
-        >
-          {passwordVisible ? (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 11c0-1.21-.51-2.42-1.42-3.42M15 9c-1.2 0-2.4.49-3.42 1.42M9 15c1.2 0 2.4-.49 3.42-1.42M9 9C7.8 9 6.6 9.49 5.58 10.42M13 5C12.21 5 11.47 5.15 10.78 5.42M3 5l18 18"/>
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3c4.5 0 8.5 3.58 8.5 8s-4 8-8.5 8-8.5-3.58-8.5-8 4-8 8.5-8zm0 3a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5z"/>
-            </svg>
-          )}
-        </button>
-      </div>
-      {showPasswordRequirements && (
-        <div className="mb-3 space-y-1">
-          <p className={`text-sm ${validatePassword(password).hasChar ? 'text-green-500' : 'text-gray-500'}`}>
-            ✓ At least one character (a-z or A-Z)
-          </p>
-          <p className={`text-sm ${validatePassword(password).hasSpecialChar ? 'text-green-500' : 'text-gray-500'}`}>
-            ✓ At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)
-          </p>
-          <p className={`text-sm ${validatePassword(password).hasNumber ? 'text-green-500' : 'text-gray-500'}`}>
-            ✓ At least one number (0-9)
+    <div className="flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Create Account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Please fill in your details to sign up
           </p>
         </div>
-      )}
 
-      <input
-        type="number"
-        placeholder="Mobile Number"
-        value={mobile}
-        onChange={handleMobileChange}
-        className="w-full mb-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-      />
-      {mobileError && (
-        <p className="text-red-500 text-sm mb-3">{mobileError}</p>
-      )}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-4">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleInputChange}
+                className="appearance-none rounded-lg relative block w-full pl-10 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+            </div>
 
-      {!isOtpSent ? (
-        <button
-          type="button"
-          className={`bg-blue-500 text-white py-2 px-4 rounded w-full mb-3 ${isOtpEnabled ? "opacity-100" : "opacity-50 cursor-not-allowed"}`}
-          disabled={!isOtpEnabled}
-          onClick={handleSendOtp}
-        >
-          Get OTP
-        </button>
-      ) : !isOtpVerified ? (
-        <div className="mb-3">
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              placeholder="Enter 4-digit OTP"
-              value={otp}
-              onChange={handleOtpChange}
-              className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-              maxLength={4}
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaEnvelope className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="appearance-none rounded-lg relative block w-full pl-10 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaLock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type={passwordVisible ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
+                onFocus={handlePasswordFocus}
+                onBlur={handlePasswordBlur}
+                className="appearance-none rounded-lg relative block w-full pl-10 pr-10 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out focus:outline-none"
+              >
+                {passwordVisible ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+              </button>
+            </div>
+
+            {showPasswordRequirements && (
+              <div className="space-y-1 bg-gray-50 p-3 rounded-lg">
+                <p className={`text-sm ${validatePassword(password).hasChar ? 'text-green-500' : 'text-gray-500'}`}>
+                  ✓ At least one character (a-z or A-Z)
+                </p>
+                <p className={`text-sm ${validatePassword(password).hasSpecialChar ? 'text-green-500' : 'text-gray-500'}`}>
+                  ✓ At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)
+                </p>
+                <p className={`text-sm ${validatePassword(password).hasNumber ? 'text-green-500' : 'text-gray-500'}`}>
+                  ✓ At least one number (0-9)
+                </p>
+              </div>
+            )}
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaMobile className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="number"
+                placeholder="Mobile Number"
+                value={mobile}
+                onChange={handleMobileChange}
+                className="appearance-none rounded-lg relative block w-full pl-10 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+              />
+            </div>
+            {mobileError && (
+              <p className="text-red-500 text-sm">{mobileError}</p>
+            )}
+
+            {!isOtpSent ? (
+              <button
+                type="button"
+                className={`w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white ${isOtpEnabled ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out`}
+                disabled={!isOtpEnabled}
+                onClick={handleSendOtp}
+              >
+                Get OTP
+              </button>
+            ) : !isOtpVerified ? (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter 4-digit OTP"
+                    value={otp}
+                    onChange={handleOtpChange}
+                    className="appearance-none rounded-lg relative block w-full py-3 px-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+                    maxLength={4}
+                  />
+                  <button
+                    type="button"
+                    className="flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                    onClick={handleVerifyOtp}
+                  >
+                    Verify
+                  </button>
+                </div>
+                {otpError && (
+                  <p className="text-red-500 text-sm">{otpError}</p>
+                )}
+              </div>
+            ) : (
+              <div className="text-green-500 text-sm bg-green-50 p-3 rounded-lg">
+                ✓ Mobile number verified
+              </div>
+            )}
+          </div>
+
+          {error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div>
             <button
-              type="button"
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
-              onClick={handleVerifyOtp}
+              type="submit"
+              disabled={!isOtpVerified || loading}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Verify
+              {loading ? (
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing up...
+                </div>
+              ) : (
+                'Sign up'
+              )}
             </button>
           </div>
-          {otpError && (
-            <p className="text-red-500 text-sm">{otpError}</p>
-          )}
-        </div>
-      ) : (
-        <div className="mb-3 text-green-500 text-sm">
-          ✓ Mobile number verified
-        </div>
-      )}
 
-      {error && (
-        <p className="text-red-500 text-sm mb-3">{error}</p>
-      )}
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Already have an account?{' '}
+              <button
+                onClick={() => {
+                  setSignupOpen(false);
+                  // The sign-in form will be opened by the parent component
+                }}
+                className="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out"
+              >
+                Sign in
+              </button>
+            </p>
+          </div>
 
-      <button 
-        type="submit" 
-        className={`bg-[#FEA116] text-white py-2 px-4 rounded w-full ${!isOtpVerified ? "opacity-50 cursor-not-allowed" : ""} ${loading ? "opacity-70" : ""}`}
-        disabled={!isOtpVerified || loading}
-      >
-        {loading ? "Signing up..." : "Sign Up"}
-      </button>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
+          </div>
 
-      <div className="my-4 text-center text-gray-400 text-sm">or</div>
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <div className="w-full">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="filled_blue"
+                size="large"
+                width="100%"
+                text="continue_with"
+                shape="rectangular"
+                logo_alignment="left"
+                context="signup"
+              />
+            </div>
+          </GoogleOAuthProvider>
 
-      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <div className="w-full">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-            useOneTap
-            theme="filled_blue"
-            size="large"
-            width="100%"
-            text="continue_with"
-            shape="rectangular"
-            logo_alignment="left"
-            context="signup"
-          />
-        </div>
-      </GoogleOAuthProvider>
-
-      <button
-        type="button"
-        className="flex items-center justify-center gap-2 border w-full py-2 rounded hover:bg-gray-100 transition mt-3"
-        onClick={() => {
-          // Initialize Apple sign-in
-          if (window.AppleID) {
-            window.AppleID.auth.signIn({
-              clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
-              scope: 'name email',
-              redirectURI: window.location.origin,
-              state: 'origin:web',
-              usePopup: true,
-              responseMode: 'form_post',
-              responseType: 'code id_token'
-            })
-            .then(handleAppleSuccess)
-            .catch(handleAppleError);
-          } else {
-            setError("Apple sign-in is not available. Please try another method.");
-          }
-        }}
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
-          alt="Apple"
-          className="w-5 h-5"
-        />
-        Continue with Apple
-      </button>
-    </form>
+          <button
+            type="button"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            onClick={() => {
+              if (window.AppleID) {
+                window.AppleID.auth.signIn({
+                  clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
+                  scope: 'name email',
+                  redirectURI: window.location.origin,
+                  state: 'origin:web',
+                  usePopup: true,
+                  responseMode: 'form_post',
+                  responseType: 'code id_token'
+                })
+                .then(handleAppleSuccess)
+                .catch(handleAppleError);
+              } else {
+                setError("Apple sign-in is not available. Please try another method.");
+              }
+            }}
+          >
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+              alt="Apple"
+              className="w-5 h-5"
+            />
+            Continue with Apple
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
 

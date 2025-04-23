@@ -82,6 +82,7 @@ const Footer = () => {
           <div>
             <h4 className="text-white font-bold mb-4">SERVICES</h4>
             <ul className="space-y-2">
+              <li>› Hotel Booking</li>
               <li>› Food & Restaurant</li>
             </ul>
           </div>

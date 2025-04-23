@@ -22,7 +22,7 @@ class User {
   static async update(id, userData) {
     const [result] = await db.execute(
       'UPDATE users SET username = ?, email = ?, mobile = ? WHERE id = ?',
-      [userData.username, userData.email, userData.mobile, id]
+      [userData.username, userData.email, userData.mobile, id] 
     );
     return result.affectedRows;
   }
