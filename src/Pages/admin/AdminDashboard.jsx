@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaBed, FaBookmark, FaCheck, FaClock, FaUserFriends, FaMoneyBillWave } from 'react-icons/fa';
 import { Line, Bar } from 'react-chartjs-2';
 import {
@@ -154,6 +154,7 @@ const AdminDashboard = () => {
       statusColor: 'bg-green-100 text-green-800',
     },
   ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

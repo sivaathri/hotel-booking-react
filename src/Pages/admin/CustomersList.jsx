@@ -17,7 +17,7 @@ const CustomersList = () => {
           return;
         }
 
-        const response = await axios.get(`${API_URL}/user/get`, {
+        const response = await axios.get(`${API_URL}/auth/`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -26,6 +26,7 @@ const CustomersList = () => {
         if (response.status === 200) {
           setCustomers(response.data);
         }
+        console.log("response",response.data);
       } catch (error) {
         console.error('Error fetching users:', error);
         setError('Failed to fetch users');
