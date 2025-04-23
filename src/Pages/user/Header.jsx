@@ -250,63 +250,82 @@ const Header = () => {
                           </div>
                         </div>
                         {showUserMenu && (
-                          <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-lg z-50 border border-gray-200 overflow-hidden animate-fade-in">
-                            {/* Top Section - User Info */}
-                            <div className="px-5 py-4 bg-gray-50 border-b border-gray-200">
-                              <p className="text-xs text-gray-500">Signed in as</p>
-                              <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
-                            </div>
+                          <div className="absolute right-0 mr-1 mt-2 w-64 bg-white rounded-xl border border-gray-200 z-50 overflow-hidden">
+                            <div className="flex flex-col text-sm text-black"> {/* Fixed from text-bla-800 to text-black */}
 
-                            {/* Links Section */}
-                            <div className="flex flex-col divide-y divide-gray-100">
-                              <Link
-                                to="/user-dashboard"
-                                className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                              >
-                                Dashboard
+                              {/* Section 1 */}
+                              <Link to="/messages" className="px-4 py-3 hover:bg-gray-100">
+                                Messages
                               </Link>
-                              <Link
-                                to="/user-profile"
-                                className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                              >
-                                Profile
+                              <Link to="/notifications" className="px-4 py-3 hover:bg-gray-100 flex justify-between items-center">
+                                <span>Notifications</span>
+                                <span className="h-2 w-2 bg-red-500 rounded-full inline-block"></span>
                               </Link>
-                              <Link
-                                to="/my-bookings"
-                                className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                              >
-                                My Bookings
-                              </Link>
-                            </div>
 
-                            {/* Logout Section */}
-                            <div className="px-5 py-3">
+                              <Link to="/wishlists" className="px-4 py-3 hover:bg-gray-100">
+                                Wishlists
+                              </Link>
+
+                              <hr className="border-t border-gray-200" />
+
+                              {/* Section 2 */}
+
+
+
+                              <Link to="/account" className="px-4 py-3 hover:bg-gray-100">
+                                Account
+                              </Link>
+
+                              <hr className="border-t border-gray-200" />
+
+                              {/* Section 3 */}
+                              <Link to="/help" className="px-4 py-3 hover:bg-gray-100">
+                                Help Centre
+                              </Link>
                               <button
                                 onClick={handleLogout}
-                                className="flex items-center w-full text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors py-2 px-2 rounded-md"
+                                className="text-left w-full px-4 py-3 hover:bg-gray-100 text-red-600"
                               >
-                                <i className="fas fa-sign-out-alt w-5 mr-3"></i> Logout
+                                Log out
                               </button>
                             </div>
                           </div>
                         )}
 
+
+
+
+
                       </div>
                     </>
                   ) : (
                     <>
-                      <button
-                        onClick={() => setSignupOpen(true)}
-                        className="btn btn-outline-light me-3 rounded-0 py-2 px-4"
-                      >
-                        Sign Up
-                      </button>
-                      <button
-                        onClick={() => setSigninOpen(true)}
-                        className="btn btn-outline-light rounded-0 py-2 px-4"
-                      >
-                        Sign In
-                      </button>
+                      <div className="flex gap-4">
+                        <button
+                          onClick={() => setSigninOpen(true)}
+                          className="bg-gray-200 text-black font-semibold px-6 py-2 hover:bg-gray-300 transition"
+                          style={{ borderRadius: '8px' }}
+                        >
+                          Sign In
+                        </button>
+
+                        <button
+                          onClick={() => setSignupOpen(true)}
+                          className="text-black font-semibold px-6 py-2 transition"
+                          style={{
+                            borderRadius: '8px',
+                            backgroundColor: '#ffc107',
+                          }}
+                          onMouseEnter={e => (e.target.style.backgroundColor = '#e0ac00')}
+                          onMouseLeave={e => (e.target.style.backgroundColor = '#ffc107')}
+                        >
+                          Sign Up
+                        </button>
+
+                      </div>
+
+
+
                     </>
                   )}
                 </div>
@@ -344,7 +363,7 @@ const Header = () => {
                         &times;
                       </button>
 
-                     
+
 
                       {/* Sign In Form */}
                       <SignIn setSigninOpen={(value) => {
