@@ -313,7 +313,7 @@ const Header = () => {
 
                 {isSignupOpen && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-fade-in">
+                    <div className="bg-white rounded-2xl p-8 w-full max-w-xl mt-5 shadow-2xl relative animate-fade-in">
                       {/* Close Button */}
                       <button
                         onClick={() => setSignupOpen(false)}
@@ -322,10 +322,7 @@ const Header = () => {
                         &times;
                       </button>
 
-                      {/* Sign Up Title */}
-                      <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Sign Up</h2>
-
-                      {/* Signup Form */}
+                      {/* Sign Up Form */}
                       <SignupForm />
                     </div>
                   </div>
@@ -333,16 +330,24 @@ const Header = () => {
 
                 {isSigninOpen && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white rounded-md p-6 w-full max-w-md relative">
+                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-fade-in">
+                      {/* Close Button */}
                       <button
                         onClick={() => setSigninOpen(false)}
-                        className="absolute top-2 right-2 text-black text-xl"
+                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
                       >
                         &times;
                       </button>
-                      <h2 className="text-lg font-bold mb-4">Sign In</h2>
-                      {/* Replace below with your signin form */}
-                      <SignIn />
+
+                     
+
+                      {/* Sign In Form */}
+                      <SignIn setSigninOpen={(value) => {
+                        setSigninOpen(value);
+                        if (!value) {
+                          setSignupOpen(true);
+                        }
+                      }} />
                     </div>
                   </div>
                 )}
