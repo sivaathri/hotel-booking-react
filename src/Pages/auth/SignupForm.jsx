@@ -5,7 +5,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { API_URL } from '../../config/api.config';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaUser, FaMobile } from 'react-icons/fa';
 
-function SignupForm({ setSignupOpen }) {
+function SignupForm({ setSignupOpen,setSigninOpen }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -164,9 +164,10 @@ function SignupForm({ setSignupOpen }) {
       if (response.status === 201) {
         // Show success message
         alert("Registration successful! You will be redirected to login page.");
+        setSignupOpen(false)
         // Redirect to login page after 2 seconds
         setTimeout(() => {
-          navigate("/user-dashboard");
+          navigate("/");
         }, 2000);
       }
     } catch (error) {
