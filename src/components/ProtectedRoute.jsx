@@ -6,7 +6,8 @@ const ProtectedRoute = ({ children }) => {
   
   if (!token) {
     // Redirect to login if not authenticated
-    return <Navigate to="/login" replace />;
+    alert('please login or sigup ')
+    return <Navigate to="/" replace />;
   }
 
   return children;
