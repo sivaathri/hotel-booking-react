@@ -230,7 +230,7 @@ const Home = () => {
                 {/* Submit Button */}
                 <div className="w-full md:w-40">
                   <button className="w-full mt-4 md:mt-0 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold py-2 px-4 shadow-md transition duration-200">
-                    Submit
+                   Search
                   </button>
 
                 </div>
