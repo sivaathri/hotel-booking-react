@@ -24,7 +24,20 @@ const CustomersList = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <>
+     {/* <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-semibold mb-4">User Details</h2>
+            <p>Here you can show a list of users or user-related info.</p>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setShowUserModal(false)}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Close
+              </button>
+            </div>
+          </div> */}
+    <div className="bg-gradient-to-r from-white to-gray-100 rounded-3xl shadow-xl p-10 max-w-3xl w-full">
       <h2 className="text-3xl font-bold mb-6 text-center">Customer List</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">
@@ -49,6 +62,8 @@ const CustomersList = () => {
         </table>
       </div>
     </div>
+    </>
+    
   );
 };
 
