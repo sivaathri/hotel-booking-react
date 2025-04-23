@@ -50,7 +50,7 @@ const AdminDashboard = () => {
     datasets: [
       {
         label: 'Payments ($)',
-        data: [1200, 1900, 1500, 2500, 2200, 3000, 2800],
+        data: [10000, 20000, 15000, 25000, 22000, 30000, 28000,40000,50000],
         backgroundColor: 'rgba(99, 102, 241, 0.8)',
         borderRadius: 4,
       },
