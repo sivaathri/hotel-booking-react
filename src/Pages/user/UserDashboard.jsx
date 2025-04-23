@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, LogOut, Monitor, Users, ChevronDown, Edit, Plus, Check, X, Mail, Phone, Calendar, MapPin, Lock, BookOpen, Search, Filter, ChevronRight, Star, MapPin as MapPinIcon, Clock, CreditCard, Smartphone, Laptop, Tablet, Globe, Trash2, AlertTriangle, UserPlus, UserMinus, UserCheck, Heart, Shield } from 'lucide-react';
 import axios from 'axios';
 import Header from '../.././Pages/user/Header';
+import { API_URL } from '../../config/api.config';
 const MyBookings = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [hoveredBooking, setHoveredBooking] = useState(null);
@@ -447,7 +448,7 @@ export default function UserDashboard() {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/auth/profile', {
+        const response = await axios.get(`${API_URL}/auth/profile`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -489,7 +490,7 @@ export default function UserDashboard() {
       const fieldName = currentField.toLowerCase().replace(' ', '');
 
       const response = await axios.put(
-        'http://localhost:5000/api/users/profile',
+        `${API_URL}/users/profile`,
         { [fieldName]: value },
         {
           headers: {
@@ -508,6 +509,7 @@ export default function UserDashboard() {
     } catch (error) {
       console.error('Error updating profile:', error);
       setError('Failed to update profile');
+      alert('Failed to update profile');
     }
   };
 
@@ -647,10 +649,10 @@ export default function UserDashboard() {
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
               </div>
-            ) : error ? (
-              <div className="bg-red-50 text-red-600 p-4 rounded-2xl shadow-lg">
-                {error}
-              </div>
+            // ) : error ? (
+            //   <div className="bg-red-50 text-red-600 p-4 rounded-2xl shadow-lg">
+            //     {error}
+            //   </div>
             ) : selectedMenu === 'My Bookings' ? (
               <MyBookings />
             ) : selectedMenu === 'Logged In Devices' ? (

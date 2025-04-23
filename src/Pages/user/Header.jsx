@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import SignupForm from "../auth/SignupForm";
 import SignIn from "../auth/SignIn";
 import axios from "axios";
-
+import { API_URL } from '../../config/api.config';
 const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
   const [isSigninOpen, setSigninOpen] = useState(false);
@@ -39,7 +39,7 @@ const Header = () => {
     if (token) {
       const fetchUserData = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/auth/profile', {
+          const response = await axios.get(`${API_URL}/auth/profile`, {
             headers: {
               Authorization: `Bearer ${token}`
             }

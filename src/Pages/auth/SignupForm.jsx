@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { API_URL } from '../../config/api.config';
 
 function SignupForm() {
   const navigate = useNavigate();
@@ -152,7 +153,7 @@ function SignupForm() {
       setLoading(true);
       setError("");
       
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post(`${API_URL}/auth/register`, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -180,7 +181,7 @@ function SignupForm() {
       setError("");
 
       // Send the Google credential to your backend
-      const response = await axios.post('http://localhost:5000/api/auth/google', {
+      const response = await axios.post(`${API_URL}/auth/google`, {
         credential: credentialResponse.credential
       });
 
@@ -209,7 +210,7 @@ function SignupForm() {
       setError("");
 
       // Send the Apple authentication response to your backend
-      const response = await axios.post('http://localhost:5000/api/auth/apple', {
+      const response = await axios.post(`${API_URL}/auth/apple`, {
         credential: response.credential
       });
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
+import { API_URL } from '../../config/api.config';
 const HostHeader = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -15,7 +15,7 @@ const HostHeader = () => {
     if (token) {
       const fetchUserData = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/auth/profile', {
+          const response = await axios.get(`${API_URL}/auth/profile`, {
             headers: {
               Authorization: `Bearer ${token}`
             }

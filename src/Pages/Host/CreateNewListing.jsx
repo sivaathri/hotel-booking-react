@@ -8,7 +8,7 @@ import L from 'leaflet';
 import { QRCodeSVG } from 'qrcode.react';
 import { FiGrid } from "react-icons/fi"
 import axios from 'axios';
-
+import { API_URL } from '../../config/api.config';
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -241,7 +241,7 @@ const CreateNewListing = () => {
                 }
 
                 // Save listing data to database
-                const response = await axios.post('http://localhost:5000/api/hosting', formDataToSend, {
+                const response = await axios.post(`${API_URL}/hosting`, formDataToSend, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'Content-Type': 'multipart/form-data'

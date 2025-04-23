@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { API_URL } from '../../config/api.config';
 const SignIn = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -40,7 +40,7 @@ const SignIn = () => {
 
     try {
       console.log('Making API request for regular user...');
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${API_URL}/auth/login`, {
         email: formData.email,
         password: formData.password
       });
