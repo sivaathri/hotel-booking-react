@@ -12,6 +12,7 @@ const Header = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [userName, setUserName] = useState("");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -69,10 +70,19 @@ const Header = () => {
   };
 
   const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     setIsAuthenticated(false);
+    setShowLogoutConfirm(false);
     window.location.href = '/';
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
   };
 
   return (
@@ -300,9 +310,31 @@ const Header = () => {
                           </div>
                         )}
 
-
-
-
+                        {/* Logout Confirmation Popup */}
+                        {showLogoutConfirm && (
+                          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                            <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-fade-in">
+                              <div className="text-center">
+                                <h3 className="text-xl font-semibold mb-4">Logout Confirmation</h3>
+                                <p className="text-gray-600 mb-6">Are you sure you want to logout?</p>
+                                <div className="flex justify-center gap-4">
+                                  <button
+                                    onClick={cancelLogout}
+                                    className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    onClick={confirmLogout}
+                                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                                  >
+                                    Logout
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                       </div>
                     </>
