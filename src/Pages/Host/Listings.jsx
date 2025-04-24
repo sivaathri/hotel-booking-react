@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiGrid, FiPlus } from 'react-icons/fi';
+import { FiSearch, FiGrid, FiPlus, FiMapPin, FiStar } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import HostHeader from './HostHeader';
 import { API_URL } from '../../config/api.config';
@@ -10,6 +10,7 @@ const Listings = () => {
   const navigate = useNavigate();
   const token = getAuthToken();
   const [propertydetails, setpropertydetails] = useState([]);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   const getPropertyDetails = async () => {
     if (!token) {
@@ -45,6 +46,13 @@ const Listings = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Your Listings</h1>
+          <button
+            onClick={() => navigate('/create-listing')}
+            className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition duration-200"
+          >
+            <FiPlus className="text-xl" />
+            <span>Add New Listing</span>
+          </button>
         </div>
 
         {/* Search and Actions */}
@@ -54,63 +62,152 @@ const Listings = () => {
             <input
               type="text"
               placeholder="Search listings by name or location"
-              className="w-full pl-12 pr-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full pl-12 pr-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white"
             />
           </div>
-          <div className="flex items-center gap-4">
-            <button className="p-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition">
-              <FiGrid className="text-xl text-gray-600" />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-3 rounded-lg border transition ${
+                viewMode === 'grid'
+                  ? 'border-rose-500 text-rose-500'
+                  : 'border-gray-300 text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <FiGrid className="text-xl" />
             </button>
             <button
-              className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              onClick={() => navigate('/create-listing')}
+              onClick={() => setViewMode('list')}
+              className={`p-3 rounded-lg border transition ${
+                viewMode === 'list'
+                  ? 'border-rose-500 text-rose-500'
+                  : 'border-gray-300 text-gray-600 hover:bg-gray-100'
+              }`}
             >
-              <FiPlus className="text-xl" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
             </button>
           </div>
         </div>
 
-        {/* Table Header */}
-        <div className="grid grid-cols-4 gap-4 mb-4 px-6 py-3 bg-white rounded-lg shadow text-gray-600 font-semibold">
-          <div>#</div>
-          <div>Listing</div>
-          <div>Location</div>
-          <div>Status</div>
-        </div>
-
-        {/* Listings */}
-        <div className="space-y-4">
-          {propertydetails.length > 0 ? (
-            propertydetails.map((property, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-4 gap-4 items-center p-4 bg-white rounded-xl shadow hover:shadow-md transition duration-200"
-              >
-                <div className="text-gray-500 font-semibold">{index + 1}</div>
-                <div>
-                  <h3 className="text-lg font-medium text-gray-800">{property.property_name}</h3>
-                  <p className="text-sm text-gray-500">{property.property_type}</p>
+        {/* Listings Grid/List View */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {propertydetails.length > 0 ? (
+              propertydetails.map((property, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-200 cursor-pointer"
+                  onClick={() => navigate(`/listing/${property.id}`)}
+                >
+                  <div className="relative pb-[60%]">
+                    <img
+                      src={property.images?.[0] || 'https://placehold.co/600x400'}
+                      alt={property.property_name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 right-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          property.status === 'Listed'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {property.status || 'Unlisted'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-lg font-semibold text-gray-800 truncate">
+                        {property.property_name}
+                      </h3>
+                      <div className="flex items-center gap-1">
+                        <FiStar className="text-yellow-400" />
+                        <span className="text-sm text-gray-600">4.8</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500 mt-1">
+                      <FiMapPin className="text-sm" />
+                      <span className="text-sm truncate">
+                        {property.location || `${property.city || ''}, ${property.state || ''}`}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2">{property.property_type}</p>
+                  </div>
                 </div>
-                <div className="text-gray-600">
-                  {property.location || `${property.city || ''}, ${property.state || ''}`}
-                </div>
-                <div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      property.status === 'Listed'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}
-                  >
-                    {property.status || 'Unlisted'}
-                  </span>
-                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500">No listings found.</p>
               </div>
-            ))
-          ) : (
-            <p className="text-center text-gray-500 mt-12">No listings found.</p>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {propertydetails.length > 0 ? (
+              propertydetails.map((property, index) => (
+                <div
+                  key={index}
+                  className="flex gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-200 cursor-pointer"
+                  onClick={() => navigate(`/listing/${property.id}`)}
+                >
+                  <div className="w-48 h-32 flex-shrink-0">
+                    <img
+                      src={property.images?.[0] || 'https://placehold.co/600x400'}
+                      alt={property.property_name}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {property.property_name}
+                      </h3>
+                      <div className="flex items-center gap-1">
+                        <FiStar className="text-yellow-400" />
+                        <span className="text-sm text-gray-600">4.8</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500 mt-1">
+                      <FiMapPin className="text-sm" />
+                      <span>
+                        {property.location || `${property.city || ''}, ${property.state || ''}`}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2">{property.property_type}</p>
+                    <div className="mt-2">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          property.status === 'Listed'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {property.status || 'Unlisted'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500 py-12">No listings found.</p>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
