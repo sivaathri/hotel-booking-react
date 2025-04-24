@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiHome, FiMapPin, FiDollarSign, FiImage, FiInfo, FiCheck, FiClock, FiCalendar, FiCreditCard, FiShield } from 'react-icons/fi';
 import HostHeader from './HostHeader';
 import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { QRCodeSVG } from 'qrcode.react';
-import { FiGrid } from "react-icons/fi"
+
 import Step1 from './CreateListingSteps/Step1';
 import Step2 from './CreateListingSteps/Step2';
 import Step3 from './CreateListingSteps/Step3';
