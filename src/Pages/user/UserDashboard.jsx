@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, LogOut, Monitor, Users, ChevronDown, Edit, Plus, Check, X, Mail, Phone, Calendar, MapPin, Lock, BookOpen, Search, Filter, ChevronRight, Star, MapPin as MapPinIcon, Clock, CreditCard, Smartphone, Laptop, Tablet, Globe, Trash2, AlertTriangle, UserPlus, UserMinus, UserCheck, Heart, Shield } from 'lucide-react';
+import { User, LogOut, Monitor, Users, ChevronDown, Edit, Plus, Check, X, Mail, Phone, Calendar, MapPin, Lock, BookOpen, Search, Filter, ChevronRight, Star, MapPin as MapPinIcon, Clock, CreditCard, Smartphone, Laptop, Tablet, Globe, Trash2, AlertTriangle, UserPlus, UserMinus, UserCheck, Heart, Shield, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import Header from '../.././Pages/user/Header';
 import { API_URL } from '../../config/api.config';
@@ -417,6 +417,268 @@ const LoggedInDevices = () => {
   );
 };
 
+const LoginDetails = () => {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
+
+  const checkPasswordRequirements = (password) => {
+    return {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+  };
+
+  const validatePassword = (password) => {
+    const errors = [];
+    const requirements = checkPasswordRequirements(password);
+
+    if (!requirements.length) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    if (!requirements.uppercase) {
+      errors.push('Password must contain at least one uppercase letter');
+    }
+    if (!requirements.number) {
+      errors.push('Password must contain at least one number');
+    }
+    if (!requirements.special) {
+      errors.push('Password must contain at least one special character');
+    }
+
+    return errors;
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (newPassword !== confirmPassword) {
+      setError('New passwords do not match');
+      return;
+    }
+
+    const passwordErrors = validatePassword(newPassword);
+    if (passwordErrors.length > 0) {
+      setError(passwordErrors.join('\n'));
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await axios.put(
+        `${API_URL}/auth/update-password`,
+        {
+          currentPassword,
+          newPassword
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setSuccess('Password updated successfully');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Failed to update password');
+    }
+  };
+
+  return (
+    <div className="space-y-6 animate-fadeIn">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Login Details</h2>
+          <p className="text-gray-600 mt-1">Manage your login credentials</p>
+        </div>
+      </div>
+
+      {/* Security Alert */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex items-start">
+        <AlertTriangle className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
+        <div>
+          <h3 className="font-medium text-yellow-800">Security Notice</h3>
+          <p className="text-yellow-600 text-sm mt-1">
+            For your security, please use a strong password and never share it with anyone.
+          </p>
+        </div>
+      </div>
+
+      {/* Password Update Form */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        <form onSubmit={handlePasswordUpdate} className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                <input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  placeholder="Enter your current password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setShowPasswordRequirements(true);
+                  }}
+                  onFocus={() => setShowPasswordRequirements(true)}
+                  onBlur={() => setTimeout(() => setShowPasswordRequirements(false), 200)}
+                  className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  placeholder="Enter your new password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+              {/* Password Requirements Dropdown */}
+              {showPasswordRequirements && (
+                <div className="absolute z-10 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-200 p-4">
+                  <div className="space-y-2">
+                    <div className={`flex items-center ${newPassword.length >= 8 ? 'text-green-500' : 'text-gray-400'}`}>
+                      {newPassword.length >= 8 ? (
+                        <Check className="w-4 h-4 mr-2" />
+                      ) : (
+                        <X className="w-4 h-4 mr-2" />
+                      )}
+                      <span className="text-sm">At least 8 characters long</span>
+                    </div>
+                    <div className={`flex items-center ${/[A-Z]/.test(newPassword) ? 'text-green-500' : 'text-gray-400'}`}>
+                      {/[A-Z]/.test(newPassword) ? (
+                        <Check className="w-4 h-4 mr-2" />
+                      ) : (
+                        <X className="w-4 h-4 mr-2" />
+                      )}
+                      <span className="text-sm">Contains at least one uppercase letter</span>
+                    </div>
+                    <div className={`flex items-center ${/[0-9]/.test(newPassword) ? 'text-green-500' : 'text-gray-400'}`}>
+                      {/[0-9]/.test(newPassword) ? (
+                        <Check className="w-4 h-4 mr-2" />
+                      ) : (
+                        <X className="w-4 h-4 mr-2" />
+                      )}
+                      <span className="text-sm">Contains at least one number</span>
+                    </div>
+                    <div className={`flex items-center ${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-500' : 'text-gray-400'}`}>
+                      {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? (
+                        <Check className="w-4 h-4 mr-2" />
+                      ) : (
+                        <X className="w-4 h-4 mr-2" />
+                      )}
+                      <span className="text-sm">Contains at least one special character</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  placeholder="Confirm your new password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl space-y-2">
+              {error.split('\n').map((err, index) => (
+                <div key={index} className="flex items-center">
+                  <X className="w-4 h-4 mr-2" />
+                  <span>{err}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 text-green-600 p-4 rounded-xl flex items-center">
+              <Check className="w-5 h-5 mr-2" />
+              <span>{success}</span>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
+          >
+            Update Password
+          </button>
+        </form>
+      </div>
+
+    </div>
+  );
+};
+
 export default function UserDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentField, setCurrentField] = useState('');
@@ -470,7 +732,7 @@ export default function UserDashboard() {
             state: userData.state || ''
           });
         }
-      
+
       } catch (error) {
         setError('Failed to fetch user data');
         console.error('Error fetching user data:', error);
@@ -491,15 +753,15 @@ export default function UserDashboard() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const fieldName = currentField.toLowerCase().replace(' ', '');
-      
+
       if (!profileData.id) {
         throw new Error('User ID not found');
       }
 
       const response = await axios.put(
         `${API_URL}/auth/${profileData.id}`,
-        { 
-          [fieldName]: value 
+        {
+          [fieldName]: value
         },
         {
           headers: {
@@ -675,14 +937,16 @@ export default function UserDashboard() {
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
               </div>
-              // ) : error ? (
-              //   <div className="bg-red-50 text-red-600 p-4 rounded-2xl shadow-lg">
-              //     {error}
-              //   </div>
+            ) : error ? (
+              <div className="bg-red-50 text-red-600 p-4 rounded-2xl shadow-lg">
+                {error}
+              </div>
             ) : selectedMenu === 'My Bookings' ? (
               <MyBookings />
             ) : selectedMenu === 'Logged In Devices' ? (
               <LoggedInDevices />
+            ) : selectedMenu === 'Login Details' ? (
+              <LoginDetails />
             ) : (
               <>
                 {/* AI Assistant */}
@@ -746,7 +1010,7 @@ export default function UserDashboard() {
                       <span className="ml-2 text-green-500">{profileData.mobile}</span>
                     </div>
 
-                  
+
                   </div>
                 </div>
 
@@ -756,13 +1020,12 @@ export default function UserDashboard() {
                     <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                       Profile Details
                     </h2>
-                    <button 
+                    <button
                       onClick={() => setIsEditMode(!isEditMode)}
-                      className={`flex items-center  rounded-xl px-6 py-2 transition-all duration-300 transform hover:-translate-y-1 ${
-                        isEditMode 
-                          ? 'bg-green-500 text-white border-green-500 hover:bg-green-600' 
+                      className={`flex items-center  rounded-xl px-6 py-2 transition-all duration-300 transform hover:-translate-y-1 ${isEditMode
+                          ? 'bg-green-500 text-white border-green-500 hover:bg-green-600'
                           : 'border-blue-500 hover:bg-yellow-50'
-                      }`}
+                        }`}
                     >
                       <Edit className="w-5 h-5 mr-2" />
                       {isEditMode ? 'SAVE' : 'EDIT'}
