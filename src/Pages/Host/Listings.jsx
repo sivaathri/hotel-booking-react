@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiGrid, FiPlus, FiMapPin, FiStar } from 'react-icons/fi';
+import { FiSearch, FiGrid, FiPlus, FiMapPin, FiStar, FiEdit2 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import HostHeader from './HostHeader';
 import { API_URL } from '../../config/api.config';
@@ -109,8 +109,7 @@ const Listings = () => {
               propertydetails.map((property, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-200 cursor-pointer"
-                  onClick={() => navigate(`/listing/${property.id}`)}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-200"
                 >
                   <div className="relative pb-[60%]">
                     <img
@@ -118,7 +117,16 @@ const Listings = () => {
                       alt={property.property_name}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-3 right-3 flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/host/edit-listing/${property.id}`);
+                        }}
+                        className="p-2 bg-white rounded-full shadow-sm hover:shadow-md transition"
+                      >
+                        <FiEdit2 className="text-gray-600" />
+                      </button>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           property.status === 'Listed'
@@ -162,8 +170,7 @@ const Listings = () => {
               propertydetails.map((property, index) => (
                 <div
                   key={index}
-                  className="flex gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-200 cursor-pointer"
-                  onClick={() => navigate(`/listing/${property.id}`)}
+                  className="flex gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-200"
                 >
                   <div className="w-48 h-32 flex-shrink-0">
                     <img
@@ -177,9 +184,17 @@ const Listings = () => {
                       <h3 className="text-lg font-semibold text-gray-800">
                         {property.property_name}
                       </h3>
-                      <div className="flex items-center gap-1">
-                        <FiStar className="text-yellow-400" />
-                        <span className="text-sm text-gray-600">4.8</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => navigate(`/host/edit-listing/${property.id}`)}
+                          className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+                        >
+                          <FiEdit2 className="text-gray-600" />
+                        </button>
+                        <div className="flex items-center gap-1">
+                          <FiStar className="text-yellow-400" />
+                          <span className="text-sm text-gray-600">4.8</span>
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 text-gray-500 mt-1">

@@ -34,6 +34,7 @@ import HostUserDashboard from './Pages/Host/HostUserDashboard';
 import Listings from './Pages/Host/Listings';
 import CreateListing from './Pages/Host/CreateListing';
 import CreateNewListing from './Pages/Host/CreateNewListing';
+import EditListing from './Pages/Host/EditListing';
 import PriceMapPage from './Pages/PriceMapPage';
 
 // Protected Routes
@@ -81,8 +82,6 @@ function App() {
             <ProtectedRoute>
               <HostUserDashboard />
             </ProtectedRoute>
-
-
           } />
           <Route path="/listings" element={
             <ProtectedRoute>
@@ -93,14 +92,16 @@ function App() {
             <ProtectedRoute>
               <CreateListing />
             </ProtectedRoute>
-
-
           } />
           <Route path="/create-new-listing" element={
             <ProtectedRoute>
               <CreateNewListing />
             </ProtectedRoute>
-
+          } />
+          <Route path="/host/edit-listing/:id" element={
+            <ProtectedRoute>
+              <EditListing />
+            </ProtectedRoute>
           } />
 
           <Route path="/admin/customers" element={<CustomersList />} />
