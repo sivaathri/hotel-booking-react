@@ -32,6 +32,7 @@ import HostUserDashboard from './Pages/Host/HostUserDashboard';
 import Listings from './Pages/Host/Listings';
 import CreateListing from './Pages/Host/CreateListing';
 import CreateNewListing from './Pages/Host/CreateNewListing';
+import PriceMapPage from './Pages/PriceMapPage';
 
 // Protected Routes
 import ProtectedRoute from './components/ProtectedRoute';
@@ -48,6 +49,7 @@ function App() {
           <Route path="/rooms/:id" element={<RoomDetails />} />
           <Route path="/book/:id" element={<UserBookRoom />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/price-map" element={<PriceMapPage />} />
           {/* <Route path="/login" element={<UserLogin />} /> */}
           <Route path="/user-dashboard" element={
             <ProtectedRoute>

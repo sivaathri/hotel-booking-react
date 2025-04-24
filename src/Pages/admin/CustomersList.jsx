@@ -80,7 +80,7 @@ const CustomersList = () => {
               <th className="py-3 px-4 border transition-colors duration-300 hover:bg-gray-300">Name</th>
               <th className="py-3 px-4 border transition-colors duration-300 hover:bg-gray-300">Email</th>
               <th className="py-3 px-4 border transition-colors duration-300 hover:bg-gray-300">Phone</th>
-              <th className="py-3 px-4 border transition-colors duration-300 hover:bg-gray-300">Status</th>
+              {/* <th className="py-3 px-4 border transition-colors duration-300 hover:bg-gray-300">Status</th> */}
             </tr>
           </thead>
           <tbody>
@@ -94,7 +94,7 @@ const CustomersList = () => {
                 <td className="py-2 px-4 border">{customer.username}</td>
                 <td className="py-2 px-4 border">{customer.email}</td>
                 <td className="py-2 px-4 border">{customer.mobile}</td>
-                <td className="py-2 px-4 border">
+                {/* <td className="py-2 px-4 border">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
                     customer.isActive 
                       ? 'bg-green-100 text-green-800 hover:bg-green-200' 
@@ -102,7 +102,7 @@ const CustomersList = () => {
                   }`}>
                     {customer.isActive ? 'Active' : 'Inactive'}
                   </span>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>
