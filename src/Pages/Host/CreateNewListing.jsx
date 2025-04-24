@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import HostHeader from './HostHeader';
 import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-
+import axios from 'axios';
+import { API_URL } from '../../config/api.config';
+import { useUser } from '../../context/UserContext';
 import Step1 from './CreateListingSteps/Step1';
 import Step2 from './CreateListingSteps/Step2';
 import Step3 from './CreateListingSteps/Step3';
@@ -105,12 +109,14 @@ styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
 
 const CreateNewListing = () => {
+  const { user, logout } = useUser();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showMap, setShowMap] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Basic Information
     propertyName: '',
@@ -232,8 +238,69 @@ const CreateNewListing = () => {
   const paymentOptions = ['UPI', 'Bank Transfer', 'Cash at Check-In', 'Online'];
   const refundPolicies = ['Fully Refundable', 'Partial Refund', 'Non-refundable'];
 
+  const saveBasicInfo = async () => {
+    try {
+      setIsLoading(true);
+  
+      const token = localStorage.getItem('token');
+  
+      const response = await axios.post(
+        `${API_URL}/basicInfo/create/${user.id}`,
+        {
+          property_name: formData.propertyName,
+          property_type: formData.propertyType
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+  
+      if (response.data.success) {
+        toast.success('Basic information saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setStep(step + 1);
+      } else {
+        toast.error('Failed to save basic information. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving basic information:', error);
+      toast.error('An error occurred while saving. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
   const handleNext = async () => {
-    if (step < 11) {
+    if (step === 1) {
+      // Save basic information when in step 1
+      await saveBasicInfo();
+    } else if (step < 11) {
       setStep(step + 1);
     } else {
       // Handle payment completion
@@ -300,6 +367,7 @@ const CreateNewListing = () => {
   return (
     <>
       <HostHeader />
+      <ToastContainer />
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -334,9 +402,12 @@ const CreateNewListing = () => {
               </button>
               <button
                 onClick={handleNext}
-                className="px-8 py-3 bg-blue-600 text-white rounded-xl text-lg font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                disabled={isLoading}
+                className={`px-8 py-3 bg-blue-600 text-white rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl ${
+                  isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+                }`}
               >
-                {step === 11 ? 'Complete Payment' : 'Next'}
+                {isLoading ? 'Saving...' : (step === 11 ? 'Complete Payment' : 'Next')}
               </button>
             </div>
           </div>

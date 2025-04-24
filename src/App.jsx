@@ -1,4 +1,6 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { UserProvider } from './context/UserContext';
 import AdminDashboard from "./Pages/admin/AdminDashboard";
 import CustomersList from "./Pages/admin/CustomersList";
 import StaffList from "./Pages/admin/StaffList";
@@ -39,7 +41,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <>
+    <UserProvider>
       <Router>
         <Routes>
           {/* HOme Screen Routes */}
@@ -115,7 +117,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
-    </>
+    </UserProvider>
   );
 }
 

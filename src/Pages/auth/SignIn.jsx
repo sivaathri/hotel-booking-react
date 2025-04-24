@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../../config/api.config';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
+import { useUser } from '../../context/UserContext';
 import ForgotPassword from './ForgotPassword';
 
 const SignIn = ({ setSigninOpen }) => {
   const navigate = useNavigate();
+  const { login } = useUser();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -32,78 +32,21 @@ const SignIn = ({ setSigninOpen }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    console.log('Starting login process...');
 
-    // Check for admin credentials    
     try {
-      console.log('Making API request for regular user...');
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email: formData.email,
-        password: formData.password
-      });
-
-      console.log('Login response:', response);
-
-      if (response.status === 200) {
-        console.log('Login successful, storing token...');
-
-        const { token, user } = response.data; // assuming `user` object is returned
-
-        if (stayLoggedIn) {
-          localStorage.setItem('token', token);
+      const result = await login(formData.email, formData.password);
+      
+      if (result.success) {
+        if (formData.email === 'admin@gmail.com' && formData.password === 'Admin@123') {
+          window.location.href = '/admin/dashboard';
         } else {
-          sessionStorage.setItem('token', token);
-        }
-
-        console.log('Token stored, checking for admin...');
-
-        // Check for specific admin credentials
-        if (
-          formData.email === 'admin@gmail.com' &&
-          formData.password === 'Admin@123'
-        ) {
-          console.log('Admin detected, redirecting...');
-          window.location.href = '/admin/dashboard'; // or your admin route
-        } else {
-          console.log('Regular user, redirecting to home...');
           window.location.href = '/';
         }
+      } else {
+        setError(result.error);
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError(error.response?.data?.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-
-    return;
-
-
-    try {
-      console.log('Making API request for regular user...');
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email: formData.email,
-        password: formData.password
-      });
-
-      console.log('Login response:', response);
-
-      if (response.status === 200) {
-        console.log('Login successful, storing token...');
-        // Store the token if stayLoggedIn is true
-        if (stayLoggedIn) {
-          localStorage.setItem('token', response.data.token);
-        } else {
-          sessionStorage.setItem('token', response.data.token);
-        }
-
-        console.log('Token stored, attempting navigation...');
-        // Force navigation to home page
-        window.location.href = '/';
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError(error.response?.data?.message || 'Login failed. Please try again.');
+      setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }

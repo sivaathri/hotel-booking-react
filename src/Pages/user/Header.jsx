@@ -3,18 +3,19 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import SignupForm from "../auth/SignupForm";
 import SignIn from "../auth/SignIn";
+import { useUser } from '../../context/UserContext';
 import axios from "axios";
 import { API_URL } from '../../config/api.config';
+
 const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
   const [isSigninOpen, setSigninOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [userName, setUserName] = useState("");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
+  const { user, logout } = useUser();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,29 +33,6 @@ const Header = () => {
       }
     };
 
-    // Check authentication status and fetch user data
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    setIsAuthenticated(!!token);
-    console.log(token);
-
-    if (token) {
-      const fetchUserData = async () => {
-        try {
-          const response = await axios.get(`${API_URL}/auth/profile`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          if (response.status === 200) {
-            setUserName(response.data.username || '');
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      };
-      fetchUserData();
-    }
-
     handleResize(); // Initial check
     window.addEventListener("resize", handleResize);
 
@@ -63,7 +41,6 @@ const Header = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
 
   const toggleNav = () => {
     setIsNavOpen(prevState => !prevState);
@@ -74,9 +51,7 @@ const Header = () => {
   };
 
   const confirmLogout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
-    setIsAuthenticated(false);
+    logout();
     setShowLogoutConfirm(false);
     window.location.href = '/';
   };
@@ -228,7 +203,7 @@ const Header = () => {
                   )}
                 </div>
                 <div className="d-flex gap-3 align-items-center">
-                  {isAuthenticated ? (
+                  {user ? (
                     <>
                       <Link
                         to="/HostHeader"
@@ -258,7 +233,7 @@ const Header = () => {
                               <div className="w-8 h-8 bg-black text-white flex items-center  justify-center rounded-full text-sm font-semibold"
                                 onClick={() => setShowUserMenu(!showUserMenu)}
                               >
-                                {userName ? userName.charAt(0).toUpperCase() : 'S'}
+                                {user.username ? user.username.charAt(0).toUpperCase() : 'S'}
                               </div>
                             </button>
 

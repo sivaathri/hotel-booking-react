@@ -1,40 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { API_URL } from '../../config/api.config';
+import { useUser } from '../../context/UserContext';
+
 const HostHeader = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [userName, setUserName] = useState("");
-
-  useEffect(() => {
-    // Check authentication status and fetch user data
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    setIsAuthenticated(!!token);
-
-    if (token) {
-      const fetchUserData = async () => {
-        try {
-          const response = await axios.get(`${API_URL}/auth/profile`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          if (response.status === 200) {
-            setUserName(response.data.username || '');
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      };
-      fetchUserData();
-    }
-  }, []);
+  const { user, logout } = useUser();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
-    setIsAuthenticated(false);
+    logout();
     window.location.href = '/';
   };
 
@@ -58,7 +31,7 @@ const HostHeader = () => {
 
         {/* Right Side - User Profile */}
         <div className="flex items-center space-x-4">
-          {isAuthenticated ? (
+          {user ? (
             <div className="position-relative">
               <div className="flex items-center justify-between h-12 px-2 border border-gray-300 rounded-full shadow-sm">
                 <div className="relative">
@@ -67,7 +40,7 @@ const HostHeader = () => {
                       className="w-8 h-8 bg-black text-white flex items-center justify-center rounded-full text-sm font-semibold"
                       onClick={() => setShowUserMenu(!showUserMenu)}
                     >
-                      {userName ? userName.charAt(0).toUpperCase() : 'S'}
+                      {user.username ? user.username.charAt(0).toUpperCase() : 'S'}
                     </div>
                   </button>
                 </div>
@@ -77,7 +50,7 @@ const HostHeader = () => {
                   {/* Top Section - User Info */}
                   <div className="px-5 py-4 bg-gray-50 border-b border-gray-200">
                     <p className="text-xs text-gray-500">Signed in as</p>
-                    <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
+                    <p className="text-sm font-semibold text-gray-900 truncate">{user.username}</p>
                   </div>
 
                   {/* Links Section */}
