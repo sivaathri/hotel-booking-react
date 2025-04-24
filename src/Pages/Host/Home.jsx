@@ -272,8 +272,18 @@ const Home = () => {
     };
   }, [step]);
 
+  // Add new state for saved steps
+  const [savedSteps, setSavedSteps] = useState(new Set());
+
+  // Add save functionality
+  const handleSave = () => {
+    setSavedSteps(prev => new Set([...prev, step]));
+    // Here you would typically make an API call to save the data
+    console.log('Saving data for step:', step, hotelData);
+  };
+
   const propertyTypes = [
-    'Hotel', 'Apartment', 'Hut House', 'Resort', 'Beach House', 'Villa'
+    'Hotel', 'Apartment', 'Hut House', 'Resort', 'Beach House', 'Villa','Homestay','Lodge','Boutique Hotel','Cottage'
   ];
 
   const bedTypes = ['Queen', 'King', 'Twin'];
@@ -288,8 +298,12 @@ const Home = () => {
   const allowedGuestTypes = ['Married Couples', 'Families', 'Solo Travelers', 'Friends'];
   const paymentMethodOptions = ['UPI', 'Bank Transfer', 'Cash at Check-In', 'Online'];
 
+  // Modify handleNext to check if current step is saved
   const handleNext = () => {
     if (step < 11) {
+      if (!savedSteps.has(step)) {
+        handleSave();
+      }
       setStep(step + 1);
     }
   };
@@ -1091,23 +1105,31 @@ const Home = () => {
                   Back
                 </Button>
               )}
-              {step < 11 ? (
-                <Button
-                  onClick={handleNext}
-                  variant="primary"
-                  className="ml-auto"
-                >
-                  Next
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSubmit}
-                  variant="success"
-                  className="ml-auto"
-                >
-                  Complete Registration
-                </Button>
-              )}
+              <div className="flex gap-4">
+                {!savedSteps.has(step) && (
+                  <Button
+                    onClick={handleSave}
+                    variant="secondary"
+                  >
+                    Save
+                  </Button>
+                )}
+                {step < 11 ? (
+                  <Button
+                    onClick={handleNext}
+                    variant="primary"
+                  >
+                    {savedSteps.has(step) ? "Next" : "Save and Next"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmit}
+                    variant="success"
+                  >
+                    Complete Registration
+                  </Button>
+                )}
+              </div>
             </motion.div>
           </div>
         </motion.div>
