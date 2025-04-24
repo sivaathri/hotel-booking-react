@@ -1,0 +1,72 @@
+import React from 'react';
+import { FiImage } from 'react-icons/fi';
+
+const Step4 = ({ formData, setFormData }) => {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Room Photos</h2>
+      <div className="space-y-4">
+        <p className="text-sm text-gray-600">Upload 5 separate images for each room (Max size: 5MB per image)</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {Array.from({ length: 5 }).map((_, index) => {
+            const photo = formData.roomPhotos[index];
+            return (
+              <div key={index} className="relative">
+                {photo ? (
+                  <>
+                    <img src={URL.createObjectURL(photo)} alt={`Room photo ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                    <button
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        roomPhotos: prev.roomPhotos.filter((_, i) => i !== index)
+                      }))}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <label className="border-2 border-dashed rounded-lg p-4 h-48 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-gray-400">
+                    <FiImage className="text-2xl" />
+                    <span className="text-sm">Upload Photo {index + 1}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        // Check file size
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert('File exceeds the 5MB size limit');
+                          return;
+                        }
+
+                        setFormData(prev => {
+                          const newPhotos = [...prev.roomPhotos];
+                          newPhotos[index] = file;
+                          return {
+                            ...prev,
+                            roomPhotos: newPhotos
+                          };
+                        });
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {formData.roomPhotos.length > 0 && (
+          <p className="text-sm text-gray-600">
+            {formData.roomPhotos.length} photo(s) uploaded. {5 - formData.roomPhotos.length} photo(s) remaining.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Step4; 
