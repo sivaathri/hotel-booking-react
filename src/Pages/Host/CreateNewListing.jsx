@@ -25,6 +25,10 @@ const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }
     async click(e) {
       const newPosition = e.latlng;
       setPosition(newPosition);
+      console.log('Selected Coordinates:', {
+        latitude: newPosition.lat.toFixed(6),
+        longitude: newPosition.lng.toFixed(6)
+      });
 
       try {
         const response = await fetch(
@@ -41,6 +45,10 @@ const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }
             state: address.state || '',
             country: address.country || '',
             postalCode: address.postcode || ''
+          });
+          console.log('Address Details:', {
+            fullAddress: data.display_name,
+            addressComponents: address
           });
         }
       } catch (error) {
@@ -406,6 +414,8 @@ const CreateNewListing = () => {
                       <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        maxZoom={19}
+                        minZoom={1}
                       />
                       {selectedLocation && (
                         <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
