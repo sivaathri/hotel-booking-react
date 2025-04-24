@@ -2,39 +2,19 @@ const express = require('express');
 const router = express.Router();
 const locationDetailsController = require('./locationDetailsController');
 
-// Middleware to log requests
-router.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-    console.log('Request Body:', req.body);
-    next();
-});
+// Get all locations
+router.get('/locations', locationDetailsController.getAllLocations);
 
-// Create location details
-router.post('/create/:userId', (req, res, next) => {
-    console.log('Create location route hit');
-    locationDetailsController.createLocation(req, res).catch(next);
-});
+// Create location details for a user
+router.post('/create/:userId', locationDetailsController.createLocation);
 
 // Get location details by ID
-router.get('/:id', (req, res, next) => {
-    console.log('Get location route hit');
-    locationDetailsController.getLocation(req, res).catch(next);
-});
+router.get('/location/:id', locationDetailsController.getLocation);
 
 // Update location details
-router.put('/:id', (req, res, next) => {
-    console.log('Update location route hit');
-    locationDetailsController.updateLocation(req, res).catch(next);
-});
+router.put('/location/:id', locationDetailsController.updateLocation);
 
-// Error handling middleware
-router.use((err, req, res, next) => {
-    console.error('Location route error:', err);
-    res.status(500).json({
-        success: false,
-        message: 'Error in location details route',
-        error: err.message
-    });
-});
+// Delete location details
+router.delete('/location/:id', locationDetailsController.deleteLocation);
 
 module.exports = router;
