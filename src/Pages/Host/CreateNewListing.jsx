@@ -215,7 +215,16 @@ const CreateNewListing = () => {
     'Free Wi-Fi',
     'Smart TV',
     'Breakfast Included',
-    'Parking'
+    'Swimming Pool',
+    'Parking',
+    'Gym',
+    'Laundry Service',
+    'Room Service',
+    '24-Hour Reception',
+   'Cab Service',
+   
+  
+    
   ];
 
   const languages = ['English', 'Hindi'];
