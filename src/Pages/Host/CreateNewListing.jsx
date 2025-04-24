@@ -9,6 +9,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import { FiGrid } from "react-icons/fi"
 import axios from 'axios';
 import { API_URL } from '../../config/api.config';
+// Add Google Maps API key
+const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your actual API key
+
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -209,61 +212,6 @@ const CreateNewListing = () => {
         setStep(step + 1);
     } else {
         // Handle payment completion
-        if (formData.paymentMethod) {
-            try {
-                // Create FormData object for file uploads
-                const formDataToSend = new FormData();
-                
-                // Append all form data
-                Object.keys(formData).forEach(key => {
-                    if (key === 'rooms' || key === 'languages' || key === 'allowedGuests' || 
-                        key === 'paymentMethods' || key === 'discounts' || key === 'bankDetails') {
-                        formDataToSend.append(key, JSON.stringify(formData[key]));
-                    } else if (key === 'mapLocation' && formData[key]) {
-                        formDataToSend.append('mapLocationLat', formData[key].lat);
-                        formDataToSend.append('mapLocationLng', formData[key].lng);
-                    } else if (key !== 'roomPhotos' && key !== 'idProof' && key !== 'propertyProof') {
-                        formDataToSend.append(key, formData[key]);
-                    }
-                });
-
-                // Append files
-                if (formData.idProof) {
-                    formDataToSend.append('idProof', formData.idProof);
-                }
-                if (formData.propertyProof) {
-                    formDataToSend.append('propertyProof', formData.propertyProof);
-                }
-                if (formData.roomPhotos && formData.roomPhotos.length > 0) {
-                    formData.roomPhotos.forEach((photo, index) => {
-                        formDataToSend.append('roomPhotos', photo);
-                    });
-                }
-
-                // Save listing data to database
-                const response = await axios.post(`${API_URL}/hosting`, formDataToSend, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-
-                if (response.status === 201) {
-                    setPaymentSuccess(true);
-                    setShowSuccessAnimation(true);
-                    
-                    // After animation completes, navigate to dashboard
-                    setTimeout(() => {
-                        navigate('/host/dashboard');
-                    }, 3000);
-                }
-            } catch (error) {
-                console.error('Error saving listing:', error);
-                alert('Error saving listing. Please try again.');
-            }
-        } else {
-            alert('Please select a payment method to complete the listing.');
-        }
     }
   };
 
@@ -435,147 +383,66 @@ const CreateNewListing = () => {
                   />
                 </div>
               </div>
-              <div className="text-sm text-gray-600 mt-2">
-                <p>Make it clear to guests where your place is located. We'll only share your exact address after they've made a reservation.</p>
-                <button
-                  className="text-black underline hover:text-gray-700 mt-1"
-                  onClick={() => window.open('https://www.tripngrub.com/help/location-privacy', '_blank')}
-                >
-                  Learn more
-                </button>
-              </div>
-              <div className="flex gap-4">
-                <button
-                  className="w-full p-4 border rounded-lg flex items-center justify-center gap-2 hover:border-gray-400"
-                  onClick={() => setShowMap(true)}
-                >
-                  <FiMapPin />
-                  Select Location on Map
-                </button>
-                <button
-                  className="w-full p-4 border rounded-lg flex items-center justify-center gap-2 hover:border-gray-400"
-                  onClick={async () => {
-                    // Validate required fields
-                    if (!formData.city || !formData.country) {
-                      alert('Please enter at least the city and country');
-                      return;
-                    }
 
-                    // Construct address parts with better formatting
-                    const addressParts = [
-                      formData.addressLine1,
-                      formData.addressLine2,
-                      formData.city,
-                      formData.state,
-                      formData.country,
-                      formData.postalCode
-                    ].filter(part => part && part.trim() !== '');
+              {/* Location Search Options */}
+              <div className="mt-4 space-y-4">
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowMap(!showMap)}
+                    className="flex-1 p-2 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors duration-200 flex items-center justify-center gap-2"
+                  >
+                    <FiMapPin className="text-lg" />
+                    {showMap ? 'Hide Map' : 'Select Location on Map'}
+                  </button>
+                </div>
 
-                    // First try: Full address with postal code
-                    const fullAddress = addressParts.join(', ');
-                    console.log('Searching for full address:', fullAddress);
-
-                    try {
-                      // Try with full address first using Nominatim
-                      const response = await fetch(
-                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1&addressdetails=1`,
-                        {
-                          headers: {
-                            'User-Agent': 'TripNGrub/1.0 (https://tripngrub.com)',
-                            'Accept-Language': 'en-US,en;q=0.9'
-                          }
-                        }
-                      );
-                      const data = await response.json();
-                      console.log('Nominatim geocoding response:', data);
-
-                      if (data && data[0]) {
-                        const result = data[0];
-                        const { lat, lon } = result;
-                        const address = result.address || {};
-
-                        // Validate the result matches our input
-                        const isMatch = (
-                          (!formData.city || address.city?.toLowerCase() === formData.city.toLowerCase()) &&
-                          (!formData.state || address.state?.toLowerCase() === formData.state.toLowerCase()) &&
-                          (!formData.country || address.country?.toLowerCase() === formData.country.toLowerCase()) &&
-                          (!formData.postalCode || address.postcode === formData.postalCode)
-                        );
-
-                        if (isMatch) {
-                          const newLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
-                          console.log('Found matching location:', newLocation);
-
-                          setSelectedLocation(newLocation);
+                {showMap && (
+                  <div className="h-96 rounded-lg overflow-hidden border border-gray-200">
+                    <MapContainer
+                      center={selectedLocation || [11.9139, 79.8145]}
+                      zoom={13}
+                      style={{ height: '100%', width: '100%' }}
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      {selectedLocation && (
+                        <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
+                          <Popup>
+                            {formData.addressLine1} {formData.addressLine2}<br />
+                            {formData.city}, {formData.state}<br />
+                            {formData.country} {formData.postalCode}
+                          </Popup>
+                        </Marker>
+                      )}
+                      <LocationMarker
+                        position={selectedLocation}
+                        setPosition={(pos) => {
+                          setSelectedLocation(pos);
                           setFormData(prev => ({
                             ...prev,
-                            mapLocation: newLocation
+                            mapLocation: pos
                           }));
-                          setShowMap(true);
-                          return;
-                        }
-                      }
+                        }}
+                        setAddress={(addr) => setFormData(prev => ({ ...prev, address: addr }))}
+                        setAddressDetails={(details) => setFormData(prev => ({ ...prev, ...details }))}
+                      />
+                    </MapContainer>
+                  </div>
+                )}
 
-                      // If full address fails, try with just city and postal code
-                      const cityPostal = `${formData.city}, ${formData.postalCode}`;
-                      console.log('Trying city and postal code:', cityPostal);
-
-                      const cityResponse = await fetch(
-                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityPostal)}&limit=1&addressdetails=1`,
-                        {
-                          headers: {
-                            'User-Agent': 'TripNGrub/1.0 (https://tripngrub.com)',
-                            'Accept-Language': 'en-US,en;q=0.9'
-                          }
-                        }
-                      );
-                      const cityData = await cityResponse.json();
-                      console.log('City/postal geocoding response:', cityData);
-
-                      if (cityData && cityData[0]) {
-                        const result = cityData[0];
-                        const { lat, lon } = result;
-                        const address = result.address || {};
-
-                        // Validate the result matches our input
-                        const isMatch = (
-                          (!formData.city || address.city?.toLowerCase() === formData.city.toLowerCase()) &&
-                          (!formData.postalCode || address.postcode === formData.postalCode)
-                        );
-
-                        if (isMatch) {
-                          const newLocation = { lat: parseFloat(lat), lng: parseFloat(lon) };
-                          console.log('Found matching city location:', newLocation);
-
-                          setSelectedLocation(newLocation);
-                          setFormData(prev => ({
-                            ...prev,
-                            mapLocation: newLocation
-                          }));
-                          setShowMap(true);
-                          return;
-                        }
-                      }
-
-                      // If all attempts fail
-                      alert(`Could not find an exact match for: ${fullAddress}\nPlease verify the address details and try again.`);
-                    } catch (error) {
-                      console.error('Error geocoding address:', error);
-                      alert('Error finding location. Please try again.');
-                    }
-                  }}
-                >
-                  <FiMapPin />
-                  Show Address on Map
-                </button>
+                {formData.mapLocation && (
+                  <div className="text-sm text-gray-600">
+                    <p>Selected Location: {formData.city}, {formData.state}, {formData.country}</p>
+                    <p>Coordinates: {formData.mapLocation.lat.toFixed(6)}, {formData.mapLocation.lng.toFixed(6)}</p>
+                  </div>
+                )}
               </div>
-              {formData.mapLocation && (
-                <p className="mt-2 text-sm text-gray-600">
-                  Selected Location: {formData.city}, {formData.state}, {formData.country}
-                </p>
-              )}
+
+              {/* Map and Location Preview */}
+        
             </div>
-            {renderMap()}
           </div>
         );
       case 3:
@@ -1350,60 +1217,6 @@ const CreateNewListing = () => {
       default:
         return null;
     }
-  };
-
-  const renderMap = () => {
-    if (!showMap) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-4 rounded-lg w-4/5 h-4/5">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Select Location</h3>
-            <button
-              onClick={() => setShowMap(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </button>
-          </div>
-          <div className="h-[calc(100%-40px)] w-full rounded-lg overflow-hidden">
-            <MapContainer
-              center={selectedLocation || [11.9139, 79.8145]}
-              zoom={13}
-              style={{ height: '100%', width: '100%' }}
-              className="rounded-lg"
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              {selectedLocation && (
-                <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
-                  <Popup>
-                    {formData.addressLine1} {formData.addressLine2}<br />
-                    {formData.city}, {formData.state}<br />
-                    {formData.country} {formData.postalCode}
-                  </Popup>
-                </Marker>
-              )}
-              <LocationMarker
-                position={selectedLocation}
-                setPosition={(pos) => {
-                  setSelectedLocation(pos);
-                  setFormData(prev => ({
-                    ...prev,
-                    mapLocation: pos
-                  }));
-                }}
-                setAddress={(addr) => setFormData(prev => ({ ...prev, address: addr }))}
-                setAddressDetails={(details) => setFormData(prev => ({ ...prev, ...details }))}
-              />
-            </MapContainer>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
