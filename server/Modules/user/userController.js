@@ -153,6 +153,34 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+exports.updatePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    // Get user to verify current password
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password
+    if (user.password !== currentPassword) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Update password
+    const updated = await User.updatePassword(userId, newPassword);
+    if (!updated) {
+      return res.status(500).json({ message: 'Failed to update password' });
+    }
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating password', error: error.message });
+  }
+};
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.getAll();

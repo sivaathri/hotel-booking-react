@@ -3,6 +3,7 @@ import { User, LogOut, Monitor, Users, ChevronDown, Edit, Plus, Check, X, Mail, 
 import axios from 'axios';
 import Header from '../.././Pages/user/Header';
 import { API_URL } from '../../config/api.config';
+import { getAuthToken } from '../../utils/getAuthToken';
 const MyBookings = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [hoveredBooking, setHoveredBooking] = useState(null);
@@ -417,7 +418,7 @@ const LoggedInDevices = () => {
   );
 };
 
-const LoginDetails = () => {
+const LoginDetails = ({ profileData }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -461,6 +462,17 @@ const LoginDetails = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    const token = getAuthToken();
+    
+    if (!token) {
+      setError('You must be logged in to update your password');
+      return;
+    }
+
+    if (!profileData.id) {
+      setError('User ID not found. Please try logging out and back in.');
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setError('New passwords do not match');
@@ -474,9 +486,8 @@ const LoginDetails = () => {
     }
 
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await axios.put(
-        `${API_URL}/auth/update-password`,
+        `${API_URL}/auth/password/${profileData.id}`,
         {
           currentPassword,
           newPassword
@@ -495,7 +506,8 @@ const LoginDetails = () => {
         setConfirmPassword('');
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to update password');
+      console.error('Password update error:', error);
+      setError(error.response?.data?.message || 'Failed to update password. Please try again.');
     }
   };
 
@@ -946,7 +958,7 @@ export default function UserDashboard() {
             ) : selectedMenu === 'Logged In Devices' ? (
               <LoggedInDevices />
             ) : selectedMenu === 'Login Details' ? (
-              <LoginDetails />
+              <LoginDetails profileData={profileData} />
             ) : (
               <>
                 {/* AI Assistant */}
