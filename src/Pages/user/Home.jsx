@@ -231,7 +231,7 @@ const Home = () => {
                 {/* Submit Button */}
                 <div className="w-full md:w-40">
                   <button className="w-full mt-4 md:mt-0 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold py-2 px-4 shadow-md transition duration-200">
-                   Search
+                    Search
                   </button>
 
                 </div>
@@ -319,9 +319,9 @@ const Home = () => {
                           Book Now
                         </a>
                       </div>
-                      
+
                     </div>
-                    
+
                   </div>
                 </div>
               ))}
@@ -330,23 +330,24 @@ const Home = () => {
         </div>
 
         {/* Call to Action Section */}
-        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-orange-600 to-yellow-800">
+        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500">
           <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-md">
               Ready to Book Your Perfect Stay?
             </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
               Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
             </p>
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white text-blue-600 font-semibold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              className="bg-white text-purple-600 font-bold py-4 px-8 rounded-full shadow-2xl hover:bg-yellow-50 hover:text-pink-600 transition-all duration-300 transform hover:-translate-y-1"
             >
               Book Your Room Now
             </motion.button>
           </div>
         </div>
+
 
         <div className="py-10 mb-30 px-4 md:px-10">
           <div className="flex flex-wrap g-0">
