@@ -16,9 +16,9 @@ const HostHeader = () => {
       <nav className="flex items-center justify-between px-6 py-4">
         <div className="bg-white p-0">
           {/* Header Start */}
-          <a href="/" className="navbar-brand w-10 h-10 ml-5 mt-2 p-0 d-flex">
-            <h1 className="m-0 text-primary text-uppercase">Hotelier</h1>
-          </a>
+          <Link to="/listings" className="navbar-brand w-10 h-10 ml-5 mt-2 p-0 d-flex">
+  <h1 className="m-0 text-primary text-uppercase">Hotelier</h1>
+</Link>
         </div>
 
         {/* Navigation Links */}
