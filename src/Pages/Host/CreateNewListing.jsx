@@ -117,6 +117,7 @@ const CreateNewListing = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [formData, setFormData] = useState({
     // Step 1: Basic Information
     propertyName: '',
@@ -327,7 +328,7 @@ const CreateNewListing = () => {
     const currentStep = (() => {
       switch (step) {
         case 1:
-          return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} />;
+          return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} isEditing={isEditing} />;
         case 2:
           return (
             <Step2
@@ -337,6 +338,7 @@ const CreateNewListing = () => {
               setShowMap={setShowMap}
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
+              isEditing={isEditing}
             />
           );
         case 3:
@@ -348,24 +350,25 @@ const CreateNewListing = () => {
               bhkTypes={bhkTypes}
               bedTypes={bedTypes}
               roomFacilities={roomFacilities}
+              isEditing={isEditing}
             />
           );
         case 4:
-          return <Step4 formData={formData} setFormData={setFormData} />;
+          return <Step4 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
         case 5:
-          return <Step5 formData={formData} setFormData={setFormData} languages={languages} />;
+          return <Step5 formData={formData} setFormData={setFormData} languages={languages} isEditing={isEditing} />;
         case 6:
-          return <Step6 formData={formData} setFormData={setFormData} />;
+          return <Step6 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
         case 7:
-          return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} />;
+          return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} isEditing={isEditing} />;
         case 8:
-          return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} />;
+          return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} isEditing={isEditing} />;
         case 9:
-          return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} />;
+          return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} isEditing={isEditing} />;
         case 10:
-          return <Step10 formData={formData} setFormData={setFormData} />;
+          return <Step10 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
         case 11:
-          return <Step11 formData={formData} setFormData={setFormData} showSuccessAnimation={showSuccessAnimation} />;
+          return <Step11 formData={formData} setFormData={setFormData} showSuccessAnimation={showSuccessAnimation} isEditing={isEditing} />;
         default:
           return null;
       }
