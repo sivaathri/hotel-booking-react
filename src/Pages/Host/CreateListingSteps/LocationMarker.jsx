@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMapEvents } from 'react-leaflet';
+import { useMapEvents, Marker } from 'react-leaflet';
 
 const LocationMarker = ({ position, setPosition, setAddress, setAddressDetails }) => {
   useMapEvents({
