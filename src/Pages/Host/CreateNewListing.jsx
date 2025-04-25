@@ -296,11 +296,75 @@ const CreateNewListing = () => {
     }
   };
   
+  const saveLocationDetails = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+
+      const response = await axios.post(
+        `${API_URL}/location/create/${user.id}`,
+        {
+          addressLine1: formData.addressLine1,
+          addressLine2: formData.addressLine2,
+          city: formData.city,
+          stateProvince: formData.state,
+          country: formData.country,
+          postalCode: formData.postalCode,
+          latitude: formData.mapLocation.lat,
+          longitude: formData.mapLocation.lng
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Location details saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setStep(step + 1);
+      } else {
+        toast.error('Failed to save location details. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving location details:', error);
+      toast.error('An error occurred while saving. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleNext = async () => {
     if (step === 1) {
       // Save basic information when in step 1
       await saveBasicInfo();
+    } else if (step === 2) {
+      // Save location details when in step 2
+      await saveLocationDetails();
     } else if (step < 11) {
       setStep(step + 1);
     } else {
