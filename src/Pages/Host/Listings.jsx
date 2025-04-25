@@ -128,14 +128,15 @@ const Listings = () => {
               propertydetails.map((property, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-200"
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group"
                 >
-                  <div className="relative pb-[60%]">
+                  <div className="relative pb-[60%] overflow-hidden">
                     <img
                       src={property.images?.[0] || 'https://placehold.co/600x400'}
                       alt={property.property_name}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
                     <div className="absolute top-3 right-3 flex gap-2">
                       <button
                         onClick={(e) => {
