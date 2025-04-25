@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiGrid, FiPlus, FiMapPin, FiStar, FiEdit2 } from 'react-icons/fi';
+import { FiSearch, FiGrid, FiPlus, FiMapPin, FiStar, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import HostHeader from './HostHeader';
 import { API_URL } from '../../config/api.config';
@@ -32,6 +32,25 @@ const Listings = () => {
       }
     } catch (error) {
       console.error('Error fetching property details:', error);
+    }
+  };
+
+  const handleDeleteProperty = async (propertyId) => {
+    if (!window.confirm('Are you sure you want to delete this property?')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_URL}/basicInfo/properties/${propertyId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Refresh the listings after deletion
+      getPropertyDetails();
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      alert('Failed to delete property. Please try again.');
     }
   };
 
@@ -127,6 +146,15 @@ const Listings = () => {
                       >
                         <FiEdit2 className="text-gray-600" />
                       </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteProperty(property.id);
+                        }}
+                        className="p-2 bg-white rounded-full shadow-sm hover:shadow-md transition hover:text-red-500"
+                      >
+                        <FiTrash2 className="text-gray-600" />
+                      </button>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           property.status === 'Listed'
@@ -190,6 +218,12 @@ const Listings = () => {
                           className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
                         >
                           <FiEdit2 className="text-gray-600" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProperty(property.id)}
+                          className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition hover:text-red-500"
+                        >
+                          <FiTrash2 className="text-gray-600" />
                         </button>
                         <div className="flex items-center gap-1">
                           <FiStar className="text-yellow-400" />
