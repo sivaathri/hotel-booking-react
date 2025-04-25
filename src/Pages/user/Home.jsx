@@ -8,6 +8,7 @@ import room3 from "../../assets/Images/About Images/room-3.jpg";
 import Header from "./Header";
 import "animate.css";
 import Footer from "./Footer";
+import { motion } from "framer-motion";
 
 const Home = () => {
   const [videoSrc, setVideoSrc] = useState(null);
@@ -318,12 +319,32 @@ const Home = () => {
                           Book Now
                         </a>
                       </div>
+                      
                     </div>
+                    
                   </div>
                 </div>
               ))}
-
             </div>
+          </div>
+        </div>
+
+        {/* Call to Action Section */}
+        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-orange-600 to-yellow-800">
+          <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              Ready to Book Your Perfect Stay?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-white text-blue-600 font-semibold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            >
+              Book Your Room Now
+            </motion.button>
           </div>
         </div>
 
