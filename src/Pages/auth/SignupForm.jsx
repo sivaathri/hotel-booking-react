@@ -5,7 +5,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { API_URL } from '../../config/api.config';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaUser, FaMobile } from 'react-icons/fa';
 
-function SignupForm({ setSignupOpen,setSigninOpen }) {
+function SignupForm({ setSignupOpen }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -236,10 +236,17 @@ function SignupForm({ setSignupOpen,setSigninOpen }) {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
+    <div className="h-full overflow-y-auto">
+      <div className="relative w-[400px] mx-auto space-y-8 bg-white p-4 sm:p-8 rounded-xl shadow-2xl">
+        {/* Close Button */}
+        <button
+          onClick={() => setSignupOpen(false)}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+        >
+          &times;
+        </button>
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
             Create Account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -248,7 +255,7 @@ function SignupForm({ setSignupOpen,setSigninOpen }) {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="rounded-md space-y-4">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FaUser className="h-5 w-5 text-gray-400" />

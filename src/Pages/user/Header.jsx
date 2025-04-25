@@ -347,14 +347,8 @@ const Header = () => {
 
                 {isSignupOpen && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-fade-in">
-                      {/* Close Button */}
-                      <button
-                        onClick={() => setSignupOpen(false)}
-                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
-                      >
-                        &times;
-                      </button>
+                    <div>
+                     
 
                       {/* Sign Up Form */}
                       <SignupForm setSigninOpen={setSigninOpen} setSignupOpen={(value) => {

@@ -317,51 +317,73 @@ const CreateNewListing = () => {
     }
   };
 
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} />;
-      case 2:
-        return (
-          <Step2
-            formData={formData}
-            setFormData={setFormData}
-            showMap={showMap}
-            setShowMap={setShowMap}
-            selectedLocation={selectedLocation}
-            setSelectedLocation={setSelectedLocation}
-          />
-        );
-      case 3:
-        return (
-          <Step3
-            formData={formData}
-            setFormData={setFormData}
-            floorTypes={floorTypes}
-            bhkTypes={bhkTypes}
-            bedTypes={bedTypes}
-            roomFacilities={roomFacilities}
-          />
-        );
-      case 4:
-        return <Step4 formData={formData} setFormData={setFormData} />;
-      case 5:
-        return <Step5 formData={formData} setFormData={setFormData} languages={languages} />;
-      case 6:
-        return <Step6 formData={formData} setFormData={setFormData} />;
-      case 7:
-        return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} />;
-      case 8:
-        return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} />;
-      case 9:
-        return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} />;
-      case 10:
-        return <Step10 formData={formData} setFormData={setFormData} />;
-      case 11:
-        return <Step11 formData={formData} setFormData={setFormData} showSuccessAnimation={showSuccessAnimation} />;
-      default:
-        return null;
+  const handleNextStep = () => {
+    if (step < 11) {
+      setStep(step + 1);
     }
+  };
+
+  const renderStep = () => {
+    const currentStep = (() => {
+      switch (step) {
+        case 1:
+          return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} />;
+        case 2:
+          return (
+            <Step2
+              formData={formData}
+              setFormData={setFormData}
+              showMap={showMap}
+              setShowMap={setShowMap}
+              selectedLocation={selectedLocation}
+              setSelectedLocation={setSelectedLocation}
+            />
+          );
+        case 3:
+          return (
+            <Step3
+              formData={formData}
+              setFormData={setFormData}
+              floorTypes={floorTypes}
+              bhkTypes={bhkTypes}
+              bedTypes={bedTypes}
+              roomFacilities={roomFacilities}
+            />
+          );
+        case 4:
+          return <Step4 formData={formData} setFormData={setFormData} />;
+        case 5:
+          return <Step5 formData={formData} setFormData={setFormData} languages={languages} />;
+        case 6:
+          return <Step6 formData={formData} setFormData={setFormData} />;
+        case 7:
+          return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} />;
+        case 8:
+          return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} />;
+        case 9:
+          return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} />;
+        case 10:
+          return <Step10 formData={formData} setFormData={setFormData} />;
+        case 11:
+          return <Step11 formData={formData} setFormData={setFormData} showSuccessAnimation={showSuccessAnimation} />;
+        default:
+          return null;
+      }
+    })();
+
+    return (
+      <div className="relative">
+        {currentStep}
+        {step !== 11 && (
+          <button
+            onClick={handleNextStep}
+            className="absolute top-0 right-0 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          >
+            Next Step
+          </button>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -407,7 +429,7 @@ const CreateNewListing = () => {
                   isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
                 }`}
               >
-                {isLoading ? 'Saving...' : (step === 11 ? 'Complete Payment' : 'Next')}
+                {isLoading ? 'Saving...' : (step === 11 ? 'Complete Payment' : 'Save')}
               </button>
             </div>
           </div>
