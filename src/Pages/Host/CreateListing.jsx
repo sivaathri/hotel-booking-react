@@ -2,13 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiCopy, FiChevronRight } from 'react-icons/fi';
 import HostHeader from './HostHeader';
-
+import { useUser } from '../../context/UserContext';
 const CreateListing = () => {
+  const { user, logout } = useUser();
   return (
     <>
       <HostHeader />
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-semibold mb-8">Welcome back, Sadhish</h1>
+        <h1 className="text-3xl font-semibold mb-8">Welcome back{user?.username ? `, ${user.username}` : ''}</h1>
 
         {/* Finish your listing section */}
         <div className="mb-12">
