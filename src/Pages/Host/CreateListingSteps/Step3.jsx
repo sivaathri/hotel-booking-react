@@ -1,8 +1,9 @@
 import React from 'react';
 import { FiGrid } from 'react-icons/fi';
 
-const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFacilities }) => {
+const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFacilities, isEditing }) => {
   const handleRoomChange = (index, field, value) => {
+    if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       rooms: prev.rooms.map((room, i) =>
@@ -12,6 +13,7 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
   };
 
   const addNewRoom = () => {
+    if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       rooms: [...prev.rooms, {
@@ -43,7 +45,7 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
           >
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">Room {index + 1}</h3>
-              {index > 0 && (
+              {index > 0 && isEditing && (
                 <button
                   onClick={() =>
                     setFormData((prev) => ({
@@ -64,7 +66,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                 <select
                   value={room.floor}
                   onChange={(e) => handleRoomChange(index, "floor", e.target.value)}
-                  className="w-full p-2 border rounded-lg"
+                  disabled={!isEditing}
+                  className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 >
                   <option value="">Select Floor</option>
                   {floorTypes.map((type) => (
@@ -80,7 +83,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                 <select
                   value={room.bhk}
                   onChange={(e) => handleRoomChange(index, "bhk", e.target.value)}
-                  className="w-full p-2 border rounded-lg"
+                  disabled={!isEditing}
+                  className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 >
                   <option value="">Select BHK Type</option>
                   {bhkTypes.map((type) => (
@@ -98,7 +102,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                 type="text"
                 value={room.name}
                 onChange={(e) => handleRoomChange(index, "name", e.target.value)}
-                className="w-full p-2 border rounded-lg"
+                disabled={!isEditing}
+                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 placeholder="e.g., Deluxe Room, Family Suite"
               />
             </div>
@@ -109,7 +114,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                 type="number"
                 value={room.capacity}
                 onChange={(e) => handleRoomChange(index, "capacity", e.target.value)}
-                className="w-full p-2 border rounded-lg"
+                disabled={!isEditing}
+                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 placeholder="Number of guests"
               />
             </div>
@@ -120,10 +126,12 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                 {bedTypes.map((type) => (
                   <button
                     key={type}
-                    className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${room.bedType === type
+                    disabled={!isEditing}
+                    className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${
+                      room.bedType === type
                         ? "border-blue-600 bg-blue-50 text-blue-600"
                         : "hover:border-gray-400 text-gray-700"
-                      }`}
+                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : ''}`}
                     onClick={() => handleRoomChange(index, "bedType", type)}
                   >
                     {type}
@@ -141,6 +149,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                     onChange={(e) =>
                       handleRoomChange(index, "hasBathroom", e.target.checked)
                     }
+                    disabled={!isEditing}
+                    className={!isEditing ? 'cursor-not-allowed' : ''}
                   />
                   Attached Bathroom
                 </label>
@@ -153,6 +163,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                     onChange={(e) =>
                       handleRoomChange(index, "hasBalcony", e.target.checked)
                     }
+                    disabled={!isEditing}
+                    className={!isEditing ? 'cursor-not-allowed' : ''}
                   />
                   Balcony/View
                 </label>
@@ -168,7 +180,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                   onChange={(e) =>
                     handleRoomChange(index, "balconyView", e.target.value)
                   }
-                  className="w-full p-2 border rounded-lg"
+                  disabled={!isEditing}
+                  className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   placeholder="e.g., Sea, Garden, City"
                 />
               </div>
@@ -206,13 +219,14 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
           </div>
         ))}
 
-        <button
-          onClick={addNewRoom}
-          className="w-full p-4 border border-dashed rounded-xl flex items-center justify-center gap-2 hover:border-blue-400 hover:bg-blue-50 transition-all text-blue-600 font-medium"
-        >
-          <FiGrid className="text-xl" />
-          Add Another Room
-        </button>
+        {isEditing && (
+          <button
+            onClick={addNewRoom}
+            className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors"
+          >
+            + Add Another Room
+          </button>
+        )}
       </div>
     </div>
   );

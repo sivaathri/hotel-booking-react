@@ -23,6 +23,7 @@ const EditListing = () => {
   const [showMap, setShowMap] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Basic Information
     propertyName: '',
@@ -194,7 +195,69 @@ const EditListing = () => {
         setIsLoading(false);
       }
     } else {
-      setStep(step + 1);
+      // Validate current step data before proceeding
+      let canProceed = true;
+      
+      switch (step) {
+        case 1:
+          if (!formData.propertyName || !formData.propertyType) {
+            canProceed = false;
+            toast.error('Please fill in all required fields');
+          }
+          break;
+        case 2:
+          if (!formData.addressLine1 || !formData.city || !formData.state || !formData.country || !formData.postalCode) {
+            canProceed = false;
+            toast.error('Please fill in all address details');
+          }
+          break;
+        case 3:
+          if (formData.rooms.length === 0 || !formData.rooms[0].name || !formData.rooms[0].floor || !formData.rooms[0].bhk) {
+            canProceed = false;
+            toast.error('Please add at least one room with required details');
+          }
+          break;
+        case 4:
+          if (formData.roomPhotos.length === 0) {
+            canProceed = false;
+            toast.error('Please add at least one room photo');
+          }
+          break;
+        case 5:
+          if (formData.languages.length === 0) {
+            canProceed = false;
+            toast.error('Please select at least one language');
+          }
+          break;
+        case 6:
+          if (!formData.checkInTime || !formData.checkOutTime) {
+            canProceed = false;
+            toast.error('Please set check-in and check-out times');
+          }
+          break;
+        case 7:
+          if (!formData.pricePerNight || !formData.refundPolicy) {
+            canProceed = false;
+            toast.error('Please set price and refund policy');
+          }
+          break;
+        case 8:
+          if (formData.allowedGuests.length === 0) {
+            canProceed = false;
+            toast.error('Please select allowed guest types');
+          }
+          break;
+        case 9:
+          if (formData.paymentMethods.length === 0 || !formData.panGstId) {
+            canProceed = false;
+            toast.error('Please add payment methods and PAN/GST ID');
+          }
+          break;
+      }
+
+      if (canProceed) {
+        setStep(step + 1);
+      }
     }
   };
 
@@ -207,7 +270,7 @@ const EditListing = () => {
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} />;
+        return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} isEditing={isEditing} />;
       case 2:
         return (
           <Step2
@@ -217,6 +280,7 @@ const EditListing = () => {
             setShowMap={setShowMap}
             selectedLocation={selectedLocation}
             setSelectedLocation={setSelectedLocation}
+            isEditing={isEditing}
           />
         );
       case 3:
@@ -228,22 +292,23 @@ const EditListing = () => {
             bhkTypes={bhkTypes}
             bedTypes={bedTypes}
             roomFacilities={roomFacilities}
+            isEditing={isEditing}
           />
         );
       case 4:
-        return <Step4 formData={formData} setFormData={setFormData} />;
+        return <Step4 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
       case 5:
-        return <Step5 formData={formData} setFormData={setFormData} languages={languages} />;
+        return <Step5 formData={formData} setFormData={setFormData} languages={languages} isEditing={isEditing} />;
       case 6:
-        return <Step6 formData={formData} setFormData={setFormData} />;
+        return <Step6 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
       case 7:
-        return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} />;
+        return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} isEditing={isEditing} />;
       case 8:
-        return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} />;
+        return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} isEditing={isEditing} />;
       case 9:
-        return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} />;
+        return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} isEditing={isEditing} />;
       case 10:
-        return <Step10 formData={formData} setFormData={setFormData} />;
+        return <Step10 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
       default:
         return null;
     }
@@ -266,7 +331,19 @@ const EditListing = () => {
           <div className="mb-8">
             <div className="flex justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">Step {step} of 10</span>
-              <span className="text-sm font-medium text-gray-700">{Math.round((step / 10) * 100)}%</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">{Math.round((step / 10) * 100)}%</span>
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium ${
+                    isEditing
+                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      : 'bg-rose-500 text-white hover:bg-rose-600'
+                  }`}
+                >
+                  {isEditing ? 'Save' : 'Edit'}
+                </button>
+              </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
@@ -296,7 +373,12 @@ const EditListing = () => {
             </button>
             <button
               onClick={handleNext}
-              className="px-6 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+              disabled={!isEditing}
+              className={`px-6 py-2 rounded-lg ${
+                isEditing
+                  ? 'bg-rose-500 text-white hover:bg-rose-600'
+                  : 'bg-gray-300 text-gray-400 cursor-not-allowed'
+              }`}
             >
               {step === 10 ? 'Save Changes' : 'Next'}
             </button>

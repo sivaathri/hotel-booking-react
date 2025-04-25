@@ -1,8 +1,9 @@
 import React from 'react';
 import { FiDollarSign } from 'react-icons/fi';
 
-const Step7 = ({ formData, setFormData, refundPolicies }) => {
+const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
   const handleRoomChange = (index, field, value) => {
+    if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       rooms: prev.rooms.map((room, i) =>
@@ -31,17 +32,18 @@ const Step7 = ({ formData, setFormData, refundPolicies }) => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {formData.rooms.map((room, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900">{room.floor || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{room.bhk || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{room.capacity ? `${room.capacity} persons` : '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{room.bedType || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
+                <tr key={index}>
+                  <td className="px-4 py-3 text-sm text-gray-600">{room.floor}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{room.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{room.capacity}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{room.bedType}</td>
+                  <td className="px-4 py-3">
                     <input
                       type="number"
-                      value={room.price || ''}
-                      onChange={(e) => handleRoomChange(index, "price", e.target.value)}
-                      className="w-24 p-1 border rounded"
+                      value={room.pricePerNight}
+                      onChange={(e) => handleRoomChange(index, "pricePerNight", e.target.value)}
+                      disabled={!isEditing}
+                      className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                       placeholder="Enter price"
                     />
                   </td>
@@ -50,7 +52,6 @@ const Step7 = ({ formData, setFormData, refundPolicies }) => {
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-sm text-gray-600">Total Rooms: {formData.rooms.length}</p>
       </div>
 
       <div className="space-y-4">
@@ -98,8 +99,10 @@ const Step7 = ({ formData, setFormData, refundPolicies }) => {
             {refundPolicies.map(policy => (
               <button
                 key={policy}
-                className={`p-2 border rounded-lg text-center ${formData.refundPolicy === policy ? 'border-black bg-gray-100' : 'hover:border-gray-400'
-                  }`}
+                disabled={!isEditing}
+                className={`p-2 border rounded-lg text-center ${
+                  formData.refundPolicy === policy ? 'border-black bg-gray-100' : 'hover:border-gray-400'
+                } ${!isEditing ? 'cursor-not-allowed opacity-50' : ''}`}
                 onClick={() => setFormData(prev => ({ ...prev, refundPolicy: policy }))}
               >
                 {policy}

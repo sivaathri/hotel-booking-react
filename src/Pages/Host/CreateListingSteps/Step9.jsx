@@ -1,7 +1,8 @@
 import React from 'react';
 
-const Step9 = ({ formData, setFormData, paymentOptions }) => {
+const Step9 = ({ formData, setFormData, paymentOptions, isEditing }) => {
   const handleArrayToggle = (field, value) => {
+    if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -11,6 +12,7 @@ const Step9 = ({ formData, setFormData, paymentOptions }) => {
   };
 
   const handleInputChange = (e) => {
+    if (!isEditing) return;
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -31,6 +33,8 @@ const Step9 = ({ formData, setFormData, paymentOptions }) => {
                   type="checkbox"
                   checked={formData.paymentMethods.includes(method)}
                   onChange={() => handleArrayToggle('paymentMethods', method)}
+                  disabled={!isEditing}
+                  className={!isEditing ? 'cursor-not-allowed' : ''}
                 />
                 {method}
               </label>
@@ -44,7 +48,8 @@ const Step9 = ({ formData, setFormData, paymentOptions }) => {
             name="panGstId"
             value={formData.panGstId}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
+            disabled={!isEditing}
+            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             placeholder="Enter PAN or GST ID"
           />
         </div>
@@ -60,7 +65,8 @@ const Step9 = ({ formData, setFormData, paymentOptions }) => {
                   ...prev,
                   bankDetails: { ...prev.bankDetails, accountNumber: e.target.value }
                 }))}
-                className="w-full p-2 border rounded-lg"
+                disabled={!isEditing}
+                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
             <div>
@@ -72,7 +78,8 @@ const Step9 = ({ formData, setFormData, paymentOptions }) => {
                   ...prev,
                   bankDetails: { ...prev.bankDetails, ifscCode: e.target.value }
                 }))}
-                className="w-full p-2 border rounded-lg"
+                disabled={!isEditing}
+                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
           </div>
@@ -85,7 +92,8 @@ const Step9 = ({ formData, setFormData, paymentOptions }) => {
                 ...prev,
                 bankDetails: { ...prev.bankDetails, accountHolderName: e.target.value }
               }))}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
           </div>
         </div>

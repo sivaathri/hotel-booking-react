@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, setSelectedLocation }) => {
+const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, setSelectedLocation, isEditing }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -33,7 +33,8 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
             name="addressLine1"
             value={formData.addressLine1}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
+            disabled={!isEditing}
+            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             placeholder="Street address"
           />
         </div>
@@ -44,7 +45,8 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
             name="addressLine2"
             value={formData.addressLine2}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded-lg"
+            disabled={!isEditing}
+            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             placeholder="Apartment, suite, unit, etc."
           />
         </div>
@@ -56,7 +58,8 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
               name="city"
               value={formData.city}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
           </div>
           <div>
@@ -66,7 +69,8 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
               name="state"
               value={formData.state}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
           </div>
         </div>
@@ -78,7 +82,8 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
               name="country"
               value={formData.country}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
           </div>
           <div>
@@ -88,7 +93,8 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
               name="postalCode"
               value={formData.postalCode}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="Enter zip/postal code"
             />
           </div>
@@ -98,7 +104,10 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
           <div className="flex gap-4">
             <button
               onClick={() => setShowMap(!showMap)}
-              className="flex-1 p-2 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors duration-200 flex items-center justify-center gap-2"
+              disabled={!isEditing}
+              className={`flex-1 p-2 border border-gray-300 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 ${
+                !isEditing ? 'cursor-not-allowed opacity-50' : 'hover:border-gray-400'
+              }`}
             >
               <FiMapPin className="text-lg" />
               {showMap ? 'Hide Map' : 'Select Location on Map'}
@@ -130,14 +139,16 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
                 <LocationMarker
                   position={selectedLocation}
                   setPosition={(pos) => {
-                    setSelectedLocation(pos);
-                    setFormData(prev => ({
-                      ...prev,
-                      mapLocation: pos
-                    }));
+                    if (isEditing) {
+                      setSelectedLocation(pos);
+                      setFormData(prev => ({
+                        ...prev,
+                        mapLocation: pos
+                      }));
+                    }
                   }}
-                  setAddress={(addr) => setFormData(prev => ({ ...prev, address: addr }))}
-                  setAddressDetails={(details) => setFormData(prev => ({ ...prev, ...details }))}
+                  setAddress={(addr) => isEditing && setFormData(prev => ({ ...prev, address: addr }))}
+                  setAddressDetails={(details) => isEditing && setFormData(prev => ({ ...prev, ...details }))}
                 />
               </MapContainer>
             </div>

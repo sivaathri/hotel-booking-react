@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiImage } from 'react-icons/fi';
 
-const Step4 = ({ formData, setFormData }) => {
+const Step4 = ({ formData, setFormData, isEditing }) => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Room Photos</h2>
@@ -15,25 +15,31 @@ const Step4 = ({ formData, setFormData }) => {
                 {photo ? (
                   <>
                     <img src={URL.createObjectURL(photo)} alt={`Room photo ${index + 1}`} className="w-full h-48 object-cover rounded-lg" />
-                    <button
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        roomPhotos: prev.roomPhotos.filter((_, i) => i !== index)
-                      }))}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                    >
-                      ×
-                    </button>
+                    {isEditing && (
+                      <button
+                        onClick={() => setFormData(prev => ({
+                          ...prev,
+                          roomPhotos: prev.roomPhotos.filter((_, i) => i !== index)
+                        }))}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    )}
                   </>
                 ) : (
-                  <label className="border-2 border-dashed rounded-lg p-4 h-48 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-gray-400">
+                  <label className={`border-2 border-dashed rounded-lg p-4 h-48 flex flex-col items-center justify-center gap-2 ${
+                    isEditing ? 'cursor-pointer hover:border-gray-400' : 'cursor-not-allowed opacity-50'
+                  }`}>
                     <FiImage className="text-2xl" />
                     <span className="text-sm">Upload Photo {index + 1}</span>
                     <input
                       type="file"
                       accept="image/*"
                       className="hidden"
+                      disabled={!isEditing}
                       onChange={(e) => {
+                        if (!isEditing) return;
                         const file = e.target.files[0];
                         if (!file) return;
 

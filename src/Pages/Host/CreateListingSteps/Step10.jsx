@@ -1,7 +1,8 @@
 import React from 'react';
 
-const Step10 = ({ formData, setFormData }) => {
+const Step10 = ({ formData, setFormData, isEditing }) => {
   const handleCheckboxChange = (e) => {
+    if (!isEditing) return;
     const { name, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -18,11 +19,15 @@ const Step10 = ({ formData, setFormData }) => {
           <input
             type="file"
             accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              idProof: e.target.files[0]
-            }))}
-            className="w-full p-2 border rounded-lg"
+            onChange={(e) => {
+              if (!isEditing) return;
+              setFormData(prev => ({
+                ...prev,
+                idProof: e.target.files[0]
+              }));
+            }}
+            disabled={!isEditing}
+            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           />
         </div>
         <div>
@@ -30,11 +35,15 @@ const Step10 = ({ formData, setFormData }) => {
           <input
             type="file"
             accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              propertyProof: e.target.files[0]
-            }))}
-            className="w-full p-2 border rounded-lg"
+            onChange={(e) => {
+              if (!isEditing) return;
+              setFormData(prev => ({
+                ...prev,
+                propertyProof: e.target.files[0]
+              }));
+            }}
+            disabled={!isEditing}
+            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           />
         </div>
         <div className="space-y-2">
@@ -44,6 +53,8 @@ const Step10 = ({ formData, setFormData }) => {
               name="termsAccepted"
               checked={formData.termsAccepted}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             I confirm all details are correct
           </label>
@@ -53,6 +64,8 @@ const Step10 = ({ formData, setFormData }) => {
               name="termsAccepted"
               checked={formData.termsAccepted}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             I accept TripNGrub's terms and policies
           </label>

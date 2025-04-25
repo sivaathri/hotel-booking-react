@@ -1,7 +1,8 @@
 import React from 'react';
 
-const Step8 = ({ formData, setFormData, guestTypes }) => {
+const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
   const handleArrayToggle = (field, value) => {
+    if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -11,6 +12,7 @@ const Step8 = ({ formData, setFormData, guestTypes }) => {
   };
 
   const handleCheckboxChange = (e) => {
+    if (!isEditing) return;
     const { name, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -31,6 +33,8 @@ const Step8 = ({ formData, setFormData, guestTypes }) => {
                   type="checkbox"
                   checked={formData.allowedGuests.includes(type)}
                   onChange={() => handleArrayToggle('allowedGuests', type)}
+                  disabled={!isEditing}
+                  className={!isEditing ? 'cursor-not-allowed' : ''}
                 />
                 {type}
               </label>
@@ -44,6 +48,8 @@ const Step8 = ({ formData, setFormData, guestTypes }) => {
               name="instantBooking"
               checked={formData.instantBooking}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             Instant Booking
           </label>
@@ -53,6 +59,8 @@ const Step8 = ({ formData, setFormData, guestTypes }) => {
               name="manualApproval"
               checked={formData.manualApproval}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             Manual Approval
           </label>

@@ -1,7 +1,8 @@
 import React from 'react';
 
-const Step5 = ({ formData, setFormData, languages }) => {
+const Step5 = ({ formData, setFormData, languages, isEditing }) => {
   const handleArrayToggle = (field, value) => {
+    if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -11,6 +12,7 @@ const Step5 = ({ formData, setFormData, languages }) => {
   };
 
   const handleInputChange = (e) => {
+    if (!isEditing) return;
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -30,6 +32,8 @@ const Step5 = ({ formData, setFormData, languages }) => {
                 type="checkbox"
                 checked={formData.languages.includes(language)}
                 onChange={() => handleArrayToggle('languages', language)}
+                disabled={!isEditing}
+                className={!isEditing ? 'cursor-not-allowed' : ''}
               />
               {language}
             </label>
@@ -41,7 +45,8 @@ const Step5 = ({ formData, setFormData, languages }) => {
               name="otherLanguage"
               value={formData.otherLanguage}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               placeholder="Enter other language"
             />
           </div>

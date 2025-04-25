@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiClock, FiCalendar } from 'react-icons/fi';
 
-const Step6 = ({ formData, setFormData }) => {
+const Step6 = ({ formData, setFormData, isEditing }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -11,6 +11,7 @@ const Step6 = ({ formData, setFormData }) => {
   };
 
   const handleCheckboxChange = (e) => {
+    if (!isEditing) return;
     const { name, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -30,7 +31,8 @@ const Step6 = ({ formData, setFormData }) => {
               name="checkInTime"
               value={formData.checkInTime}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
           </div>
           <div>
@@ -40,7 +42,8 @@ const Step6 = ({ formData, setFormData }) => {
               name="checkOutTime"
               value={formData.checkOutTime}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg"
+              disabled={!isEditing}
+              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             />
           </div>
         </div>
@@ -51,6 +54,8 @@ const Step6 = ({ formData, setFormData }) => {
               name="petsAllowed"
               checked={formData.petsAllowed}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             Pets Allowed
           </label>
@@ -60,6 +65,8 @@ const Step6 = ({ formData, setFormData }) => {
               name="smokingAllowed"
               checked={formData.smokingAllowed}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             Smoking Allowed
           </label>
@@ -69,6 +76,8 @@ const Step6 = ({ formData, setFormData }) => {
               name="alcoholAllowed"
               checked={formData.alcoholAllowed}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             Alcohol Allowed
           </label>
@@ -78,6 +87,8 @@ const Step6 = ({ formData, setFormData }) => {
               name="noiseRestrictions"
               checked={formData.noiseRestrictions}
               onChange={handleCheckboxChange}
+              disabled={!isEditing}
+              className={!isEditing ? 'cursor-not-allowed' : ''}
             />
             Noise Restrictions
           </label>
