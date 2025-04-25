@@ -373,11 +373,10 @@ const EditListing = () => {
             </button>
             <button
               onClick={handleNext}
-              disabled={!isEditing}
               className={`px-6 py-2 rounded-lg ${
                 isEditing
                   ? 'bg-rose-500 text-white hover:bg-rose-600'
-                  : 'bg-gray-300 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
               }`}
             >
               {step === 10 ? 'Save Changes' : 'Next'}
