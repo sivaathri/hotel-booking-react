@@ -158,9 +158,9 @@ const Home = () => {
 
         {/* Carousel End */}
         <div className="w-full flex justify-center items-center absolute top-80 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
-          <div className="container mx-auto bg-[#101828] bg-opacity-95 shadow-3xl p-6 sm:p-8 rounded-2xl flex flex-row items-center gap-4 border border-gray-800">
+          <div className="container mx-auto bg-[#101828] bg-opacity-95 shadow-3xl p-6 sm:p-8 rounded-2xl flex flex-col md:flex-row items-center gap-4 md:gap-6 border border-gray-800">
             {/* Destination */}
-            <div className="flex flex-col w-1/5">
+            <div className="flex flex-col w-full md:w-1/4">
               <label className="block text-white text-sm font-medium mb-1">Enter Destination</label>
               <input
                 type="text"
@@ -169,7 +169,7 @@ const Home = () => {
               />
             </div>
             {/* Check-in */}
-            <div className="flex flex-col w-1/5">
+            <div className="flex flex-col w-full md:w-1/4">
               <label className="block text-white text-sm font-medium mb-1">Check-in</label>
               <input
                 type="date"
@@ -177,7 +177,7 @@ const Home = () => {
               />
             </div>
             {/* Check-out */}
-            <div className="flex flex-col w-1/5">
+            <div className="flex flex-col w-full md:w-1/4">
               <label className="block text-white text-sm font-medium mb-1">Check-out</label>
               <input
                 type="date"
@@ -185,7 +185,7 @@ const Home = () => {
               />
             </div>
             {/* Guests */}
-            <div className="flex flex-col w-1/5 relative" ref={dropdownRef}>
+            <div className="flex flex-col w-full md:w-1/4 relative" ref={dropdownRef}>
               <label className="block text-white text-sm font-medium mb-1">Rooms & Guests</label>
               <input
                 readOnly
@@ -219,8 +219,8 @@ const Home = () => {
               )}
             </div>
             {/* Search Button */}
-            <div className="flex items-end w-1/5">
-              <button className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold py-2 px-8 shadow-md transition duration-200">
+            <div className="flex items-end w-full md:w-auto">
+              <button className="w-full md:w-auto rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold py-2 px-8 shadow-md transition duration-200 mt-4 md:mt-0">
                 Search
               </button>
             </div>
