@@ -383,6 +383,75 @@ const CreateNewListing = () => {
     }
   };
 
+  const saveRoomSetup = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+
+      // Process each room in the formData
+      const roomPromises = formData.rooms.map(async (room) => {
+        const response = await axios.post(
+          `${API_URL}/roomSetup/`,
+          {
+            user_id: user.id,
+            floor: room.floor,
+            room_type: room.bhk,
+            number_of_rooms: 1, // Assuming 1 room per entry
+            capacity: room.capacity,
+            bed_type: room.bedType,
+            has_attached_bathroom: room.hasBathroom,
+            has_balcony: room.hasBalcony,
+            facilities: room.facilities
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        return response.data;
+      });
+
+      const results = await Promise.all(roomPromises);
+      
+      if (results.every(result => result.success)) {
+        toast.success('Room setup saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setStep(step + 1);
+      } else {
+        toast.error('Failed to save some room details. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving room setup:', error);
+      toast.error('An error occurred while saving. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       // Save basic information when in step 1
@@ -390,6 +459,9 @@ const CreateNewListing = () => {
     } else if (step === 2) {
       // Save location details when in step 2
       await saveLocationDetails();
+    } else if (step === 3) {
+      // Save room setup when in step 3
+      await saveRoomSetup();
     } else if (step < 11) {
       setStep(step + 1);
     } else {
