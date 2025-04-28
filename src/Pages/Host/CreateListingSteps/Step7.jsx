@@ -24,6 +24,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Floor</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Room Type</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Number of Rooms</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Capacity</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Bed Type</th>
@@ -34,6 +35,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
               {formData.rooms.map((room, index) => (
                 <tr key={index}>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.floor}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{room.bhk}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.name}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.capacity}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.bedType}</td>
