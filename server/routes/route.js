@@ -9,11 +9,12 @@ router.use(cors())
 const userRoutes = require('../Modules/user/userRoutes');
 const basicInfoRoutes = require('../Modules/HostList/basicInfo/basicInfoRoutes');
 const locationDetailsRoutes = require('../Modules/HostList/locationDetails/locationDetailsRoutes');
-
+const roomSetupRoutes = require('../Modules/roomSetup/roomSetupRoutes');
 // API Routes
 router.use('/auth', userRoutes)
 router.use('/basicInfo', basicInfoRoutes)
 router.use('/location', locationDetailsRoutes)
+router.use('/roomSetup', roomSetupRoutes)
       
 
 
