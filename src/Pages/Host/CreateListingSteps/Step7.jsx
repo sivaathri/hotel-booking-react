@@ -24,7 +24,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Floor</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Rooms Type</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Number of Rooms</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Capacity</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Bed Type</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Price/Night (₹)</th>

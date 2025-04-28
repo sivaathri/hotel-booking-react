@@ -24,7 +24,7 @@
     "bootstrap": "^5.3.5",
     "chart.js": "^4.4.9",
     "dotenv": "^16.5.0",
-    "framer-motion": "^12.8.0",
+    "framer-motion": "^12.9.2",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.488.0",

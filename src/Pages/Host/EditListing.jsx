@@ -105,7 +105,7 @@ const EditListing = () => {
     'Villa'
   ];
 
-  const bedTypes = ['Queen', 'King', 'Twin'];
+  const bedTypes = ['Single'];
   const floorTypes = ['Ground Floor', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor', '6th Floor', '7th Floor', '8th Floor', '9th Floor', '10th Floor'];
   const bhkTypes = ['1 BHK', '2 BHK', '3 BHK', '4 BHK', '5 BHK', 'Studio','Villa'];
   const roomFacilities = [

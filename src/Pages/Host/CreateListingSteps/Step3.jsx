@@ -12,6 +12,23 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
     }));
   };
 
+  const handleBedTypeToggle = (index, bedType) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      rooms: prev.rooms.map((room, i) => {
+        if (i === index) {
+          const currentBedTypes = room.bedType || [];
+          const newBedTypes = currentBedTypes.includes(bedType)
+            ? currentBedTypes.filter(type => type !== bedType)
+            : [...currentBedTypes, bedType];
+          return { ...room, bedType: newBedTypes };
+        }
+        return room;
+      })
+    }));
+  };
+
   const addNewRoom = () => {
     if (!isEditing) return;
     setFormData(prev => ({
@@ -79,14 +96,14 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">BHK Type</label>
+                <label className="block text-sm font-medium mb-2">Room Type</label>
                 <select
                   value={room.bhk}
                   onChange={(e) => handleRoomChange(index, "bhk", e.target.value)}
                   disabled={!isEditing}
                   className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 >
-                  <option value="">Select BHK Type</option>
+                  <option value="">Select Room Type</option>
                   {bhkTypes.map((type) => (
                     <option key={type} value={type}>
                       {type}
@@ -97,14 +114,14 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Room Name/Type</label>
+              <label className="block text-sm font-medium mb-2">Number of Room </label>
               <input
-                type="text"
+                type="number"
                 value={room.name}
                 onChange={(e) => handleRoomChange(index, "name", e.target.value)}
                 disabled={!isEditing}
                 className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                placeholder="e.g., Deluxe Room, Family Suite"
+                placeholder="e.g ; 2,3,4"
               />
             </div>
 
@@ -128,11 +145,11 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                     key={type}
                     disabled={!isEditing}
                     className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${
-                      room.bedType === type
+                      (room.bedType || []).includes(type)
                         ? "border-blue-600 bg-blue-50 text-blue-600"
                         : "hover:border-gray-400 text-gray-700"
                     } ${!isEditing ? 'cursor-not-allowed opacity-50' : ''}`}
-                    onClick={() => handleRoomChange(index, "bedType", type)}
+                    onClick={() => handleBedTypeToggle(index, type)}
                   >
                     {type}
                   </button>

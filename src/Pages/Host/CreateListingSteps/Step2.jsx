@@ -147,8 +147,6 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
                       }));
                     }
                   }}
-                  setAddress={(addr) => isEditing && setFormData(prev => ({ ...prev, address: addr }))}
-                  setAddressDetails={(details) => isEditing && setFormData(prev => ({ ...prev, ...details }))}
                 />
               </MapContainer>
             </div>
