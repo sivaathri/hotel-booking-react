@@ -22,7 +22,7 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="bg-[#0B1120] text-white pt-20">
+      <footer className="bg-[#0B1120] mt-20 text-white pt-20">
         <div className="bg-gradient-to-r from-white via-orange-50 to-white p-12 max-w-5xl mx-auto rounded-3xl shadow-2xl -mt-40 relative z-10 min-h-[280px]">
           <h2 className="text-center text-4xl font-extrabold text-[#0B1120] tracking-tight">
             Subscribe Our <span className="text-orange-500">NEWSLETTER</span>
