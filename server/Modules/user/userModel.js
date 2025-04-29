@@ -61,7 +61,7 @@ class User {
     const values = [];
     
     validFields.forEach(field => {
-      if (userData[field] !== undefined) {
+      if (userData[field] !== undefined && userData[field] !== null) {
         updates.push(`${field} = ?`);
         values.push(userData[field]);
       }
@@ -72,11 +72,16 @@ class User {
     // Add id to values array
     values.push(id);
 
-    const [result] = await db.execute(
-      `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
-      values
-    );
-    return result.affectedRows;
+    try {
+      const [result] = await db.execute(
+        `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+        values
+      );
+      return result.affectedRows;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
   }
 
   static async delete(id) {

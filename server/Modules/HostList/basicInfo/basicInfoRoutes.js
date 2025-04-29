@@ -14,7 +14,7 @@ router.get('/properties/:id', basicInfoController.getPropertyById);
 router.post('/create/:user_id', basicInfoController.createBasicInfo);
 
 // Update property by ID
-router.put('/property/:id', basicInfoController.updatePropertyById);
+// router.put('/property/:id', basicInfoController.updatePropertyById);
 router.put('/properties/:id', basicInfoController.updatePropertyById);
 
 // Delete property by ID

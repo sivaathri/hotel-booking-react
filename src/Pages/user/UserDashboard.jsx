@@ -6,6 +6,7 @@ import { API_URL } from '../../config/api.config';
 import { getAuthToken } from '../../utils/getAuthToken';
 
 const MyBookings = () => {
+  
   const [activeTab, setActiveTab] = useState('upcoming');
   const [hoveredBooking, setHoveredBooking] = useState(null);
 
@@ -189,11 +190,10 @@ const MyBookings = () => {
 
             <div className="flex justify-between items-center">
               <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  booking.status === 'confirmed' ? 'bg-green-500' :
-                  booking.status === 'pending' ? 'bg-yellow-500' :
-                  booking.status === 'completed' ? 'bg-blue-500' : 'bg-red-500'
-                }`}></div>
+                <div className={`w-2 h-2 rounded-full mr-2 ${booking.status === 'confirmed' ? 'bg-green-500' :
+                    booking.status === 'pending' ? 'bg-yellow-500' :
+                      booking.status === 'completed' ? 'bg-blue-500' : 'bg-red-500'
+                  }`}></div>
                 <span className="text-sm font-medium text-gray-900">
                   {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                 </span>
@@ -237,11 +237,10 @@ const MyBookings = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-4 text-sm font-medium relative ${
-                activeTab === tab
+              className={`pb-4 text-sm font-medium relative ${activeTab === tab
                   ? 'text-blue-600'
                   : 'text-gray-500 hover:text-gray-700'
-              }`}
+                }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
               {activeTab === tab && (
@@ -457,11 +456,12 @@ const LoginDetails = ({ profileData }) => {
   };
 
   const handlePasswordUpdate = async (e) => {
+    const token = getAuthToken();
     e.preventDefault();
     setError('');
     setSuccess('');
-    const token = getAuthToken();
-    
+   
+
     if (!token) {
       setError('You must be logged in to update your password');
       return;
@@ -695,6 +695,8 @@ export default function UserDashboard() {
   const [selectedMenu, setSelectedMenu] = useState('Profile');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [profileData, setProfileData] = useState({
     id: '',
     name: '',
@@ -711,9 +713,10 @@ export default function UserDashboard() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const token = getAuthToken();
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        
         if (!token) {
           // Redirect to login if no token
           window.location.href = '/';
@@ -761,7 +764,7 @@ export default function UserDashboard() {
 
   const handleUpdate = async (value) => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = getAuthToken();
       const fieldName = currentField.toLowerCase().replace(' ', '');
 
       if (!profileData.id) {
@@ -786,6 +789,11 @@ export default function UserDashboard() {
           [fieldName]: value
         }));
         setIsModalOpen(false);
+        setSuccessMessage('Profile updated successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => {
+          setShowSuccessToast(false);
+        }, 3000);
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -855,6 +863,15 @@ export default function UserDashboard() {
       <div className="fixed top-0 left-0 right-0 z-50">
         <Header />
       </div>
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed top-20 right-4 z-50">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center animate-fadeIn">
+            <Check className="w-5 h-5 mr-2" />
+            <span>{successMessage}</span>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto pt-24 p-6">
         {/* Header Navigation */}
         <div className="flex items-center justify-between mb-8">
@@ -903,11 +920,10 @@ export default function UserDashboard() {
                   <button
                     key={item.name}
                     onClick={() => setSelectedMenu(item.name)}
-                    className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${
-                      selectedMenu === item.name
+                    className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${selectedMenu === item.name
                         ? 'bg-blue-50 text-blue-600'
                         : 'text-gray-600 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <item.icon className="w-5 h-5 mr-3" />
                     <span className="text-sm font-medium">{item.name}</span>
@@ -947,14 +963,18 @@ export default function UserDashboard() {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Complete your Profile</h3>
                     <span className="text-sm text-gray-500">
-                      {Math.round((Object.values(profileData).filter(value => value !== '').length / 7) * 100)}% Complete
+                      {Math.min(Math.round((Object.entries(profileData)
+                        .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
+                        .filter(([_, value]) => value !== '').length / 7) * 100), 100)}% Complete
                     </span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
                     <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                       style={{
-                        width: `${(Object.values(profileData).filter(value => value !== '').length / 7) * 100}%`
+                        width: `${Math.min((Object.entries(profileData)
+                          .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
+                          .filter(([_, value]) => value !== '').length / 7) * 100, 100)}%`
                       }}
                     />
                   </div>
@@ -985,12 +1005,40 @@ export default function UserDashboard() {
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-lg font-semibold text-gray-900">Profile Details</h2>
                     <button
-                      onClick={() => setIsEditMode(!isEditMode)}
-                      className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-                        isEditMode
+                      onClick={async () => {
+                        if (isEditMode) {
+                          // Save changes
+                          try {
+                            const token = getAuthToken();
+                            const response = await axios.put(
+                              `${API_URL}/auth/${profileData.id}`,
+                              profileData,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${token}`
+                                }
+                              }
+                            );
+
+                            if (response.status === 200) {
+                              setSuccessMessage('Profile updated successfully!');
+                              setShowSuccessToast(true);
+                              setTimeout(() => {
+                                setShowSuccessToast(false);
+                              }, 3000);
+                            }
+                          } catch (error) {
+                            console.error('Error updating profile:', error);
+                            setError('Failed to update profile');
+                            alert('Failed to update profile: ' + (error.message || 'Unknown error'));
+                          }
+                        }
+                        setIsEditMode(!isEditMode);
+                      }}
+                      className={`flex items-center px-4 py-2 rounded-lg transition-colors ${isEditMode
                           ? 'bg-green-500 text-white hover:bg-green-600'
                           : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                      }`}
+                        }`}
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       <span className="text-sm font-medium">{isEditMode ? 'Save Changes' : 'Edit Profile'}</span>
