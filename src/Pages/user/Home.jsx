@@ -158,7 +158,7 @@ const Home = () => {
 
         {/* Carousel End */}
         <div className="w-full flex justify-center items-center absolute top-80 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
-          <div className="container mx-auto bg-[#101828] bg-opacity-95 shadow-3xl p-6 sm:p-8 rounded-2xl flex flex-col md:flex-row items-center gap-4 md:gap-6 border border-gray-800">
+          <div className="container mx-auto bg-[#101828] bg-opacity-95 shadow-3xl p-6 sm:p-8 rounded-2xl flex flex-col md:flex-row items-center gap-4 md:gap-6  ">
             {/* Destination */}
             <div className="flex flex-col w-full md:w-1/4">
               <label className="block text-white text-sm font-medium mb-1">Enter Destination</label>

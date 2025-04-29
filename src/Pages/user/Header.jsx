@@ -202,7 +202,7 @@ const Header = () => {
                     </Link>
                   )}
                 </div>
-                <div className="d-flex gap-3 align-items-center">
+                <div className="d-flex gap-3 m-3 align-items-center">
                   {user ? (
                     <>
                       <Link
