@@ -65,7 +65,43 @@ class UploadImagesController {
         try {
             const { roomId } = req.params;
             const images = await UploadImagesModel.getRoomImages(roomId);
-            res.status(200).json(images);
+            
+            if (!images || images.length === 0) {
+                return res.status(404).json({ error: "No images found for this room" });
+            }
+
+            // Create an HTML page to display the images
+            const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Room Images</title>
+                    <style>
+                        body {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 20px;
+                            padding: 20px;
+                        }
+                        img {
+                            max-width: 300px;
+                            height: auto;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${images.map(image => `
+                        <img src="/api/hostlist/uploadimages/images/${path.basename(image.image_path)}" 
+                             alt="Room Image" />
+                    `).join('')}
+                </body>
+                </html>
+            `;
+
+            res.setHeader('Content-Type', 'text/html');
+            res.send(html);
         } catch (error) {
             console.error("Error fetching room images:", error);
             res.status(500).json({ error: "Failed to fetch room images" });

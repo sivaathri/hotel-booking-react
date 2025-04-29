@@ -61,7 +61,7 @@ const handleUploadError = (err, req, res, next) => {
 // Routes
 router.post("/user/:userId", upload.array('images', 20), handleUploadError, UploadImagesController.uploadRoomImages);
 router.post("/room/:roomId", upload.array('images', 20), handleUploadError, UploadImagesController.uploadRoomImages);
-router.get("/:roomId/images", UploadImagesController.getRoomImages);
+router.get("/images/:roomId", UploadImagesController.getRoomImages);
 router.delete("/:imageId", UploadImagesController.deleteRoomImage);
 
 module.exports = router; 

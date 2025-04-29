@@ -2,12 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const routes = require('./routes/route');
+const path = require('path');
 
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+
+// Serve static files from the assets directory
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // Request logging middleware
 app.use((req, res, next) => {

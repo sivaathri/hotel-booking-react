@@ -118,6 +118,7 @@ const CreateNewListing = () => {
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
+  const [completedSteps, setCompletedSteps] = useState(new Set());
   const [formData, setFormData] = useState({
     // Step 1: Basic Information
     propertyName: '',
@@ -535,15 +536,19 @@ const CreateNewListing = () => {
     if (step === 1) {
       // Save basic information when in step 1
       await saveBasicInfo();
+      setCompletedSteps(prev => new Set([...prev, 1]));
     } else if (step === 2) {
       // Save location details when in step 2
       await saveLocationDetails();
+      setCompletedSteps(prev => new Set([...prev, 2]));
     } else if (step === 3) {
       // Save room setup when in step 3
       await saveRoomSetup();
+      setCompletedSteps(prev => new Set([...prev, 3]));
     } else if (step === 4) {
       // Save room photos when in step 4
       await saveRoomPhotos();
+      setCompletedSteps(prev => new Set([...prev, 4]));
     } else if (step < 11) {
       setStep(step + 1);
     } else {
@@ -556,7 +561,7 @@ const CreateNewListing = () => {
   };
 
   const handleBack = () => {
-    if (step > 1) {
+    if (step > 1 && !completedSteps.has(step - 1)) {
       setStep(step - 1);
     }
   };
@@ -660,11 +665,11 @@ const CreateNewListing = () => {
               <button
                 onClick={handleBack}
                 className={`px-8 py-3 border-2 rounded-xl text-lg font-medium transition-all duration-200 ${
-                  step === 1 
+                  step === 1 || completedSteps.has(step - 1)
                     ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' 
                     : 'border-gray-400 text-gray-700 hover:bg-gray-50 hover:border-gray-500'
                 }`}
-                disabled={step === 1}
+                disabled={step === 1 || completedSteps.has(step - 1)}
               >
                 Back
               </button>
