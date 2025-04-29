@@ -138,7 +138,7 @@ const EditListing = () => {
       try {
         setIsLoading(true);
         const token = getAuthToken();
-        const response = await axios.get(`${API_URL}/basicInfo/property/${id}`, {
+        const response = await axios.get(`${API_URL}/getall/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -146,12 +146,101 @@ const EditListing = () => {
 
         if (response.data.success) {
           const property = response.data.data;
+          
+          // Log the raw property data
+          console.log('Raw Property Data:', property);
+          console.log('Location Data:', property.location);
+
+          // Parse facilities from string to array if it exists
+          const rooms = property.rooms?.map(room => ({
+            name: `Room ${room.room_id}`,
+            floor: room.floor?.toString() || '',
+            bhk: room.room_type || '',
+            capacity: room.capacity?.toString() || '',
+            bedType: room.bed_type || '',
+            hasBathroom: room.has_attached_bathroom === 1,
+            hasBalcony: room.has_balcony === 1,
+            balconyView: '',
+            facilities: room.facilities ? JSON.parse(room.facilities) : []
+          })) || [];
+
+          // Initialize location data with empty values if location is null
+          const locationData = property.location || {
+            address_line1: '',
+            address_line2: '',
+            city: '',
+            state: '',
+            country: '',
+            postal_code: '',
+            coordinates: null
+          };
+
+          // Log the processed location data
+          console.log('Processed Location Data:', locationData);
+
           setFormData(prev => ({
             ...prev,
-            propertyName: property.property_name,
-            propertyType: property.property_type,
-            // Add other property details as needed
+            // Step 1: Basic Information
+            propertyName: property.property_name || '',
+            propertyType: property.property_type || '',
+
+            // Step 2: Location
+            addressLine1: locationData.address_line1 || '',
+            addressLine2: locationData.address_line2 || '',
+            city: locationData.city || '',
+            state: locationData.state || '',
+            country: locationData.country || '',
+            postalCode: locationData.postal_code || '',
+            mapLocation: locationData.coordinates || null,
+
+            // Step 3: Rooms Setup
+            rooms: rooms,
+
+            // Step 4: Room Photos
+            roomPhotos: property.room_photos || [],
+
+            // Step 5: Language Preference
+            languages: property.languages || [],
+            otherLanguage: property.other_language || '',
+
+            // Step 6: House Rules
+            checkInTime: property.check_in_time || '',
+            checkOutTime: property.check_out_time || '',
+            petsAllowed: property.pets_allowed || false,
+            smokingAllowed: property.smoking_allowed || false,
+            alcoholAllowed: property.alcohol_allowed || false,
+            noiseRestrictions: property.noise_restrictions || false,
+
+            // Step 7: Pricing & Availability
+            pricePerNight: property.price_per_night || '',
+            discounts: property.discounts || {
+              longStay: false,
+              earlyBird: false,
+              lastMinute: false
+            },
+            refundPolicy: property.refund_policy || '',
+            availabilityCalendar: property.availability_calendar || [],
+
+            // Step 8: Guest Booking Preferences
+            allowedGuests: property.allowed_guests || [],
+            instantBooking: property.instant_booking || false,
+            manualApproval: property.manual_approval || false,
+
+            // Step 9: Payment Setup
+            paymentMethods: property.payment_methods || [],
+            panGstId: property.pan_gst_id || '',
+            bankDetails: property.bank_details || {
+              accountNumber: '',
+              ifscCode: '',
+              accountHolderName: ''
+            },
+
+            // Step 10: Verification
+            idProof: property.id_proof || null,
+            propertyProof: property.property_proof || null,
+            termsAccepted: property.terms_accepted || false,
           }));
+          setIsEditing(true); // Enable editing mode since we have data
         }
       } catch (error) {
         console.error('Error fetching property details:', error);
@@ -194,70 +283,71 @@ const EditListing = () => {
       } finally {
         setIsLoading(false);
       }
-    } else {
-      // Validate current step data before proceeding
-      let canProceed = true;
-      
-      switch (step) {
-        case 1:
-          if (!formData.propertyName || !formData.propertyType) {
-            canProceed = false;
-            toast.error('Please fill in all required fields');
-          }
-          break;
-        case 2:
-          if (!formData.addressLine1 || !formData.city || !formData.state || !formData.country || !formData.postalCode) {
-            canProceed = false;
-            toast.error('Please fill in all address details');
-          }
-          break;
-        case 3:
-          if (formData.rooms.length === 0 || !formData.rooms[0].name || !formData.rooms[0].floor || !formData.rooms[0].bhk) {
-            canProceed = false;
-            toast.error('Please add at least one room with required details');
-          }
-          break;
-        case 4:
-          if (formData.roomPhotos.length === 0) {
-            canProceed = false;
-            toast.error('Please add at least one room photo');
-          }
-          break;
-        case 5:
-          if (formData.languages.length === 0) {
-            canProceed = false;
-            toast.error('Please select at least one language');
-          }
-          break;
-        case 6:
-          if (!formData.checkInTime || !formData.checkOutTime) {
-            canProceed = false;
-            toast.error('Please set check-in and check-out times');
-          }
-          break;
-        case 7:
-          if (!formData.pricePerNight || !formData.refundPolicy) {
-            canProceed = false;
-            toast.error('Please set price and refund policy');
-          }
-          break;
-        case 8:
-          if (formData.allowedGuests.length === 0) {
-            canProceed = false;
-            toast.error('Please select allowed guest types');
-          }
-          break;
-        case 9:
-          if (formData.paymentMethods.length === 0 || !formData.panGstId) {
-            canProceed = false;
-            toast.error('Please add payment methods and PAN/GST ID');
-          }
-          break;
-      }
+      return;
+    }
 
-      if (canProceed) {
-        setStep(step + 1);
-      }
+    // Validate current step data before proceeding
+    let canProceed = true;
+    
+    switch (step) {
+      case 1:
+        if (!formData.propertyName || !formData.propertyType) {
+          canProceed = false;
+          toast.error('Please fill in all required fields');
+        }
+        break;
+      case 2:
+        if (!formData.addressLine1 || !formData.city || !formData.state || !formData.country || !formData.postalCode) {
+          canProceed = false;
+          toast.error('Please fill in all address details');
+        }
+        break;
+      case 3:
+        if (formData.rooms.length === 0 || !formData.rooms[0].name || !formData.rooms[0].floor || !formData.rooms[0].bhk) {
+          canProceed = false;
+          toast.error('Please add at least one room with required details');
+        }
+        break;
+      case 4:
+        if (formData.roomPhotos.length === 0) {
+          canProceed = false;
+          toast.error('Please add at least one room photo');
+        }
+        break;
+      case 5:
+        if (formData.languages.length === 0) {
+          canProceed = false;
+          toast.error('Please select at least one language');
+        }
+        break;
+      case 6:
+        if (!formData.checkInTime || !formData.checkOutTime) {
+          canProceed = false;
+          toast.error('Please set check-in and check-out times');
+        }
+        break;
+      case 7:
+        if (!formData.pricePerNight || !formData.refundPolicy) {
+          canProceed = false;
+          toast.error('Please set price and refund policy');
+        }
+        break;
+      case 8:
+        if (formData.allowedGuests.length === 0) {
+          canProceed = false;
+          toast.error('Please select allowed guest types');
+        }
+        break;
+      case 9:
+        if (formData.paymentMethods.length === 0 || !formData.panGstId) {
+          canProceed = false;
+          toast.error('Please add payment methods and PAN/GST ID');
+        }
+        break;
+    }
+
+    if (canProceed) {
+      setStep(step + 1);
     }
   };
 

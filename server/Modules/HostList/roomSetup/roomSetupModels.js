@@ -11,6 +11,11 @@ class Room {
     return rows[0];
   }
 
+  static async getRoomsByUserId(user_id) {
+    const [rows] = await db.query('SELECT * FROM room_setup WHERE user_id = ?', [user_id]);
+    return rows;
+  }
+
   static async createRoom(data) {
     const {
       user_id,

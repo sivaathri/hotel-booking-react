@@ -86,6 +86,19 @@ class LocationDetails {
     }
   }
 
+  static async getLocationDetailsByUserId(userId) {
+    try {
+      const [result] = await db.query(
+        `SELECT * FROM location_details WHERE user_id = ?`,
+        [userId]
+      );
+      return result[0] || null;
+    } catch (error) {
+      console.error('Error getting location details by user ID:', error);
+      throw error;
+    }
+  }
+
   static async getAllLocationDetails() {
     try {
       const [result] = await db.query(
