@@ -66,8 +66,8 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
             <label className="block text-sm font-medium mb-2">State/Province</label>
             <input
               type="text"
-              name="state"
-              value={formData.state}
+              name="state_province"
+              value={formData.state_province}
               onChange={handleInputChange}
               disabled={!isEditing}
               className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
@@ -131,7 +131,7 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
                   <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
                     <Popup>
                       {formData.addressLine1} {formData.addressLine2}<br />
-                      {formData.city}, {formData.state}<br />
+                      {formData.city}, {formData.state_province}<br />
                       {formData.country} {formData.postalCode}
                     </Popup>
                   </Marker>
@@ -154,7 +154,7 @@ const Step2 = ({ formData, setFormData, showMap, setShowMap, selectedLocation, s
 
           {formData.mapLocation && (
             <div className="text-sm text-gray-600">
-              <p>Selected Location: {formData.city}, {formData.state}, {formData.country}</p>
+              <p>Selected Location: {formData.city}, {formData.state_province}, {formData.country}</p>
               <p>Coordinates: {formData.mapLocation.lat.toFixed(6)}, {formData.mapLocation.lng.toFixed(6)}</p>
             </div>
           )}

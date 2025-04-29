@@ -34,7 +34,7 @@ const EditListing = () => {
     addressLine1: '',
     addressLine2: '',
     city: '',
-    state: '',
+    state_province: '',
     country: '',
     postalCode: '',
     mapLocation: null,
@@ -170,7 +170,7 @@ const EditListing = () => {
             address_line1: '',
             address_line2: '',
             city: '',
-            state: '',
+            state_province: '',
             country: '',
             postal_code: '',
             coordinates: null
@@ -189,7 +189,7 @@ const EditListing = () => {
             addressLine1: locationData.address_line1 || '',
             addressLine2: locationData.address_line2 || '',
             city: locationData.city || '',
-            state: locationData.state || '',
+            state_province: locationData.state_province || '',
             country: locationData.country || '',
             postalCode: locationData.postal_code || '',
             mapLocation: locationData.coordinates || null,
@@ -298,7 +298,7 @@ const EditListing = () => {
         }
         break;
       case 2:
-        if (!formData.addressLine1 || !formData.city || !formData.state || !formData.country || !formData.postalCode) {
+        if (!formData.addressLine1 || !formData.city || !formData.state_province || !formData.country || !formData.postalCode) {
           canProceed = false;
           toast.error('Please fill in all address details');
         }
