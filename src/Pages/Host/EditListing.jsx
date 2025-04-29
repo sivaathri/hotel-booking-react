@@ -24,6 +24,7 @@ const EditListing = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [stepEditing, setStepEditing] = useState({});
   const [formData, setFormData] = useState({
     // Step 1: Basic Information
     propertyName: '',
@@ -357,10 +358,17 @@ const EditListing = () => {
     }
   };
 
+  const handleStepEdit = (stepNumber) => {
+    setStepEditing(prev => ({
+      ...prev,
+      [stepNumber]: !prev[stepNumber]
+    }));
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} isEditing={isEditing} />;
+        return <Step1 formData={formData} setFormData={setFormData} propertyTypes={propertyTypes} isEditing={stepEditing[1] || false} />;
       case 2:
         return (
           <Step2
@@ -370,7 +378,7 @@ const EditListing = () => {
             setShowMap={setShowMap}
             selectedLocation={selectedLocation}
             setSelectedLocation={setSelectedLocation}
-            isEditing={isEditing}
+            isEditing={stepEditing[2] || false}
           />
         );
       case 3:
@@ -382,23 +390,23 @@ const EditListing = () => {
             bhkTypes={bhkTypes}
             bedTypes={bedTypes}
             roomFacilities={roomFacilities}
-            isEditing={isEditing}
+            isEditing={stepEditing[3] || false}
           />
         );
       case 4:
-        return <Step4 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
+        return <Step4 formData={formData} setFormData={setFormData} isEditing={stepEditing[4] || false} />;
       case 5:
-        return <Step5 formData={formData} setFormData={setFormData} languages={languages} isEditing={isEditing} />;
+        return <Step5 formData={formData} setFormData={setFormData} languages={languages} isEditing={stepEditing[5] || false} />;
       case 6:
-        return <Step6 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
+        return <Step6 formData={formData} setFormData={setFormData} isEditing={stepEditing[6] || false} />;
       case 7:
-        return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} isEditing={isEditing} />;
+        return <Step7 formData={formData} setFormData={setFormData} refundPolicies={refundPolicies} isEditing={stepEditing[7] || false} />;
       case 8:
-        return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} isEditing={isEditing} />;
+        return <Step8 formData={formData} setFormData={setFormData} guestTypes={guestTypes} isEditing={stepEditing[8] || false} />;
       case 9:
-        return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} isEditing={isEditing} />;
+        return <Step9 formData={formData} setFormData={setFormData} paymentOptions={paymentOptions} isEditing={stepEditing[9] || false} />;
       case 10:
-        return <Step10 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
+        return <Step10 formData={formData} setFormData={setFormData} isEditing={stepEditing[10] || false} />;
       default:
         return null;
     }
@@ -423,16 +431,6 @@ const EditListing = () => {
               <span className="text-sm font-medium text-gray-700">Step {step} of 10</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-gray-700">{Math.round((step / 10) * 100)}%</span>
-                <button
-                  onClick={() => setIsEditing(!isEditing)}
-                  className={`px-3 py-1 rounded-md text-sm font-medium ${
-                    isEditing
-                      ? 'bg-green-500 text-white hover:bg-green-600'
-                      : 'bg-rose-500 text-white hover:bg-rose-600'
-                  }`}
-                >
-                  {isEditing ? 'Save' : 'Edit'}
-                </button>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -445,6 +443,33 @@ const EditListing = () => {
 
           {/* Step Content */}
           <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">
+                {step === 1 && "Basic Information"}
+                {step === 2 && "Location Details"}
+                {step === 3 && "Rooms Setup"}
+                {step === 4 && "Room Photos"}
+                {step === 5 && "Language Preference"}
+                {step === 6 && "House Rules"}
+                {step === 7 && "Pricing & Availability"}
+                {step === 8 && "Guest Booking Preferences"}
+                {step === 9 && "Payment Setup"}
+                {step === 10 && "Verification"}
+              </h2>
+              <button
+                onClick={() => handleStepEdit(step)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
+                  stepEditing[step]
+                    ? 'bg-green-500 text-white hover:bg-green-600'
+                    : 'bg-rose-500 text-white hover:bg-rose-600'
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                {stepEditing[step] ? 'Save' : 'Edit'}
+              </button>
+            </div>
             {renderStep()}
           </div>
 
@@ -464,7 +489,7 @@ const EditListing = () => {
             <button
               onClick={handleNext}
               className={`px-6 py-2 rounded-lg ${
-                isEditing
+                stepEditing[step]
                   ? 'bg-rose-500 text-white hover:bg-rose-600'
                   : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
               }`}
