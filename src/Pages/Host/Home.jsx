@@ -94,18 +94,18 @@ const InputField = ({ type = 'text', value, onChange, placeholder, className = '
     value={value}
     onChange={onChange}
     placeholder={placeholder}
-    className={`w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF5A5F]/20 focus:border-[#FF5A5F] transition-all duration-300 placeholder-gray-400 text-gray-800 ${className}`}
+    className={`w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300 placeholder-gray-400 text-gray-800 ${className}`}
     {...props}
   />
 );
 
 const Checkbox = ({ checked, onChange, label, className = '' }) => (
-  <label className={`flex items-center space-x-3 p-4 bg-white rounded-lg cursor-pointer border border-gray-300 hover:border-[#FF5A5F] transition-all duration-300 ${className}`}>
+  <label className={`flex items-center space-x-3 p-4 bg-white rounded-lg cursor-pointer border border-gray-300 hover:border-primary transition-all duration-300 ${className}`}>
     <input
       type="checkbox"
       checked={checked}
       onChange={onChange}
-      className="h-5 w-5 rounded text-[#FF5A5F] focus:ring-[#FF5A5F] border-gray-300"
+      className="h-5 w-5 rounded text-primary focus:ring-primary border-gray-300"
     />
     <span className="text-gray-700">{label}</span>
   </label>
@@ -114,8 +114,8 @@ const Checkbox = ({ checked, onChange, label, className = '' }) => (
 const RadioButton = ({ checked, onChange, label, name, className = '' }) => (
   <label className={`flex items-center space-x-3 p-4 bg-white rounded-lg cursor-pointer border transition-all duration-300 ${
     checked 
-      ? 'border-[#FF5A5F] bg-[#FF5A5F]/5' 
-      : 'border-gray-300 hover:border-[#FF5A5F]'
+      ? 'border-primary bg-primary/5' 
+      : 'border-gray-300 hover:border-primary'
   } ${className}`}>
     <div className="relative">
       <input
@@ -127,35 +127,33 @@ const RadioButton = ({ checked, onChange, label, name, className = '' }) => (
       />
       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
         checked 
-          ? 'border-[#FF5A5F] bg-[#FF5A5F]' 
+          ? 'border-primary bg-primary' 
           : 'border-gray-300'
       }`}>
         {checked && <Check className="w-3 h-3 text-white" />}
       </div>
     </div>
     <span className={`font-medium ${
-      checked ? 'text-[#FF5A5F]' : 'text-gray-700'
+      checked ? 'text-primary' : 'text-gray-700'
     }`}>{label}</span>
   </label>
 );
 
 const Button = ({ children, onClick, variant = 'primary', className = '', ...props }) => {
   const variants = {
-    primary: 'bg-[#FF5A5F] text-white hover:bg-[#FF5A5F]/90',
+    primary: 'bg-primary text-white hover:bg-primary/90',
     secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-    success: 'bg-[#00A699] text-white hover:bg-[#00A699]/90'
+    success: 'bg-success text-white hover:bg-success/90'
   };
-
+  
   return (
-    <motion.button
+    <button
       onClick={onClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className={`px-6 py-3 rounded-lg transition-all duration-300 font-medium ${variants[variant]} ${className}`}
+      className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
-    </motion.button>
+    </button>
   );
 };
 

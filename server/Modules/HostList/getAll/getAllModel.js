@@ -60,6 +60,46 @@ class GetAllInfo {
             throw error;
         }
     }
+
+    static async updateHostInfo(id, updateData) {
+        try {
+            // Get the current host info to ensure it exists
+            const currentHost = await this.getCombinedInfoById(id);
+            
+            if (!currentHost) {
+                return null;
+            }
+
+            // Update basic info if provided
+            if (updateData.property_name) {
+                await BasicInfo.updatePropertyById(id, { property_name: updateData.property_name });
+            }
+
+            // Only update location if location data is provided and has changed
+            if (updateData.location && Object.keys(updateData.location).length > 0) {
+                const locationId = currentHost.location?.id;
+                if (locationId) {
+                    await LocationDetails.updateLocationDetails(locationId, updateData.location);
+                }
+            }
+
+            // Only update rooms if rooms data is provided and has changed
+            if (updateData.rooms && Array.isArray(updateData.rooms) && updateData.rooms.length > 0) {
+                // First delete existing rooms
+                await Room.deleteRoomsByUserId(currentHost.user_id);
+                // Then insert new rooms
+                for (const room of updateData.rooms) {
+                    await Room.createRoom({ ...room, user_id: currentHost.user_id });
+                }
+            }
+
+            // Return the updated combined info
+            return await this.getCombinedInfoById(id);
+        } catch (error) {
+            console.error('Error updating host info:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = GetAllInfo;

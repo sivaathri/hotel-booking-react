@@ -1,8 +1,17 @@
 /********** Template CSS **********/
 :root {
-    --primary: #FEA116;
-    --light: #F1F8FF;
-    --dark: #0F172B;
+    --primary: #4A90E2;
+    --secondary: #50C878;
+    --accent: #FF6B6B;
+    --light: #F8F9FA;
+    --dark: #2C3E50;
+    --success: #50C878;
+    --warning: #FFB74D;
+    --danger: #FF6B6B;
+    --info: #4A90E2;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
 }
 
 .fw-medium {
@@ -39,14 +48,24 @@
 
 /*** Button ***/
 .btn {
-    font-weight: 500;
-    text-transform: uppercase;
-    transition: .5s;
+    font-weight: 600;
+    text-transform: none;
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.5rem;
 }
 
-.btn.btn-primary,
-.btn.btn-secondary {
-    color: #FFFFFF;
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: darken(var(--primary), 10%);
+    border-color: darken(var(--primary), 10%);
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
 }
 
 .btn-square {
@@ -78,17 +97,18 @@
 
 /*** Navbar ***/
 .navbar-dark .navbar-nav .nav-link {
-    margin-right: 30px;
-    padding: 25px 0;
-    color: #FFFFFF;
-    font-size: 15px;
-    text-transform: uppercase;
-    outline: none;
+    margin-right: 20px;
+    padding: 15px 0;
+    color: var(--light);
+    font-size: 16px;
+    font-weight: 500;
+    transition: var(--transition);
 }
 
 .navbar-dark .navbar-nav .nav-link:hover,
 .navbar-dark .navbar-nav .nav-link.active {
-    color: var(--primary);
+    color: var(--accent);
+    transform: translateY(-2px);
 }
 
 @media (max-width: 991.98px) {

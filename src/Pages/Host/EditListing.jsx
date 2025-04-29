@@ -97,6 +97,9 @@ const EditListing = () => {
     termsAccepted: false,
   });
 
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentEditStep, setCurrentEditStep] = useState(null);
+
   const propertyTypes = [
     'Hotel',
     'Apartment',
@@ -359,11 +362,178 @@ const EditListing = () => {
     }
   };
 
-  const handleStepEdit = (stepNumber) => {
-    setStepEditing(prev => ({
-      ...prev,
-      [stepNumber]: !prev[stepNumber]
-    }));
+  const handleStepEdit = async (stepNumber) => {
+    if (isEditMode && currentEditStep === stepNumber) {
+      // If already in edit mode for this step, save the changes
+      try {
+        setIsLoading(true);
+        const token = getAuthToken();
+        let updateData = {};
+
+        // Prepare update data based on the current step
+        switch (stepNumber) {
+          case 1: // Basic Information
+            if (!formData.propertyName || !formData.propertyType) {
+              toast.error('Please fill in all required fields for Basic Information');
+              return;
+            }
+            updateData = {
+              property_name: formData.propertyName,
+              property_type: formData.propertyType
+            };
+            break;
+          case 2: // Location
+            if (!formData.addressLine1 || !formData.city || !formData.state_province || !formData.country || !formData.postalCode) {
+              toast.error('Please fill in all required address details');
+              return;
+            }
+            updateData = {
+              location: {
+                address_line1: formData.addressLine1,
+                address_line2: formData.addressLine2,
+                city: formData.city,
+                state_province: formData.state_province,
+                country: formData.country,
+                postal_code: formData.postalCode,
+                latitude: formData.mapLocation?.lat || '',
+                longitude: formData.mapLocation?.lng || ''
+              }
+            };
+            break;
+          case 3: // Rooms
+            if (formData.rooms.length === 0 || !formData.rooms[0].name || !formData.rooms[0].floor || !formData.rooms[0].bhk) {
+              toast.error('Please add at least one room with required details');
+              return;
+            }
+            updateData = {
+              rooms: formData.rooms.map(room => ({
+                floor: room.floor,
+                room_type: room.bhk,
+                number_of_rooms: room.numberOfRooms,
+                capacity: room.capacity,
+                bed_type: room.bedType,
+                has_attached_bathroom: room.hasBathroom ? 1 : 0,
+                has_balcony: room.hasBalcony ? 1 : 0,
+                facilities: JSON.stringify(room.facilities)
+              }))
+            };
+            break;
+          case 4: // Room Photos
+            if (formData.roomPhotos.length === 0) {
+              toast.error('Please add at least one room photo');
+              return;
+            }
+            updateData = {
+              room_photos: formData.roomPhotos
+            };
+            break;
+          case 5: // Language Preference
+            if (formData.languages.length === 0) {
+              toast.error('Please select at least one language');
+              return;
+            }
+            updateData = {
+              languages: formData.languages,
+              other_language: formData.otherLanguage
+            };
+            break;
+          case 6: // House Rules
+            if (!formData.checkInTime || !formData.checkOutTime) {
+              toast.error('Please set check-in and check-out times');
+              return;
+            }
+            updateData = {
+              check_in_time: formData.checkInTime,
+              check_out_time: formData.checkOutTime,
+              pets_allowed: formData.petsAllowed,
+              smoking_allowed: formData.smokingAllowed,
+              alcohol_allowed: formData.alcoholAllowed,
+              noise_restrictions: formData.noiseRestrictions
+            };
+            break;
+          case 7: // Pricing & Availability
+            if (!formData.pricePerNight || !formData.refundPolicy) {
+              toast.error('Please set price and refund policy');
+              return;
+            }
+            updateData = {
+              price_per_night: formData.pricePerNight,
+              discounts: formData.discounts,
+              refund_policy: formData.refundPolicy,
+              availability_calendar: formData.availabilityCalendar
+            };
+            break;
+          case 8: // Guest Booking Preferences
+            if (formData.allowedGuests.length === 0) {
+              toast.error('Please select allowed guest types');
+              return;
+            }
+            updateData = {
+              allowed_guests: formData.allowedGuests,
+              instant_booking: formData.instantBooking,
+              manual_approval: formData.manualApproval
+            };
+            break;
+          case 9: // Payment Setup
+            if (formData.paymentMethods.length === 0 || !formData.panGstId) {
+              toast.error('Please add payment methods and PAN/GST ID');
+              return;
+            }
+            updateData = {
+              payment_methods: formData.paymentMethods,
+              pan_gst_id: formData.panGstId,
+              bank_details: formData.bankDetails
+            };
+            break;
+          case 10: // Verification
+            if (!formData.idProof || !formData.propertyProof || !formData.termsAccepted) {
+              toast.error('Please complete all verification requirements');
+              return;
+            }
+            updateData = {
+              id_proof: formData.idProof,
+              property_proof: formData.propertyProof,
+              terms_accepted: formData.termsAccepted
+            };
+            break;
+        }
+
+        const response = await axios.put(
+          `${API_URL}/getall/${id}`,
+          updateData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          toast.success(`Step ${stepNumber} updated successfully!`);
+          setIsEditMode(false);
+          setCurrentEditStep(null);
+          setStepEditing(prev => ({
+            ...prev,
+            [stepNumber]: false
+          }));
+        } else {
+          toast.error(`Failed to update Step ${stepNumber}: ${response.data.message || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.error('Error updating property:', error);
+        toast.error(`Failed to update Step ${stepNumber}: ${error.response?.data?.message || error.message || 'Unknown error'}`);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // Enter edit mode for this step
+      setIsEditMode(true);
+      setCurrentEditStep(stepNumber);
+      setStepEditing(prev => ({
+        ...prev,
+        [stepNumber]: true
+      }));
+    }
   };
 
   const renderStep = () => {
@@ -460,7 +630,7 @@ const EditListing = () => {
               <button
                 onClick={() => handleStepEdit(step)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
-                  stepEditing[step]
+                  isEditMode && currentEditStep === step
                     ? 'bg-green-500 text-white hover:bg-green-600'
                     : 'bg-rose-500 text-white hover:bg-rose-600'
                 }`}
@@ -468,7 +638,7 @@ const EditListing = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                {stepEditing[step] ? 'Save' : 'Edit'}
+                {isEditMode && currentEditStep === step ? 'Save' : 'Edit'}
               </button>
             </div>
             {renderStep()}
@@ -478,9 +648,9 @@ const EditListing = () => {
           <div className="flex justify-between mt-6">
             <button
               onClick={handleBack}
-              disabled={step === 1}
+              disabled={step === 1 || isEditMode}
               className={`px-6 py-2 rounded-lg border ${
-                step === 1
+                step === 1 || isEditMode
                   ? 'border-gray-300 text-gray-400 cursor-not-allowed'
                   : 'border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
@@ -489,10 +659,11 @@ const EditListing = () => {
             </button>
             <button
               onClick={handleNext}
+              disabled={isEditMode}
               className={`px-6 py-2 rounded-lg ${
-                stepEditing[step]
-                  ? 'bg-rose-500 text-white hover:bg-rose-600'
-                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                isEditMode
+                  ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
+                  : 'bg-rose-500 text-white hover:bg-rose-600'
               }`}
             >
               {step === 10 ? 'Save Changes' : 'Next'}
