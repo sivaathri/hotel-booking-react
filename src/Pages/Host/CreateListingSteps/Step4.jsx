@@ -41,13 +41,20 @@ const Step4 = ({ formData, setFormData, isEditing }) => {
                     <span className="text-sm">Upload Photo {index + 1}</span>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept=".jpg,.jpeg,.png,.gif"
                       className="hidden"
                       disabled={!isEditing}
                       onChange={(e) => {
                         if (!isEditing) return;
                         const file = e.target.files[0];
                         if (!file) return;
+
+                        // Check file type
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                        if (!allowedTypes.includes(file.type)) {
+                          alert('Please upload only JPG, PNG, or GIF images');
+                          return;
+                        }
 
                         // Check file size
                         if (file.size > 5 * 1024 * 1024) {

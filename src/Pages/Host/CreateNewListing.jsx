@@ -127,7 +127,7 @@ const CreateNewListing = () => {
     addressLine1: '',
     addressLine2: '',
     city: '',
-    state: '',
+    state_province: '',
     country: '',
     postalCode: '',
     mapLocation: null,
@@ -326,18 +326,21 @@ const CreateNewListing = () => {
       setIsLoading(true);
       const token = localStorage.getItem('token');
 
+      // Ensure all required fields are present and not null
+      const locationData = {
+        addressLine1: formData.addressLine1 || '',
+        addressLine2: formData.addressLine2 || '',
+        city: formData.city || '',
+        state_province: formData.state_province || '',
+        country: formData.country || '',
+        postalCode: formData.postalCode || '',
+        latitude: formData.mapLocation?.lat || 0,
+        longitude: formData.mapLocation?.lng || 0
+      };
+
       const response = await axios.post(
         `${API_URL}/location/create/${user.id}`,
-        {
-          addressLine1: formData.addressLine1,
-          addressLine2: formData.addressLine2,
-          city: formData.city,
-          stateProvince: formData.state,
-          country: formData.country,
-          postalCode: formData.postalCode,
-          latitude: formData.mapLocation.lat,
-          longitude: formData.mapLocation.lng
-        },
+        locationData,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -357,7 +360,7 @@ const CreateNewListing = () => {
         });
         setStep(step + 1);
       } else {
-        toast.error('Failed to save location details. Please try again.', {
+        toast.error(response.data.message || 'Failed to save location details. Please try again.', {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -369,7 +372,7 @@ const CreateNewListing = () => {
       }
     } catch (error) {
       console.error('Error saving location details:', error);
-      toast.error('An error occurred while saving. Please try again.', {
+      toast.error(error.response?.data?.message || 'An error occurred while saving. Please try again.', {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -452,6 +455,82 @@ const CreateNewListing = () => {
     }
   };
 
+  const saveRoomPhotos = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+
+      if (!formData.roomPhotos || formData.roomPhotos.length === 0) {
+        toast.error('Please add at least one room photo', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
+
+      // Create FormData object to send files
+      const formDataToSend = new FormData();
+      formData.roomPhotos.forEach((photo, index) => {
+        if (photo instanceof File) {
+          formDataToSend.append('images', photo);
+        }
+      });
+
+      const response = await axios.post(
+        `${API_URL}/uploadImages/user/${user.id}`,
+        formDataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Room photos saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setStep(step + 1);
+      } else {
+        toast.error(response.data.message || 'Failed to save room photos. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving room photos:', error);
+      const errorMessage = error.response?.data?.message || 'An error occurred while saving. Please try again.';
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       // Save basic information when in step 1
@@ -462,6 +541,9 @@ const CreateNewListing = () => {
     } else if (step === 3) {
       // Save room setup when in step 3
       await saveRoomSetup();
+    } else if (step === 4) {
+      // Save room photos when in step 4
+      await saveRoomPhotos();
     } else if (step < 11) {
       setStep(step + 1);
     } else {

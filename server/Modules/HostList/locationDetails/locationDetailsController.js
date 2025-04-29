@@ -3,7 +3,7 @@ const LocationDetails = require('./locationDetailsModels');
 const locationDetailsController = {
     createLocation: async (req, res) => {
         try {
-            const { addressLine1, addressLine2, city, stateProvince, country, postalCode, latitude, longitude } = req.body;
+            const { addressLine1, addressLine2, city, state_province, country, postalCode, latitude, longitude } = req.body;
             const userId = req.params.userId;
 
             // Validate required fields
@@ -19,7 +19,7 @@ const locationDetailsController = {
                     message: "City is required"
                 });
             }
-            if (!stateProvince) {
+            if (!state_province) {
                 return res.status(400).json({
                     success: false,
                     message: "State/Province is required"
@@ -61,7 +61,7 @@ const locationDetailsController = {
                 addressLine1: addressLine1,
                 addressLine2: addressLine2 || null,
                 city: city,
-                stateProvince: stateProvince,
+                state_province: state_province,
                 country: country,
                 postalCode: postalCode,
                 latitude: latitude,
@@ -142,9 +142,10 @@ const locationDetailsController = {
     },
 
     updateLocation: async (req, res) => {
+        return ("req",req.body)
         try {
             const locationId = req.params.id;
-            const { addressLine1, addressLine2, city, stateProvince, country, postalCode, latitude, longitude } = req.body;
+            const { addressLine1, addressLine2, city, state_province, country, postalCode, latitude, longitude } = req.body;
 
             if (!locationId) {
                 return res.status(400).json({
@@ -166,7 +167,7 @@ const locationDetailsController = {
                     message: "City is required"
                 });
             }
-            if (!stateProvince) {
+            if (!state_province) {
                 return res.status(400).json({
                     success: false,
                     message: "State/Province is required"
@@ -201,7 +202,7 @@ const locationDetailsController = {
                 addressLine1: addressLine1,
                 addressLine2: addressLine2 || null,
                 city: city,
-                stateProvince: stateProvince,
+                state_province: state_province,
                 country: country,
                 postalCode: postalCode,
                 latitude: latitude,
