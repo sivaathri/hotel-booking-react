@@ -155,7 +155,8 @@ const EditListing = () => {
           // Parse facilities from string to array if it exists
           const rooms = property.rooms?.map(room => ({
             name: `Room ${room.room_id}`,
-            floor: room.floor?.toString() || '',
+            numberOfRooms: room.number_of_rooms || 1,
+            floor: room.floor ? `${room.floor}${room.floor === 1 ? 'st' : room.floor === 2 ? 'nd' : room.floor === 3 ? 'rd' : 'th'} Floor` : '',
             bhk: room.room_type || '',
             capacity: room.capacity?.toString() || '',
             bedType: room.bed_type || '',

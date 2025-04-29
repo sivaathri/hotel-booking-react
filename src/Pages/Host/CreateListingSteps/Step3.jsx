@@ -76,6 +76,9 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                     </option>
                   ))}
                 </select>
+                {!room.floor && (
+                  <p className="text-sm text-red-500 mt-1">Please select a floor</p>
+                )}
               </div>
 
               <div>
@@ -97,14 +100,14 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Number of Room </label>
+              <label className="block text-sm font-medium mb-2">Number of Rooms</label>
               <input
                 type="number"
-                value={room.name}
-                onChange={(e) => handleRoomChange(index, "name", e.target.value)}
+                value={room.numberOfRooms || ''}
+                onChange={(e) => handleRoomChange(index, "numberOfRooms", e.target.value)}
                 disabled={!isEditing}
                 className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                placeholder="e.g ; 2,3,4"
+                placeholder="e.g. 2, 3, 4"
               />
             </div>
 
