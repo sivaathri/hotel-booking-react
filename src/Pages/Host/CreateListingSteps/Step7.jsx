@@ -12,20 +12,61 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
     }));
   };
 
-  const handleOccupancyPriceChange = (index, occupancy, value, type) => {
+  const handleRoomCapacityChange = (roomIndex, roomNumber, capacity) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      rooms: prev.rooms.map((room, i) =>
+        i === roomIndex ? {
+          ...room,
+          individualRoomCapacities: {
+            ...room.individualRoomCapacities,
+            [roomNumber]: capacity
+          }
+        } : room
+      )
+    }));
+  };
+
+  const handleOccupancyRangeChange = (index, rangeIndex, field, value) => {
     if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       rooms: prev.rooms.map((room, i) =>
         i === index ? {
           ...room,
-          occupancyPricing: {
-            ...room.occupancyPricing,
-            [occupancy]: {
-              value: value,
-              type: type
-            }
-          }
+          occupancyRanges: room.occupancyRanges.map((range, ri) =>
+            ri === rangeIndex ? { ...range, [field]: value } : range
+          )
+        } : room
+      )
+    }));
+  };
+
+  const addOccupancyRange = (index) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      rooms: prev.rooms.map((room, i) =>
+        i === index ? {
+          ...room,
+          occupancyRanges: [
+            ...(room.occupancyRanges || []),
+            { minGuests: 1, maxGuests: 1, value: 0, type: 'INR' }
+          ]
+        } : room
+      )
+    }));
+  };
+
+  const removeOccupancyRange = (index, rangeIndex) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      rooms: prev.rooms.map((room, i) =>
+        i === index ? {
+          ...room,
+          occupancyRanges: room.occupancyRanges.filter((_, ri) => ri !== rangeIndex)
         } : room
       )
     }));
@@ -39,16 +80,16 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-medium mb-4">Room Summary</h3>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full min-w-[1400px] divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Floor</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Room Type</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Number of Rooms</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Capacity</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Bed Type</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Base Price/Night (₹)</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Occupancy Price Adjustments</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 w-24">Floor</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 w-32">Room Type</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 w-32">Number of Rooms</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 w-48">Room Capacities</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 w-40">Bed Type</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 w-40">Base Price/Night (₹)</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 w-96">Occupancy Price Adjustments</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -57,7 +98,29 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                   <td className="px-4 py-3 text-sm text-gray-600">{room.floor}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.bhk}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.numberOfRooms}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{room.capacity}</td>
+                  <td className="px-4 py-3">
+                    <div className="space-y-2">
+                      {Array.from({ length: room.numberOfRooms }, (_, i) => {
+                        const roomNumber = i + 1;
+                        const currentCapacity = room.individualRoomCapacities?.[roomNumber] || room.capacity;
+                        return (
+                          <div key={roomNumber} className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">Room {roomNumber}:</span>
+                            <input
+                              type="number"
+                              value={currentCapacity}
+                              onChange={(e) => handleRoomCapacityChange(index, roomNumber, parseInt(e.target.value))}
+                              disabled={!isEditing}
+                              className={`w-20 p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                              min="1"
+                              max={room.capacity}
+                            />
+                            <span className="text-sm text-gray-600">guests</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {room.bedType === "SingleQueenSingle" ? "Single Queen Single" : room.bedType}
                   </td>
@@ -72,34 +135,66 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <div className="space-y-2">
-                      {Array.from({ length: room.capacity - 1 }, (_, i) => {
-                        const occupancy = room.capacity - (i + 1);
-                        const currentPricing = room.occupancyPricing?.[occupancy] || { value: 0, type: 'INR' };
-                        return (
-                          <div key={occupancy} className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600">{occupancy} guests:</span>
+                    <div className="space-y-4">
+                      {(room.occupancyRanges || []).map((range, rangeIndex) => (
+                        <div key={rangeIndex} className="flex items-center gap-2 p-2 border rounded-lg">
+                          <div className="flex items-center gap-2">
                             <input
                               type="number"
-                              value={currentPricing.value}
-                              onChange={(e) => handleOccupancyPriceChange(index, occupancy, e.target.value, currentPricing.type)}
+                              value={range.minGuests}
+                              onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'minGuests', parseInt(e.target.value))}
                               disabled={!isEditing}
-                              className={`w-24 p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                              placeholder="Reduction"
+                              className={`w-16 p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                              min="1"
+                              max={range.maxGuests}
                             />
-                            <select
-                              value={currentPricing.type}
-                              onChange={(e) => handleOccupancyPriceChange(index, occupancy, currentPricing.value, e.target.value)}
+                            <span className="text-sm text-gray-600">to</span>
+                            <input
+                              type="number"
+                              value={range.maxGuests}
+                              onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'maxGuests', parseInt(e.target.value))}
                               disabled={!isEditing}
-                              className={`p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                            >
-                              <option value="INR">INR</option>
-                              <option value="percentage">%</option>
-                            </select>
-                            <span className="text-sm text-gray-600">reduction</span>
+                              className={`w-16 p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                              min={range.minGuests}
+                              max={room.capacity}
+                            />
+                            <span className="text-sm text-gray-600">guests:</span>
                           </div>
-                        );
-                      })}
+                          <input
+                            type="number"
+                            value={range.value}
+                            onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'value', e.target.value)}
+                            disabled={!isEditing}
+                            className={`w-32 p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                            placeholder="Amount"
+                          />
+                          <select
+                            value={range.type}
+                            onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'type', e.target.value)}
+                            disabled={!isEditing}
+                            className={`w-24 p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                          >
+                            <option value="INR">INR</option>
+                            <option value="percentage">%</option>
+                          </select>
+                          {isEditing && (
+                            <button
+                              onClick={() => removeOccupancyRange(index, rangeIndex)}
+                              className="p-2 text-red-500 hover:text-red-700"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      {isEditing && (
+                        <button
+                          onClick={() => addOccupancyRange(index)}
+                          className="w-full p-2 text-blue-500 border border-blue-500 rounded-lg hover:bg-blue-50"
+                        >
+                          + Add Occupancy Range
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
