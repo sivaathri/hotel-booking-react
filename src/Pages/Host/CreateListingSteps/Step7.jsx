@@ -12,6 +12,25 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
     }));
   };
 
+  const handleOccupancyPriceChange = (index, occupancy, value, type) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      rooms: prev.rooms.map((room, i) =>
+        i === index ? {
+          ...room,
+          occupancyPricing: {
+            ...room.occupancyPricing,
+            [occupancy]: {
+              value: value,
+              type: type
+            }
+          }
+        } : room
+      )
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Pricing & Availability</h2>
@@ -28,7 +47,8 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Number of Rooms</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Capacity</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Bed Type</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Price/Night (₹)</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Base Price/Night (₹)</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Occupancy Price Adjustments</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -50,6 +70,37 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                       className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                       placeholder="Enter price"
                     />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="space-y-2">
+                      {Array.from({ length: room.capacity - 1 }, (_, i) => {
+                        const occupancy = room.capacity - (i + 1);
+                        const currentPricing = room.occupancyPricing?.[occupancy] || { value: 0, type: 'INR' };
+                        return (
+                          <div key={occupancy} className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">{occupancy} guests:</span>
+                            <input
+                              type="number"
+                              value={currentPricing.value}
+                              onChange={(e) => handleOccupancyPriceChange(index, occupancy, e.target.value, currentPricing.type)}
+                              disabled={!isEditing}
+                              className={`w-24 p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                              placeholder="Reduction"
+                            />
+                            <select
+                              value={currentPricing.type}
+                              onChange={(e) => handleOccupancyPriceChange(index, occupancy, currentPricing.value, e.target.value)}
+                              disabled={!isEditing}
+                              className={`p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                            >
+                              <option value="INR">INR</option>
+                              <option value="percentage">%</option>
+                            </select>
+                            <span className="text-sm text-gray-600">reduction</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </td>
                 </tr>
               ))}
