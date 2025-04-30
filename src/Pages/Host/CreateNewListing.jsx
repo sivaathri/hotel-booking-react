@@ -9,6 +9,7 @@ import L from 'leaflet';
 import axios from 'axios';
 import { API_URL } from '../../config/api.config';
 import { useUser } from '../../context/UserContext';
+import { getAuthToken } from '../../utils/getAuthToken';
 import Step1 from './CreateListingSteps/Step1';
 import Step2 from './CreateListingSteps/Step2';
 import Step3 from './CreateListingSteps/Step3';
@@ -269,7 +270,7 @@ const CreateNewListing = () => {
     try {
       setIsLoading(true);
   
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
   
       const response = await axios.post(
         `${API_URL}/basicInfo/create/${user.id}`,
@@ -325,7 +326,7 @@ const CreateNewListing = () => {
   const saveLocationDetails = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
 
       // Ensure all required fields are present and not null
       const locationData = {
@@ -390,7 +391,7 @@ const CreateNewListing = () => {
   const saveRoomSetup = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
 
       // Process each room in the formData
       const roomPromises = formData.rooms.map(async (room) => {
@@ -459,7 +460,7 @@ const CreateNewListing = () => {
   const saveRoomPhotos = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
 
       if (!formData.roomPhotos || formData.roomPhotos.length === 0) {
         toast.error('Please add at least one room photo', {

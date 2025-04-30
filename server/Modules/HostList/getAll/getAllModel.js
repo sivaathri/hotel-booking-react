@@ -100,6 +100,35 @@ class GetAllInfo {
             throw error;
         }
     }
+
+    static async deleteHostInfo(id) {
+        try {
+            // Get the current host info to ensure it exists
+            const currentHost = await this.getCombinedInfoById(id);
+            
+            if (!currentHost) {
+                return null;
+            }
+
+            // Delete rooms first (due to foreign key constraints)
+            if (currentHost.rooms && currentHost.rooms.length > 0) {
+                await Room.deleteRoomsByUserId(currentHost.user_id);
+            }
+
+            // Delete location details
+            if (currentHost.location) {
+                await LocationDetails.deleteLocationDetails(currentHost.location.id);
+            }
+
+            // Finally delete the basic info
+            const deletedBasicInfo = await BasicInfo.deletePropertyById(id);
+
+            return deletedBasicInfo;
+        } catch (error) {
+            console.error('Error deleting host info:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = GetAllInfo;
