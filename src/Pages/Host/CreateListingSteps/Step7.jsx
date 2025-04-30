@@ -36,7 +36,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                 <tr key={index}>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.floor}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.bhk}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{room.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{room.numberOfRooms}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.capacity}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{room.bedType}</td>
                   <td className="px-4 py-3">

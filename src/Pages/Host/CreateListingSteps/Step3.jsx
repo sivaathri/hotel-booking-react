@@ -21,7 +21,7 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
         floor: '',
         bhk: '',
         capacity: '',
-        bedType: '',
+        bedType: [],
         hasBathroom: false,
         hasBalcony: false,
         balconyView: '',
@@ -131,11 +131,16 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                     key={type}
                     disabled={!isEditing}
                     className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${
-                      room.bedType === type
+                      room.bedType.includes(type)
                         ? "border-blue-600 bg-blue-50 text-blue-600"
                         : "hover:border-gray-400 text-gray-700"
                     } ${!isEditing ? 'cursor-not-allowed opacity-50' : ''}`}
-                    onClick={() => handleRoomChange(index, "bedType", type)}
+                    onClick={() => {
+                      const newBedTypes = room.bedType.includes(type)
+                        ? room.bedType.filter(t => t !== type)
+                        : [...room.bedType, type];
+                      handleRoomChange(index, "bedType", newBedTypes);
+                    }}
                   >
                     {type}
                   </button>
