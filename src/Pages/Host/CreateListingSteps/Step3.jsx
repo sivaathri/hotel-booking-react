@@ -1,6 +1,33 @@
 import React from 'react';
 import { FiGrid } from 'react-icons/fi';
 
+const roomTypes = [
+  { value: 'Single', label: 'Single', description: '1 bed, 1 room' },
+  { value: 'Double', label: 'Double', description: '1 double bed, 1 room' },
+  { value: 'Twin', label: 'Twin', description: '2 single beds, 1 room' },
+  { value: 'TwinDouble', label: 'Twin/Double', description: 'Convertible beds' },
+  { value: 'Triple', label: 'Triple', description: '3 beds' },
+  { value: 'Quadruple', label: 'Quadruple', description: '4 beds' },
+  { value: 'Family', label: 'Family', description: '2 beds + child bed or sofa bed' },
+  { value: 'Suite', label: 'Suite', description: 'Bedroom + Living area' },
+  { value: 'Studio', label: 'Studio', description: 'Open layout with kitchen' },
+  { value: 'Apartment', label: 'Apartment', description: '1–3 bedrooms + kitchen & living' },
+  { value: 'DormitoryRoom', label: 'Dormitory Room', description: 'Shared room with bunk beds' },
+  { value: 'BedInDormitory', label: 'Bed in Dormitory', description: 'Single bed in shared dorm' },
+  { value: 'Bungalow', label: 'Bungalow', description: 'Ground level house with rooms' },
+  { value: 'Chalet', label: 'Chalet', description: 'Cabin-style home, often in hills' },
+  { value: 'Villa', label: 'Villa', description: 'Independent large home with multiple rooms' },
+  { value: 'HolidayHome', label: 'Holiday Home', description: 'Similar to villa, for vacation rentals' },
+  { value: 'MobileHome', label: 'Mobile Home', description: 'Portable home/caravan' },
+  { value: 'Tent', label: 'Tent', description: 'Luxury tent or camping tent' },
+  { value: '1BHK', label: '1 BHK', description: '1 Bedroom + Hall + Kitchen' },
+  { value: '2BHK', label: '2 BHK', description: '2 Bedrooms + Hall + Kitchen' },
+  { value: '3BHK', label: '3 BHK', description: '3 Bedrooms + Hall + Kitchen' },
+  { value: '4BHK', label: '4 BHK', description: '4 Bedrooms + Hall + Kitchen' },
+  { value: '5BHK', label: '5 BHK', description: '5 Bedrooms + Hall + Kitchen' },
+  { value: '6BHK', label: '6 BHK', description: '6 Bedrooms + Hall + Kitchen' }
+];
+
 const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFacilities, isEditing }) => {
   const handleRoomChange = (index, field, value) => {
     if (!isEditing) return;
@@ -90,9 +117,9 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFaci
                   className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 >
                   <option value="">Select Room Type</option>
-                  {bhkTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
+                  {roomTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label} - {type.description}
                     </option>
                   ))}
                 </select>
