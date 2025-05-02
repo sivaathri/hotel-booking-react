@@ -3,118 +3,101 @@ const path = require("path");
 const fs = require("fs");
 
 class UploadImagesController {
-    static async uploadRoomImages(req, res) {
+    static async uploadImage(req, res) {
         try {
-            const { userId, roomId } = req.params;
-            const files = req.files;
+            const { roomId } = req.params;
+            const file = req.file;
             
-            console.log('Upload request received:', {
-                userId,
-                roomId,
-                filesCount: files ? files.length : 0
-            });
-
-            if (!files || files.length === 0) {
-                console.log('No files received in request');
+            if (!file) {
                 return res.status(400).json({ 
                     success: false,
-                    message: "No files uploaded" 
+                    message: "No file uploaded" 
                 });
             }
 
-            const imagePaths = [];
+            const imagePath = `hostroomimages/${file.filename}`;
             
-            for (const file of files) {
-                try {
-                    console.log('Processing file:', file.originalname);
-                    // The file is already saved by multer, we just need to get its path
-                    const relativePath = `hostroomimages/${file.filename}`;
-                    imagePaths.push(relativePath);
-                    console.log('File processed successfully:', relativePath);
-                } catch (fileError) {
-                    console.error('Error processing file:', fileError);
-                    throw new Error(`Failed to process file ${file.originalname}: ${fileError.message}`);
-                }
-            }
+            // Save to database
+            await UploadImagesModel.saveImage(roomId, imagePath);
 
-            // Save image paths to database
-            if (roomId) {
-                console.log('Saving room images for roomId:', roomId);
-                await UploadImagesModel.saveRoomImages(roomId, imagePaths);
-            } else if (userId) {
-                console.log('Saving user images for userId:', userId);
-                await UploadImagesModel.saveUserImages(userId, imagePaths);
+            res.status(200).json({
+                success: true,
+                message: "Image uploaded successfully",
+                data: {
+                    imagePath,
+                    roomId
+                }
+            });
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            res.status(500).json({ 
+                success: false,
+                message: error.message || "Failed to upload image"
+            });
+        }
+    }
+
+    static async getAllImages(req, res) {
+        try {
+            const images = await UploadImagesModel.getAllImages();
+            
+            if (!images || images.length === 0) {
+                return res.status(404).json({ 
+                    success: false,
+                    message: "No images found" 
+                });
             }
 
             res.status(200).json({
                 success: true,
-                message: "Images uploaded successfully",
-                imagePaths
+                data: images
             });
         } catch (error) {
-            console.error("Error uploading images:", error);
+            console.error("Error fetching images:", error);
             res.status(500).json({ 
                 success: false,
-                message: error.message || "Failed to upload images",
-                error: error.message 
+                message: "Failed to fetch images" 
             });
         }
     }
 
-    static async getRoomImages(req, res) {
+    static async getImagesByRoomId(req, res) {
         try {
             const { roomId } = req.params;
-            const images = await UploadImagesModel.getRoomImages(roomId);
+            const images = await UploadImagesModel.getImagesByRoomId(roomId);
             
             if (!images || images.length === 0) {
-                return res.status(404).json({ error: "No images found for this room" });
+                return res.status(404).json({ 
+                    success: false,
+                    message: "No images found for this room" 
+                });
             }
 
-            // Create an HTML page to display the images
-            const html = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Room Images</title>
-                    <style>
-                        body {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 20px;
-                            padding: 20px;
-                        }
-                        img {
-                            max-width: 300px;
-                            height: auto;
-                            border-radius: 8px;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${images.map(image => `
-                        <img src="/api/hostlist/uploadimages/images/${path.basename(image.image_path)}" 
-                             alt="Room Image" />
-                    `).join('')}
-                </body>
-                </html>
-            `;
-
-            res.setHeader('Content-Type', 'text/html');
-            res.send(html);
+            res.status(200).json({
+                success: true,
+                data: images
+            });
         } catch (error) {
             console.error("Error fetching room images:", error);
-            res.status(500).json({ error: "Failed to fetch room images" });
+            res.status(500).json({ 
+                success: false,
+                message: "Failed to fetch room images" 
+            });
         }
     }
 
-    static async deleteRoomImage(req, res) {
+    static async deleteImage(req, res) {
         try {
             const { imageId } = req.params;
-            const image = await UploadImagesModel.getRoomImages(imageId);
+            
+            // Get image details before deletion
+            const image = await UploadImagesModel.getImageById(imageId);
             
             if (!image) {
-                return res.status(404).json({ error: "Image not found" });
+                return res.status(404).json({ 
+                    success: false,
+                    message: "Image not found" 
+                });
             }
 
             // Delete file from server
@@ -124,12 +107,18 @@ class UploadImagesController {
             }
 
             // Delete from database
-            await UploadImagesModel.deleteRoomImage(imageId);
+            await UploadImagesModel.deleteImage(imageId);
 
-            res.status(200).json({ message: "Image deleted successfully" });
+            res.status(200).json({
+                success: true,
+                message: "Image deleted successfully"
+            });
         } catch (error) {
             console.error("Error deleting image:", error);
-            res.status(500).json({ error: "Failed to delete image" });
+            res.status(500).json({ 
+                success: false,
+                message: "Failed to delete image" 
+            });
         }
     }
 }
