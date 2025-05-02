@@ -56,6 +56,14 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
     }));
   };
 
+  const handleInstantPaymentChange = (e) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      instantPayment: e.target.checked
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Pricing & Availability</h2>
@@ -187,7 +195,27 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
         </div>
       </div>
 
-     
+      {/* Instant Payment Option */}
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <div className="flex items-center space-x-3">
+          <input
+            type="checkbox"
+            id="instantPayment"
+            checked={formData.instantPayment || false}
+            onChange={handleInstantPaymentChange}
+            disabled={!isEditing}
+            className={`h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${
+              !isEditing ? 'cursor-not-allowed opacity-50' : ''
+            }`}
+          />
+          <label htmlFor="instantPayment" className="text-sm font-medium text-gray-900">
+            Enable instant payment (0 down payment)
+          </label>
+        </div>
+        <p className="mt-2 text-sm text-gray-500">
+          When enabled, guests can book without making an advance payment. Payment will be collected at check-in.
+        </p>
+      </div>
     </div>
   );
 };
