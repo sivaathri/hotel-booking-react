@@ -35,6 +35,29 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
   const [roomDetails, setRoomDetails] = useState(formData.roomDetails || {});
   const [dropdownValue, setDropdownValue] = useState('');
 
+  // Sync formData.rooms with selectedRoomTypes and roomDetails
+  React.useEffect(() => {
+    // Build rooms array in the structure Step7 expects
+    const rooms = selectedRoomTypes.map(type => {
+      const details = roomDetails[type] || {};
+      return {
+        floor: details.floor || '',
+        bhk: type,
+        numberOfRooms: details.numberOfRooms || '',
+        capacity: details.capacity || '',
+        bedType: details.bedType || '',
+        hasBathroom: details.hasBathroom || false,
+        hasBalcony: details.hasBalcony || false,
+        balconyView: details.balconyView || '',
+        facilities: details.facilities || [],
+        pricePerNight: details.pricePerNight || '',
+        occupancyRanges: details.occupancyRanges || [],
+        individualRoomCapacities: details.individualRoomCapacities || {},
+      };
+    });
+    setFormData(prev => ({ ...prev, rooms }));
+  }, [selectedRoomTypes, roomDetails, setFormData]);
+
   // Add room type from dropdown
   const handleAddRoomType = (e) => {
     const value = e.target.value;
@@ -151,7 +174,7 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
                   />
                 </div>
                 <div className="flex-1 min-w-[180px]">
-                  <label className="block text-sm font-medium mb-2">Capacity</label>
+                  <label className="block text-sm font-medium mb-2">Capacity for Each rooms</label>
                   <input
                     type="number"
                     value={roomDetails[type]?.capacity || ''}
