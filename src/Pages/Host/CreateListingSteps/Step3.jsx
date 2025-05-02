@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FiGrid } from 'react-icons/fi';
 
 const roomTypes = [
@@ -28,241 +28,144 @@ const roomTypes = [
   { value: '6BHK', label: '6 BHK', description: '6 Bedrooms + Hall + Kitchen' }
 ];
 
-const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, bedTypes, roomFacilities, isEditing }) => {
-  const handleRoomChange = (index, field, value) => {
-    if (!isEditing) return;
-    setFormData(prev => ({
-      ...prev,
-      rooms: prev.rooms.map((room, i) =>
-        i === index ? { ...room, [field]: value } : room
-      )
-    }));
+const bedTypes = ['Single', 'Double', 'Queen', 'King', 'Twin'];
+
+const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
+  const [selectedRoomTypes, setSelectedRoomTypes] = useState(formData.selectedRoomTypes || []);
+  const [roomDetails, setRoomDetails] = useState(formData.roomDetails || {});
+  const [dropdownValue, setDropdownValue] = useState('');
+
+  // Add room type from dropdown
+  const handleAddRoomType = (e) => {
+    const value = e.target.value;
+    if (value && !selectedRoomTypes.includes(value)) {
+      const updated = [...selectedRoomTypes, value];
+      setSelectedRoomTypes(updated);
+      setFormData(prev => ({ ...prev, selectedRoomTypes: updated }));
+      setDropdownValue('');
+    }
   };
 
-  const addNewRoom = () => {
-    if (!isEditing) return;
-    setFormData(prev => ({
-      ...prev,
-      rooms: [...prev.rooms, {
-        name: '',
-        floor: '',
-        bhk: '',
-        capacity: '',
-        bedType: [],
-        hasBathroom: false,
-        hasBalcony: false,
-        balconyView: '',
-        facilities: []
-      }]
-    }));
+  // Remove room type
+  const handleRemoveRoomType = (type) => {
+    const updated = selectedRoomTypes.filter(t => t !== type);
+    setSelectedRoomTypes(updated);
+    setFormData(prev => ({ ...prev, selectedRoomTypes: updated }));
+    // Optionally remove details for this type
+    const updatedDetails = { ...roomDetails };
+    delete updatedDetails[type];
+    setRoomDetails(updatedDetails);
+    setFormData(prev => ({ ...prev, roomDetails: updatedDetails }));
   };
+
+  // Handle detail change for a room type
+  const handleDetailChange = (type, field, value) => {
+    const updatedDetails = {
+      ...roomDetails,
+      [type]: {
+        ...roomDetails[type],
+        [field]: value
+      }
+    };
+    setRoomDetails(updatedDetails);
+    setFormData(prev => ({ ...prev, roomDetails: updatedDetails }));
+  };
+
+  // Filter out already selected room types from dropdown
+  const availableRoomTypes = roomTypes.filter(rt => !selectedRoomTypes.includes(rt.value));
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold flex items-center gap-2 text-gray-800">
         <FiGrid className="text-blue-600" />
-        Rooms Setup
+        Room Setup
       </h2>
-
-      <div className="space-y-6">
-        {formData.rooms.map((room, index) => (
-          <div
-            key={index}
-            className="border p-4 rounded-xl space-y-4 transition-shadow shadow-sm hover:shadow-lg bg-white"
+      {/* Dropdown and chips/tags in a single row */}
+      <div className="flex items-center gap-4 mb-6">
+        <div>
+          <label className="block text-lg font-medium mb-2">Select room type</label>
+          <select
+            value={dropdownValue}
+            onChange={handleAddRoomType}
+            disabled={!isEditing || availableRoomTypes.length === 0}
+            className={`p-2 border rounded-lg min-w-[180px] ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           >
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium">Room {index + 1}</h3>
-              {index > 0 && isEditing && (
-                <button
-                  onClick={() =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      rooms: prev.rooms.filter((_, i) => i !== index),
-                    }))
-                  }
-                  className="text-red-500 hover:text-red-700 font-medium"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Floor</label>
-                <select
-                  value={room.floor}
-                  onChange={(e) => handleRoomChange(index, "floor", e.target.value)}
-                  disabled={!isEditing}
-                  className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                >
-                  <option value="">Select Floor</option>
-                  {floorTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-                {!room.floor && (
-                  <p className="text-sm text-red-500 mt-1">Please select a floor</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Room Type</label>
-                <select
-                  value={room.bhk}
-                  onChange={(e) => handleRoomChange(index, "bhk", e.target.value)}
-                  disabled={!isEditing}
-                  className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                >
-                  <option value="">Select Room Type</option>
-                  {roomTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label} - {type.description}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Number of Rooms</label>
-              <input
-                type="number"
-                value={room.numberOfRooms || ''}
-                onChange={(e) => handleRoomChange(index, "numberOfRooms", e.target.value)}
-                disabled={!isEditing}
-                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                placeholder="e.g. 2, 3, 4"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Capacity</label>
-              <input
-                type="number"
-                value={room.capacity}
-                onChange={(e) => handleRoomChange(index, "capacity", e.target.value)}
-                disabled={!isEditing}
-                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                placeholder="Number of guests"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Bed Type</label>
-              <div className="grid grid-cols-3 gap-4">
-                {bedTypes.map((type) => (
+            <option value="">-- Select --</option>
+            {availableRoomTypes.map((type) => (
+              <option key={type.value} value={type.value}>{type.label}</option>
+            ))}
+          </select>
+        </div>
+        {/* Selected room types as tags/chips */}
+        <div className="flex flex-wrap gap-2 items-center">
+          {selectedRoomTypes.map(type => {
+            const roomTypeObj = roomTypes.find(rt => rt.value === type);
+            return (
+              <span key={type} className="flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-2">
+                {roomTypeObj ? roomTypeObj.label : type}
+                {isEditing && (
                   <button
-                    key={type}
-                    disabled={!isEditing}
-                    className={`p-2 border rounded-xl text-center font-medium transition-colors duration-200 ${
-                      room.bedType.includes(type)
-                        ? "border-blue-600 bg-blue-50 text-blue-600"
-                        : "hover:border-gray-400 text-gray-700"
-                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : ''}`}
-                    onClick={() => {
-                      const newBedTypes = room.bedType.includes(type)
-                        ? room.bedType.filter(t => t !== type)
-                        : [...room.bedType, type];
-                      handleRoomChange(index, "bedType", newBedTypes);
-                    }}
+                    type="button"
+                    className="ml-2 text-blue-700 hover:text-red-600 focus:outline-none"
+                    onClick={() => handleRemoveRoomType(type)}
                   >
-                    {type}
+                    &times;
                   </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={room.hasBathroom}
-                    onChange={(e) =>
-                      handleRoomChange(index, "hasBathroom", e.target.checked)
-                    }
-                    disabled={!isEditing}
-                    className={!isEditing ? 'cursor-not-allowed' : ''}
-                  />
-                  Attached Bathroom
-                </label>
-              </div>
-              <div>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={room.hasBalcony}
-                    onChange={(e) =>
-                      handleRoomChange(index, "hasBalcony", e.target.checked)
-                    }
-                    disabled={!isEditing}
-                    className={!isEditing ? 'cursor-not-allowed' : ''}
-                  />
-                  Balcony/View
-                </label>
-              </div>
-            </div>
-
-            {room.hasBalcony && (
-              <div>
-                <label className="block text-sm font-medium mb-2">Balcony View</label>
-                <input
-                  type="text"
-                  value={room.balconyView}
-                  onChange={(e) =>
-                    handleRoomChange(index, "balconyView", e.target.value)
-                  }
-                  disabled={!isEditing}
-                  className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                  placeholder="e.g., Sea, Garden, City"
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium mb-3 text-gray-800">
-                Facilities
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {roomFacilities.map((facility) => {
-                  const isSelected = room.facilities.includes(facility);
-                  return (
-                    <button
-                      key={facility}
-                      onClick={() => {
-                        const newFacilities = isSelected
-                          ? room.facilities.filter((f) => f !== facility)
-                          : [...room.facilities, facility];
-                        handleRoomChange(index, "facilities", newFacilities);
-                      }}
-                      type="button"
-                      className={`px-4 py-2 rounded-full border transition-all duration-200 text-sm font-medium 
-                      ${isSelected
-                          ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-400"
-                        }`}
-                    >
-                      {facility}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {isEditing && (
-          <button
-            onClick={addNewRoom}
-            className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors"
-          >
-            + Add Another Room
-          </button>
-        )}
+                )}
+              </span>
+            );
+          })}
+        </div>
       </div>
+      {/* For each selected room type, show details in a single column */}
+      {selectedRoomTypes.length > 0 && (
+        <div className="flex flex-col gap-4">
+          {selectedRoomTypes.map((type) => {
+            const roomTypeObj = roomTypes.find(rt => rt.value === type);
+            return (
+              <div key={type} className="flex flex-row gap-6 border p-4 rounded-xl bg-white items-end">
+                <div className="text-base font-semibold min-w-[100px]">{roomTypeObj ? roomTypeObj.label : type}</div>
+                <div className="flex-1 min-w-[180px]">
+                  <label className="block text-sm font-medium mb-2">Floor</label>
+                  <select
+                    value={roomDetails[type]?.floor || ''}
+                    onChange={e => handleDetailChange(type, 'floor', e.target.value)}
+                    disabled={!isEditing}
+                    className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  >
+                    <option value="">Select Floor</option>
+                    {floorTypes.map((ft) => (
+                      <option key={ft} value={ft}>{ft}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1 min-w-[180px]">
+                  <label className="block text-sm font-medium mb-2">Number of Rooms</label>
+                  <input
+                    type="number"
+                    value={roomDetails[type]?.numberOfRooms || ''}
+                    onChange={e => handleDetailChange(type, 'numberOfRooms', e.target.value)}
+                    disabled={!isEditing}
+                    className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    placeholder="e.g. 2, 3, 4"
+                  />
+                </div>
+                <div className="flex-1 min-w-[180px]">
+                  <label className="block text-sm font-medium mb-2">Capacity</label>
+                  <input
+                    type="number"
+                    value={roomDetails[type]?.capacity || ''}
+                    onChange={e => handleDetailChange(type, 'capacity', e.target.value)}
+                    disabled={!isEditing}
+                    className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    placeholder="Number of guests"
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
