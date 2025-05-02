@@ -1,4 +1,5 @@
 import React from 'react';
+import { Form, Row, Col, Card, Checkbox, Input } from 'antd';
 
 const Step10 = ({ formData, setFormData, isEditing }) => {
   const handleCheckboxChange = (e) => {
@@ -11,66 +12,76 @@ const Step10 = ({ formData, setFormData, isEditing }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Verification & Submission</h2>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">ID Proof</label>
-          <input
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(e) => {
-              if (!isEditing) return;
-              setFormData(prev => ({
-                ...prev,
-                idProof: e.target.files[0]
-              }));
-            }}
-            disabled={!isEditing}
-            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">Property Ownership Proof</label>
-          <input
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(e) => {
-              if (!isEditing) return;
-              setFormData(prev => ({
-                ...prev,
-                propertyProof: e.target.files[0]
-              }));
-            }}
-            disabled={!isEditing}
-            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="termsAccepted"
-              checked={formData.termsAccepted}
-              onChange={handleCheckboxChange}
-              disabled={!isEditing}
-              className={!isEditing ? 'cursor-not-allowed' : ''}
-            />
-            I confirm all details are correct
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="termsAccepted"
-              checked={formData.termsAccepted}
-              onChange={handleCheckboxChange}
-              disabled={!isEditing}
-              className={!isEditing ? 'cursor-not-allowed' : ''}
-            />
-            I accept TripNGrub's terms and policies
-          </label>
-        </div>
-      </div>
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-6">Verification & Submission</h2>
+      
+      {/* Document Verification */}
+      <Card title="Document Verification" className="mb-4">
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <Form.Item label="ID Proof">
+              <Input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => {
+                  if (!isEditing) return;
+                  setFormData(prev => ({
+                    ...prev,
+                    idProof: e.target.files[0]
+                  }));
+                }}
+                disabled={!isEditing}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item label="Property Ownership Proof">
+              <Input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => {
+                  if (!isEditing) return;
+                  setFormData(prev => ({
+                    ...prev,
+                    propertyProof: e.target.files[0]
+                  }));
+                }}
+                disabled={!isEditing}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Terms & Conditions */}
+      <Card title="Terms & Conditions" className="mb-4">
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <Form.Item>
+              <Checkbox
+                checked={formData.termsAccepted}
+                onChange={handleCheckboxChange}
+                name="termsAccepted"
+                disabled={!isEditing}
+              >
+                I confirm all details are correct
+              </Checkbox>
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item>
+              <Checkbox
+                checked={formData.termsAccepted}
+                onChange={handleCheckboxChange}
+                name="termsAccepted"
+                disabled={!isEditing}
+              >
+                I accept TripNGrub's terms and policies
+              </Checkbox>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };
