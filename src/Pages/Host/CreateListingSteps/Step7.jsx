@@ -12,22 +12,6 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
     }));
   };
 
-  const handleRoomCapacityChange = (roomIndex, roomNumber, capacity) => {
-    if (!isEditing) return;
-    setFormData(prev => ({
-      ...prev,
-      rooms: prev.rooms.map((room, i) =>
-        i === roomIndex ? {
-          ...room,
-          individualRoomCapacities: {
-            ...room.individualRoomCapacities,
-            [roomNumber]: capacity
-          }
-        } : room
-      )
-    }));
-  };
-
   const handleOccupancyRangeChange = (index, rangeIndex, field, value) => {
     if (!isEditing) return;
     setFormData(prev => ({
@@ -109,9 +93,8 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                             <input
                               type="number"
                               value={currentCapacity}
-                              onChange={(e) => handleRoomCapacityChange(index, roomNumber, parseInt(e.target.value))}
-                              disabled={!isEditing}
-                              className={`w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                              disabled={true}
+                              className="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                               min="1"
                               max={room.capacity}
                             />
@@ -158,7 +141,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                               min={range.minGuests}
                               max={room.capacity}
                             />
-                            <span className="text-sm text-gray-500">guests:</span>
+                            <span className="text-sm text-gray-500">guests</span>
                           </div>
                           <input
                             type="number"
