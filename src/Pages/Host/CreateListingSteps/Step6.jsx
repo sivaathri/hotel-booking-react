@@ -1,15 +1,8 @@
 import React from 'react';
-import { FiClock, FiCalendar, FiWifi, FiCoffee, FiDollarSign, FiShield, FiActivity, FiTv, FiBriefcase, FiShoppingBag, FiUsers } from 'react-icons/fi';
+import { Form, Row, Col, Card, Checkbox } from 'antd';
+import { FiActivity, FiWifi, FiCoffee, FiShield, FiTv, FiBriefcase, FiUsers } from 'react-icons/fi';
 
 const Step6 = ({ formData, setFormData, isEditing }) => {
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
   const handleCheckboxChange = (e) => {
     if (!isEditing) return;
     const { name, checked } = e.target;
@@ -123,34 +116,38 @@ const Step6 = ({ formData, setFormData, isEditing }) => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold mb-6">Facilities & Amenities</h2>
-        <div className="space-y-8">
-          {facilityCategories.map((category, index) => (
-            <div key={index} className="border rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-4">
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-6">Facilities & Amenities</h2>
+      <div className="space-y-4">
+        {facilityCategories.map((category, index) => (
+          <Card 
+            key={index} 
+            title={
+              <div className="flex items-center gap-2">
                 {category.icon}
-                <h3 className="text-lg font-medium">{category.title}</h3>
+                <span>{category.title}</span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {category.facilities.map((facility) => (
-                  <label key={facility.name} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+            }
+            className="mb-4"
+          >
+            <Row gutter={[16, 16]}>
+              {category.facilities.map((facility) => (
+                <Col span={8} key={facility.name}>
+                  <Form.Item>
+                    <Checkbox
                       name={facility.name}
                       checked={formData[facility.name] || false}
                       onChange={handleCheckboxChange}
                       disabled={!isEditing}
-                      className={!isEditing ? 'cursor-not-allowed' : ''}
-                    />
-                    {facility.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+                    >
+                      {facility.label}
+                    </Checkbox>
+                  </Form.Item>
+                </Col>
+              ))}
+            </Row>
+          </Card>
+        ))}
       </div>
     </div>
   );

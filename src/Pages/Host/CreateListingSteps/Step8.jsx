@@ -1,4 +1,5 @@
 import React from 'react';
+import { Form, Row, Col, Card, Checkbox, Radio } from 'antd';
 
 const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
   const handleArrayToggle = (field, value) => {
@@ -21,51 +22,61 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Guest Booking Preferences</h2>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">Who can book?</label>
-          <div className="grid grid-cols-2 gap-4">
-            {guestTypes.map(type => (
-              <label key={type} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={formData.allowedGuests.includes(type)}
-                  onChange={() => handleArrayToggle('allowedGuests', type)}
-                  disabled={!isEditing}
-                  className={!isEditing ? 'cursor-not-allowed' : ''}
-                />
-                {type}
-              </label>
-            ))}
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="instantBooking"
-              checked={formData.instantBooking}
-              onChange={handleCheckboxChange}
-              disabled={!isEditing}
-              className={!isEditing ? 'cursor-not-allowed' : ''}
-            />
-            Instant Booking
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="manualApproval"
-              checked={formData.manualApproval}
-              onChange={handleCheckboxChange}
-              disabled={!isEditing}
-              className={!isEditing ? 'cursor-not-allowed' : ''}
-            />
-            Manual Approval
-          </label>
-        </div>
-      </div>
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-6">Guest Booking Preferences</h2>
+      
+      {/* Guest Types */}
+      <Card title="Who can book?" className="mb-4">
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <Form.Item>
+              <Checkbox.Group 
+                value={formData.allowedGuests} 
+                onChange={(value) => setFormData(prev => ({ ...prev, allowedGuests: value }))}
+                disabled={!isEditing}
+              >
+                <Row gutter={[16, 16]}>
+                  {guestTypes.map(type => (
+                    <Col span={8} key={type}>
+                      <Checkbox value={type}>{type}</Checkbox>
+                    </Col>
+                  ))}
+                </Row>
+              </Checkbox.Group>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Booking Type */}
+      <Card title="Booking Type" className="mb-4">
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <Form.Item label="Instant Booking">
+              <Radio.Group 
+                value={formData.instantBooking} 
+                onChange={(e) => setFormData(prev => ({ ...prev, instantBooking: e.target.value }))}
+                disabled={!isEditing}
+              >
+                <Radio value={true}>Yes</Radio>
+                <Radio value={false}>No</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Manual Approval">
+              <Radio.Group 
+                value={formData.manualApproval} 
+                onChange={(e) => setFormData(prev => ({ ...prev, manualApproval: e.target.value }))}
+                disabled={!isEditing}
+              >
+                <Radio value={true}>Yes</Radio>
+                <Radio value={false}>No</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };
