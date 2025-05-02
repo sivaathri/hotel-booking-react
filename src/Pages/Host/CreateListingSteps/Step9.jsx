@@ -1,4 +1,5 @@
 import React from 'react';
+import { Form, Row, Col, Card, Checkbox, Input } from 'antd';
 
 const Step9 = ({ formData, setFormData, paymentOptions, isEditing }) => {
   const handleArrayToggle = (field, value) => {
@@ -21,83 +22,86 @@ const Step9 = ({ formData, setFormData, paymentOptions, isEditing }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Payment Setup</h2>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">Payment Methods</label>
-          <div className="grid grid-cols-2 gap-4">
-            {paymentOptions.map(method => (
-              <label key={method} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-6">Payment Setup</h2>
+      
+      {/* Payment Methods */}
+      <Card title="Payment Methods" className="mb-4">
+        <Row gutter={[16, 16]}>
+          {paymentOptions.map(method => (
+            <Col span={8} key={method}>
+              <Form.Item>
+                <Checkbox
                   checked={formData.paymentMethods.includes(method)}
                   onChange={() => handleArrayToggle('paymentMethods', method)}
                   disabled={!isEditing}
-                  className={!isEditing ? 'cursor-not-allowed' : ''}
-                />
-                {method}
-              </label>
-            ))}
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">PAN/GST ID</label>
-          <input
-            type="text"
-            name="panGstId"
-            value={formData.panGstId}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-            placeholder="Enter PAN or GST ID"
-          />
-        </div>
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Bank Account Details</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Account Number</label>
-              <input
-                type="text"
+                >
+                  {method}
+                </Checkbox>
+              </Form.Item>
+            </Col>
+          ))}
+        </Row>
+      </Card>
+
+      {/* PAN/GST Details */}
+      <Card title="Tax Information" className="mb-4">
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <Form.Item label="PAN/GST ID">
+              <Input
+                name="panGstId"
+                value={formData.panGstId}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                placeholder="Enter PAN or GST ID"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Bank Account Details */}
+      <Card title="Bank Account Details" className="mb-4">
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <Form.Item label="Account Number">
+              <Input
                 value={formData.bankDetails.accountNumber}
                 onChange={(e) => setFormData(prev => ({
                   ...prev,
                   bankDetails: { ...prev.bankDetails, accountNumber: e.target.value }
                 }))}
                 disabled={!isEditing}
-                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">IFSC Code</label>
-              <input
-                type="text"
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="IFSC Code">
+              <Input
                 value={formData.bankDetails.ifscCode}
                 onChange={(e) => setFormData(prev => ({
                   ...prev,
                   bankDetails: { ...prev.bankDetails, ifscCode: e.target.value }
                 }))}
                 disabled={!isEditing}
-                className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Account Holder Name</label>
-            <input
-              type="text"
-              value={formData.bankDetails.accountHolderName}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                bankDetails: { ...prev.bankDetails, accountHolderName: e.target.value }
-              }))}
-              disabled={!isEditing}
-              className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-            />
-          </div>
-        </div>
-      </div>
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item label="Account Holder Name">
+              <Input
+                value={formData.bankDetails.accountHolderName}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  bankDetails: { ...prev.bankDetails, accountHolderName: e.target.value }
+                }))}
+                disabled={!isEditing}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };
