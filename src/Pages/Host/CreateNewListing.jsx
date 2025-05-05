@@ -484,7 +484,7 @@ const CreateNewListing = () => {
       });
 
       const response = await axios.post(
-        `${API_URL}/uploadImages/user/${user.id}`,
+        `${API_URL}/uploadImages/room/${user.id}`,
         formDataToSend,
         {
           headers: {
