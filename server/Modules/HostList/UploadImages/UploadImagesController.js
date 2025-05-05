@@ -3,36 +3,37 @@ const path = require("path");
 const fs = require("fs");
 
 class UploadImagesController {
-    static async uploadImage(req, res) {
+    static async uploadImages(req, res) {
         try {
             const { roomId } = req.params;
-            const file = req.file;
+            const files = req.files;
             
-            if (!file) {
+            if (!files || files.length === 0) {
                 return res.status(400).json({ 
                     success: false,
-                    message: "No file uploaded" 
+                    message: "No files uploaded" 
                 });
             }
 
-            const imagePath = `hostroomimages/${file.filename}`;
+            const imagePaths = files.map(file => `hostroomimages/${file.filename}`);
             
             // Save to database
-            await UploadImagesModel.saveImage(roomId, imagePath);
+            const result = await UploadImagesModel.saveImages(roomId, imagePaths);
 
             res.status(200).json({
                 success: true,
-                message: "Image uploaded successfully",
+                message: result.updated ? "Images added successfully" : "Images uploaded successfully",
                 data: {
-                    imagePath,
+                    id: result.id,
+                    imagePaths,
                     roomId
                 }
             });
         } catch (error) {
-            console.error("Error uploading image:", error);
+            console.error("Error uploading images:", error);
             res.status(500).json({ 
                 success: false,
-                message: error.message || "Failed to upload image"
+                message: error.message || "Failed to upload images"
             });
         }
     }
@@ -100,24 +101,26 @@ class UploadImagesController {
                 });
             }
 
-            // Delete file from server
-            const filePath = path.join(__dirname, "../../../assets", image.image_path);
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-            }
+            // Delete all files from server
+            image.image_paths.forEach(imagePath => {
+                const filePath = path.join(__dirname, "../../../assets", imagePath);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
 
             // Delete from database
             await UploadImagesModel.deleteImage(imageId);
 
             res.status(200).json({
                 success: true,
-                message: "Image deleted successfully"
+                message: "Images deleted successfully"
             });
         } catch (error) {
-            console.error("Error deleting image:", error);
+            console.error("Error deleting images:", error);
             res.status(500).json({ 
                 success: false,
-                message: "Failed to delete image" 
+                message: "Failed to delete images" 
             });
         }
     }
