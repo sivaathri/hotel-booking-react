@@ -1,15 +1,37 @@
 const db = require("../../../config/db");
 
 class UploadImagesModel {
-    static async saveImage(roomId, imagePath) {
+    static async saveImages(roomId, imagePaths) {
         try {
-            const query = `
-                INSERT INTO room_images (room_id, image_path)
-                VALUES (?, ?)
+            // First, check if there's already an entry for this room
+            const checkQuery = `
+                SELECT id, image_paths 
+                FROM room_images 
+                WHERE room_id = ?
             `;
-            
-            const [result] = await db.query(query, [roomId, imagePath]);
-            return result;
+            const [existing] = await db.query(checkQuery, [roomId]);
+
+            if (existing && existing.length > 0) {
+                // Update existing record
+                const existingPaths = JSON.parse(existing[0].image_paths || '[]');
+                const updatedPaths = [...existingPaths, ...imagePaths];
+                
+                const updateQuery = `
+                    UPDATE room_images 
+                    SET image_paths = ? 
+                    WHERE room_id = ?
+                `;
+                await db.query(updateQuery, [JSON.stringify(updatedPaths), roomId]);
+                return { id: existing[0].id, updated: true };
+            } else {
+                // Create new record
+                const insertQuery = `
+                    INSERT INTO room_images (room_id, image_paths)
+                    VALUES (?, ?)
+                `;
+                const [result] = await db.query(insertQuery, [roomId, JSON.stringify(imagePaths)]);
+                return { id: result.insertId, updated: false };
+            }
         } catch (error) {
             throw error;
         }
@@ -18,28 +40,37 @@ class UploadImagesModel {
     static async getAllImages() {
         try {
             const query = `
-                SELECT * FROM room_images
+                SELECT id, room_id, image_paths, created_at 
+                FROM room_images
                 ORDER BY created_at DESC
             `;
             
             const [images] = await db.query(query);
-            return images;
+            // Parse the JSON strings back to arrays
+            return images.map(img => ({
+                ...img,
+                image_paths: JSON.parse(img.image_paths || '[]')
+            }));
         } catch (error) {
             throw error;
         }
     }
- 
+
     static async getImagesByRoomId(roomId) {
         try {
-            
             const query = `
-                SELECT * FROM room_images 
+                SELECT id, room_id, image_paths, created_at 
+                FROM room_images 
                 WHERE room_id = ?
                 ORDER BY created_at DESC
             `;
             
             const [images] = await db.query(query, [roomId]);
-            return images;
+            // Parse the JSON strings back to arrays
+            return images.map(img => ({
+                ...img,
+                image_paths: JSON.parse(img.image_paths || '[]')
+            }));
         } catch (error) {
             throw error;
         }
@@ -48,12 +79,19 @@ class UploadImagesModel {
     static async getImageById(imageId) {
         try {
             const query = `
-                SELECT * FROM room_images 
+                SELECT id, room_id, image_paths, created_at 
+                FROM room_images 
                 WHERE id = ?
             `;
             
             const [image] = await db.query(query, [imageId]);
-            return image[0];
+            if (image && image.length > 0) {
+                return {
+                    ...image[0],
+                    image_paths: JSON.parse(image[0].image_paths || '[]')
+                };
+            }
+            return null;
         } catch (error) {
             throw error;
         }

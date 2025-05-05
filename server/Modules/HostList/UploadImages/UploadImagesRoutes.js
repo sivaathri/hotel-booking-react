@@ -26,7 +26,8 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
+        fileSize: 5 * 1024 * 1024, // 5MB limit per file
+        files: 20 // Maximum number of files allowed
     },
     fileFilter: function (req, file, cb) {
         // Accept images only
@@ -41,6 +42,24 @@ const upload = multer({
 // Error handling middleware
 const handleUploadError = (err, req, res, next) => {
     if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                success: false,
+                message: 'File size too large. Maximum size is 5MB per file.'
+            });
+        }
+        if (err.code === 'LIMIT_FILE_COUNT') {
+            return res.status(400).json({
+                success: false,
+                message: 'Too many files. Maximum 20 files allowed.'
+            });
+        }
+        if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid field name. Use "images" as the field name for file uploads.'
+            });
+        }
         return res.status(400).json({
             success: false,
             message: err.message
@@ -55,7 +74,7 @@ const handleUploadError = (err, req, res, next) => {
 };
 
 // Routes
-router.post("/room/:roomId", upload.single('image'), handleUploadError, UploadImagesController.uploadImage);
+router.post("/room/:roomId", upload.array('images', 20), handleUploadError, UploadImagesController.uploadImages);
 router.get("/", UploadImagesController.getAllImages);
 router.get("/room/:roomId", UploadImagesController.getImagesByRoomId);
 router.delete("/:imageId", UploadImagesController.deleteImage);
