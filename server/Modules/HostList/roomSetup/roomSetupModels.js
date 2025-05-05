@@ -31,7 +31,7 @@ class Room {
     const [result] = await db.query(
       `INSERT INTO room_setup 
       (user_id, floor, room_type, number_of_rooms, capacity) 
-      VALUES (?, ?, ?, ?, ?,)`,
+      VALUES (?, ?, ?, ?, ?)`,
       [
         user_id,
         floor,
