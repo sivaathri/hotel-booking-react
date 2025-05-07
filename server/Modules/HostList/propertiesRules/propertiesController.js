@@ -1,135 +1,70 @@
 const PropertyRules = require('./propertiesModels');
 
-class PropertyController {
-    static async createProperty(req, res) {
-        try {
-            const propertyData = {
-                user_id: req.body.user_id,
-                check_in_time: req.body.check_in_time,
-                check_out_time: req.body.check_out_time,
-                min_guest_age: req.body.min_guest_age,
-                proof_type: req.body.proof_type,
-                unmarried_couples_allowed: req.body.unmarried_couples_allowed,
-                male_only_groups_allowed: req.body.male_only_groups_allowed,
-                scanty_baggage_allowed: req.body.scanty_baggage_allowed,
-                smoking_allowed: req.body.smoking_allowed,
-                alcohol_allowed: req.body.alcohol_allowed,
-                non_veg_allowed: req.body.non_veg_allowed,
-                outside_food_allowed: req.body.outside_food_allowed,
-                food_delivery_service: req.body.food_delivery_service,
-                wheelchair_accessible: req.body.wheelchair_accessible,
-                wheelchair_provided: req.body.wheelchair_provided,
-                pets_allowed: req.body.pets_allowed,
-                pets_on_property: req.body.pets_on_property,
-                mattress_cost_child: req.body.mattress_cost_child,
-                mattress_cost_adult: req.body.mattress_cost_adult,
-                cot_cost: req.body.cot_cost,
-                rule_description: req.body.rule_description
-            };
+// Get all property rules
+const getAllRules = async (req, res) => {
+  try {
+    const data = await PropertyRules.getAllRules();
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
-            const propertyId = await PropertyRules.create(propertyData);
-            res.status(201).json({
-                success: true,
-                message: 'Property rules created successfully',
-                data: { id: propertyId }
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error creating property rules',
-                error: error.message
-            });
-        }
-    }
+// Get rules by ID
+const getRulesById = async (req, res) => {
+  try {
+    const data = await PropertyRules.getRulesById(req.params.id);
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
 
-    static async getProperty(req, res) {
-        try {
-            const property = await PropertyRules.findById(req.params.id);
-            if (!property) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Property rules not found'
-                });
-            }
-            res.status(200).json({
-                success: true,
-                data: property
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching property rules',
-                error: error.message
-            });
-        }
-    }
+// Get rules by user ID
+const getRulesByUserId = async (req, res) => {
+  try {
+    const data = await PropertyRules.getRulesByUserId(req.params.user_id);
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
-    static async updateProperty(req, res) {
-        try {
-            const propertyData = {
-                check_in_time: req.body.check_in_time,
-                check_out_time: req.body.check_out_time,
-                min_guest_age: req.body.min_guest_age,
-                proof_type: req.body.proof_type,
-                unmarried_couples_allowed: req.body.unmarried_couples_allowed,
-                male_only_groups_allowed: req.body.male_only_groups_allowed,
-                scanty_baggage_allowed: req.body.scanty_baggage_allowed,
-                smoking_allowed: req.body.smoking_allowed,
-                alcohol_allowed: req.body.alcohol_allowed,
-                non_veg_allowed: req.body.non_veg_allowed,
-                outside_food_allowed: req.body.outside_food_allowed,
-                food_delivery_service: req.body.food_delivery_service,
-                wheelchair_accessible: req.body.wheelchair_accessible,
-                wheelchair_provided: req.body.wheelchair_provided,
-                pets_allowed: req.body.pets_allowed,
-                pets_on_property: req.body.pets_on_property,
-                mattress_cost_child: req.body.mattress_cost_child,
-                mattress_cost_adult: req.body.mattress_cost_adult,
-                cot_cost: req.body.cot_cost,
-                rule_description: req.body.rule_description
-            };
+// Create new rules
+const createRules = async (req, res) => {
+  try {
+    const data = await PropertyRules.createRules(req.params.user_id, req.body);
+    res.status(201).json({ success: true, message: "Property rules created", data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
-            const updated = await PropertyRules.update(req.params.id, propertyData);
-            if (!updated) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Property rules not found'
-                });
-            }
-            res.status(200).json({
-                success: true,
-                message: 'Property rules updated successfully'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error updating property rules',
-                error: error.message
-            });
-        }
-    }
+// Update rules
+const updateRulesById = async (req, res) => {
+  try {
+    const data = await PropertyRules.updateRulesById(req.params.id, req.body);
+    res.json({ success: true, message: "Rules updated", data });
+  } catch (error) {
+    res.status(error.message === "Property rules not found" ? 404 : 500).json({ success: false, message: error.message });
+  }
+};
 
-    static async deleteProperty(req, res) {
-        try {
-            const deleted = await PropertyRules.delete(req.params.id);
-            if (!deleted) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Property rules not found'
-                });
-            }
-            res.status(200).json({
-                success: true,
-                message: 'Property rules deleted successfully'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error deleting property rules',
-                error: error.message
-            });
-        }
-    }
-}
+// Delete rules
+const deleteRulesById = async (req, res) => {
+  try {
+    await PropertyRules.deleteRulesById(req.params.id);
+    res.json({ success: true, message: "Rules deleted" });
+  } catch (error) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
 
-module.exports = PropertyController;
+module.exports = {
+  getAllRules,
+  getRulesById,
+  getRulesByUserId,
+  createRules,
+  updateRulesById,
+  deleteRulesById,
+};

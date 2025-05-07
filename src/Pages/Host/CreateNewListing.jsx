@@ -597,45 +597,63 @@ const CreateNewListing = () => {
       setIsLoading(true);
       const token = getAuthToken();
 
-      const response = await axios.post(
-        `${API_URL}/property/${user.id}`,
-        {
-          // Must Read Rules
-          checkInTime: formData.checkInTime,
-          checkOutTime: formData.checkOutTime,
-          minAge: formData.minAge,
-          acceptedIds: formData.acceptedIds,
+      // Format the data according to the database schema
+      const propertyData = {
+        // Basic property rules
+        user_id: user.id,
+        check_in_time: formData.checkInTime,
+        check_out_time: formData.checkOutTime,
+        min_guest_age: formData.minAge,
 
-          // Guest Profile
-          unmarriedCouplesAllowed: formData.unmarriedCouplesAllowed,
-          maleOnlyGroupsAllowed: formData.maleOnlyGroupsAllowed,
-          scantyBaggageAllowed: formData.scantyBaggageAllowed,
+        // ID proofs
+        proof_type: formData.acceptedIds,
 
-          // Smoking & Alcohol
-          smokingAllowed: formData.smokingAllowed,
-          alcoholAllowed: formData.alcoholAllowed,
-
-          // Food Arrangement
-          nonVegAllowed: formData.nonVegAllowed,
-          outsideFoodAllowed: formData.outsideFoodAllowed,
-          foodDeliveryOptions: formData.foodDeliveryOptions,
-
-          // Property Accessibility
-          wheelchairAccessible: formData.wheelchairAccessible,
-          wheelchairProvided: formData.wheelchairProvided,
-
-          // Pet Policy
-          petsAllowed: formData.petsAllowed,
-          petsOnProperty: formData.petsOnProperty,
-
-          // Child & Extra Bed Policy
-          extraMattressChildCost: formData.extraMattressChildCost,
-          extraMattressAdultCost: formData.extraMattressAdultCost,
-          extraCotCost: formData.extraCotCost,
-
-          // Other Rules
-          otherRules: formData.otherRules
+        // Guest profile rules
+        guest_profile: {
+          unmarried_couples_allowed: formData.unmarriedCouplesAllowed,
+          male_only_groups_allowed: formData.maleOnlyGroupsAllowed,
+          scanty_baggage_allowed: formData.scantyBaggageAllowed
         },
+
+        // Smoking & alcohol rules
+        smoking_alcohol: {
+          smoking_allowed: formData.smokingAllowed,
+          alcohol_allowed: formData.alcoholAllowed
+        },
+
+        // Food rules
+        food_rules: {
+          non_veg_allowed: formData.nonVegAllowed,
+          outside_food_allowed: formData.outsideFoodAllowed
+        },
+        food_delivery: formData.foodDeliveryOptions,
+
+        // Accessibility rules
+        accessibility: {
+          wheelchair_accessible: formData.wheelchairAccessible,
+          wheelchair_provided: formData.wheelchairProvided
+        },
+
+        // Pet policy
+        pet_policy: {
+          pets_allowed: formData.petsAllowed,
+          pets_on_property: formData.petsOnProperty
+        },
+
+        // Extra bed policy
+        extra_bed: {
+          mattress_cost_child: formData.extraMattressChildCost,
+          mattress_cost_adult: formData.extraMattressAdultCost,
+          cot_cost: formData.extraCotCost
+        },
+
+        // Additional rules
+        additional_rules: formData.otherRules
+      };
+
+      const response = await axios.post(
+        `${API_URL}/property/properties`,
+        propertyData,
         {
           headers: {
             Authorization: `Bearer ${token}`
