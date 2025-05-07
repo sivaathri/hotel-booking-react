@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const PropertyController = require('./propertiesController');
-router.post('/', PropertyController.createProperty);
+router.post('/:user_id', PropertyController.createProperty);
 
 module.exports = router;

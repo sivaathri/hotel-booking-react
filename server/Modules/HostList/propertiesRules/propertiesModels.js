@@ -23,11 +23,15 @@ class Property {
         await connection.beginTransaction();
 
         try {
+            // Convert ISO date strings to TIME format
+            const checkInTime = new Date(check_in_time).toTimeString().split(' ')[0];
+            const checkOutTime = new Date(check_out_time).toTimeString().split(' ')[0];
+
             // Insert basic property info
             const [propertyResult] = await connection.query(
                 `INSERT INTO properties (user_id, check_in_time, check_out_time, min_guest_age)
                 VALUES (?, ?, ?, ?)`,
-                [user_id, check_in_time, check_out_time, min_guest_age]
+                [user_id, checkInTime, checkOutTime, min_guest_age]
             );
 
             // Insert ID proofs if provided
@@ -46,7 +50,7 @@ class Property {
                 await connection.query(
                     `INSERT INTO guest_profile_rules (user_id, unmarried_couples_allowed, male_only_groups_allowed, scanty_baggage_allowed)
                     VALUES (?, ?, ?, ?)`,
-                    [user_id, 
+                    [user_id,
                      guest_profile_rules.unmarried_couples_allowed,
                      guest_profile_rules.male_only_groups_allowed,
                      guest_profile_rules.scanty_baggage_allowed]
@@ -69,14 +73,14 @@ class Property {
                 await connection.query(
                     `INSERT INTO food_rules (user_id, non_veg_allowed, outside_food_allowed)
                     VALUES (?, ?, ?)`,
-                    [user_id, 
+                    [user_id,
                      food_rules.non_veg_allowed,
                      food_rules.outside_food_allowed]
                 );
             }
 
             // Insert food delivery options if provided
-            if (food_delivery_options && food_delivery_options.service_name) {
+            if (food_delivery_options) {
                 await connection.query(
                     `INSERT INTO food_delivery_options (user_id, service_name)
                     VALUES (?, ?)`,

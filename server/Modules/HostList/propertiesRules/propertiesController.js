@@ -2,11 +2,14 @@ const Property = require('./propertiesModels');
 
 const createProperty = async (req, res) => {
     try {
+        const user_id = req.params.user_id;
         const {
-            user_id,
             check_in_time,
             check_out_time,
+            checkInTime,
+            checkOutTime,
             min_guest_age,
+            minAge,
             id_proofs,
             guest_profile_rules,
             smoking_alcohol_rules,
@@ -26,7 +29,12 @@ const createProperty = async (req, res) => {
             });
         }
 
-        if (!check_in_time || !check_out_time) {
+        // Handle both camelCase and snake_case formats
+        const checkInTimeValue = check_in_time || checkInTime;
+        const checkOutTimeValue = check_out_time || checkOutTime;
+        const minGuestAgeValue = min_guest_age || minAge;
+
+        if (!checkInTimeValue || !checkOutTimeValue) {
             return res.status(400).json({
                 success: false,
                 message: "Check-in and check-out times are required"
@@ -111,7 +119,16 @@ const createProperty = async (req, res) => {
             });
         }
 
-        const insertId = await Property.createProperty(req.body);
+        // Create a standardized object with snake_case keys
+        const propertyData = {
+            user_id,
+            check_in_time: checkInTimeValue,
+            check_out_time: checkOutTimeValue,
+            min_guest_age: minGuestAgeValue,
+            ...req.body
+        };
+
+        const insertId = await Property.createProperty(propertyData);
         res.status(201).json({ 
             success: true, 
             message: "Property and all associated rules created successfully",
