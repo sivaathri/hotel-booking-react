@@ -555,6 +555,112 @@ const CreateNewListing = () => {
     }
   };
 
+  const saveLanguagePreferences = async () => {
+    try {
+      setIsLoading(true);
+      const token = getAuthToken();
+
+      // Get default check-in and check-out times if not set
+      const defaultCheckIn = formData.checkInTime || '14:00:00';
+      const defaultCheckOut = formData.checkOutTime || '12:00:00';
+
+      const response = await axios.post(
+        `${API_URL}/property`,
+        {
+          user_id: user.id,
+          check_in_time: defaultCheckIn,
+          check_out_time: defaultCheckOut,
+          min_guest_age: 18,
+          guest_profile_rules: {
+            unmarried_couples_allowed: false,
+            male_only_groups_allowed: true,
+            scanty_baggage_allowed: false
+          },
+          smoking_alcohol_rules: {
+            smoking_allowed: false,
+            alcohol_allowed: false
+          },
+          food_rules: {
+            rules: JSON.stringify({
+              non_veg_allowed: true,
+              outside_food_allowed: true
+            })
+          },
+          food_delivery_options: {
+            options: JSON.stringify({
+              service_name: "All"
+            })
+          },
+          accessibility_rules: {
+            rules: JSON.stringify({
+              wheelchair_accessible: false,
+              wheelchair_provided: false
+            })
+          },
+          pet_policy: {
+            pets_allowed: false,
+            pets_on_property: JSON.stringify([])
+          },
+          extra_bed_policy: {
+            policy: JSON.stringify({
+              mattress_cost_child: 0,
+              mattress_cost_adult: 0,
+              cot_cost: 0
+            })
+          },
+          additional_rules: {
+            rule_description: JSON.stringify({
+              languages: formData.languages,
+              other_language: formData.otherLanguage
+            })
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Property rules saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setStep(step + 1);
+        setCompletedSteps(prev => new Set([...prev, 5]));
+      } else {
+        toast.error(response.data.message || 'Failed to save property rules. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving property rules:', error);
+      toast.error(error.response?.data?.message || 'An error occurred while saving. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       // Save basic information when in step 1
@@ -572,6 +678,9 @@ const CreateNewListing = () => {
       // Save room photos when in step 4
       await saveRoomPhotos();
       setCompletedSteps(prev => new Set([...prev, 4]));
+    } else if (step === 5) {
+      // Save language preferences when in step 5
+      await saveLanguagePreferences();
     } else if (step < 11) {
       setStep(step + 1);
     } else {
