@@ -600,7 +600,7 @@ const CreateNewListing = () => {
       // Format the data according to the database schema
       const propertyData = {
         // Basic property rules
-        user_id: user.id,
+       
         check_in_time: formData.checkInTime,
         check_out_time: formData.checkOutTime,
         min_guest_age: formData.minAge,
@@ -609,50 +609,50 @@ const CreateNewListing = () => {
         proof_type: formData.acceptedIds,
 
         // Guest profile rules
-        guest_profile: {
+       
           unmarried_couples_allowed: formData.unmarriedCouplesAllowed,
           male_only_groups_allowed: formData.maleOnlyGroupsAllowed,
-          scanty_baggage_allowed: formData.scantyBaggageAllowed
-        },
+          scanty_baggage_allowed: formData.scantyBaggageAllowed,
+      
 
         // Smoking & alcohol rules
-        smoking_alcohol: {
+       
           smoking_allowed: formData.smokingAllowed,
           alcohol_allowed: formData.alcoholAllowed
-        },
+        ,
 
         // Food rules
-        food_rules: {
+       
           non_veg_allowed: formData.nonVegAllowed,
           outside_food_allowed: formData.outsideFoodAllowed
-        },
+        ,
         food_delivery: formData.foodDeliveryOptions,
 
         // Accessibility rules
-        accessibility: {
+       
           wheelchair_accessible: formData.wheelchairAccessible,
           wheelchair_provided: formData.wheelchairProvided
-        },
+        ,
 
         // Pet policy
-        pet_policy: {
+       
           pets_allowed: formData.petsAllowed,
           pets_on_property: formData.petsOnProperty
-        },
+        ,
 
         // Extra bed policy
-        extra_bed: {
+       
           mattress_cost_child: formData.extraMattressChildCost,
           mattress_cost_adult: formData.extraMattressAdultCost,
           cot_cost: formData.extraCotCost
-        },
+        ,
 
         // Additional rules
-        additional_rules: formData.otherRules
+        rule_description: formData.otherRules
       };
 
       const response = await axios.post(
-        `${API_URL}/property/properties`,
+        `${API_URL}/property/rules/create/${user.id}`,
         propertyData,
         {
           headers: {
