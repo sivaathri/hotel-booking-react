@@ -17,7 +17,11 @@ const idproff = require('../Modules/HostList/idproofs/idproofsroutes')
 const guestprofilerules = require('../Modules/HostList/guest_profile_rules/routes')
 const smokingalcoholrules = require('../Modules/HostList/smoking_alcohol_rules/routes')
 const foodrules  = require('../Modules/HostList/food_rules/routes')
-
+const Fooddeliveryoptions = require('../Modules/HostList/food_delivery_options/routes')
+const Accessibilityrules = require('../Modules/HostList/accessibility_rules/routes')
+const Petpolicy = require('../Modules/HostList/pet_policy/routes')
+const extrabedpolicy = require('../Modules/HostList/extra_bed_policy/routes')
+const additionalrules = require('../Modules/HostList/additional_rules/routes')
 // API Routes
 router.use('/auth', userRoutes)
 router.use('/basicInfo', basicInfoRoutes)
@@ -29,7 +33,12 @@ router.use('/properties', properties)
 router.use('/idproff', idproff)
 router.use('/guestprofilerules', guestprofilerules)
 router.use('/smokingalcoholrules', smokingalcoholrules)
-router.use('/foodrules ', foodrules )
+router.use('/foodrules', foodrules)
+router.use('/Fooddeliveryoptions', Fooddeliveryoptions)
+router.use('/Accessibilityrules', Accessibilityrules)
+router.use('/Petpolicy', Petpolicy)
+router.use('/extrabedpolicy', extrabedpolicy)
+router.use('/additionalrules', additionalrules)
 
 
 
