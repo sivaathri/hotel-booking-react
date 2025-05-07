@@ -198,7 +198,8 @@ const CreateNewListing = () => {
       cardNumber: '',
       expiryDate: '',
       cvv: ''
-    }
+    },
+    roomIds: []
   });
 
   const propertyTypes = [
@@ -420,6 +421,10 @@ const CreateNewListing = () => {
       const results = await Promise.all(roomPromises);
       
       if (results.every(result => result.success)) {
+        // Store the room IDs for later use
+        const roomIds = results.map(result => result.insertId);
+        setFormData(prev => ({ ...prev, roomIds }));
+        
         toast.success('Room setup saved successfully!', {
           position: "top-right",
           autoClose: 3000,
@@ -475,6 +480,19 @@ const CreateNewListing = () => {
         return;
       }
 
+      if (!formData.roomIds || formData.roomIds.length === 0) {
+        toast.error('No room IDs found. Please complete room setup first.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
+
       // Create FormData object to send files
       const formDataToSend = new FormData();
       formData.roomPhotos.forEach((photo, index) => {
@@ -483,18 +501,23 @@ const CreateNewListing = () => {
         }
       });
 
-      const response = await axios.post(
-        `${API_URL}/uploadImages/room/${user.id}`,
-        formDataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
+      // Upload images for each room
+      const uploadPromises = formData.roomIds.map(roomId => 
+        axios.post(
+          `${API_URL}/uploadImages/room/${roomId}`,
+          formDataToSend,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
           }
-        }
+        )
       );
 
-      if (response.data.success) {
+      const results = await Promise.all(uploadPromises);
+      
+      if (results.every(result => result.data.success)) {
         toast.success('Room photos saved successfully!', {
           position: "top-right",
           autoClose: 3000,
@@ -506,7 +529,7 @@ const CreateNewListing = () => {
         });
         setStep(step + 1);
       } else {
-        toast.error(response.data.message || 'Failed to save room photos. Please try again.', {
+        toast.error('Failed to save some room photos. Please try again.', {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -518,8 +541,7 @@ const CreateNewListing = () => {
       }
     } catch (error) {
       console.error('Error saving room photos:', error);
-      const errorMessage = error.response?.data?.message || 'An error occurred while saving. Please try again.';
-      toast.error(errorMessage, {
+      toast.error('An error occurred while saving photos. Please try again.', {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
