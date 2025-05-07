@@ -3,12 +3,12 @@ const db = require("../../../config/db");
 class Id_proofs {
   // Create a new ID proof
   static async create(data) {
-    const { property_id, user_id, proof_type } = data;
+    const { user_id, proof_type } = data;
 
-    const query = `INSERT INTO id_proofs (property_id, user_id, proof_type)
-                   VALUES (?, ?, ?)`;
+    const query = `INSERT INTO id_proofs (user_id, proof_type)
+                   VALUES ( ?, ?)`;
 
-    const [result] = await db.query(query, [property_id, user_id, proof_type]);
+    const [result] = await db.query(query, [ user_id, proof_type]);
     return result.insertId; // Return the ID of the inserted record
   }
 
