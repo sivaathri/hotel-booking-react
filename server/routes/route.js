@@ -12,7 +12,7 @@ const locationDetailsRoutes = require('../Modules/HostList/locationDetails/locat
 const roomSetupRoutes = require('../Modules/HostList/roomSetup/roomSetupRoutes');
 const getall = require('../Modules/HostList/getAll/getAllRoutes');
 const uploadImagesRoutes = require('../Modules/HostList/UploadImages/UploadImagesRoutes');
-const properties = require ('../Modules/HostList/propertiesRules/propertiesRoutes')
+const property = require ('../Modules/HostList/propertiesRules/propertiesRoutes')
 const idproff = require('../Modules/HostList/idproofs/idproofsroutes')
 const guestprofilerules = require('../Modules/HostList/guest_profile_rules/routes')
 const smokingalcoholrules = require('../Modules/HostList/smoking_alcohol_rules/routes')
@@ -29,7 +29,7 @@ router.use('/location', locationDetailsRoutes)
 router.use('/roomSetup', roomSetupRoutes)
 router.use('/getall', getall)   
 router.use('/uploadImages', uploadImagesRoutes)
-router.use('/properties', properties)
+router.use('/property', property)
 router.use('/idproff', idproff)
 router.use('/guestprofilerules', guestprofilerules)
 router.use('/smokingalcoholrules', smokingalcoholrules)
