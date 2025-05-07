@@ -1,9 +1,10 @@
 import React from 'react';
 import { Form, Row, Col, Card, Checkbox, Input, InputNumber, Radio, Select, TimePicker } from 'antd';
+import { toast } from 'react-toastify';
 
 const { TextArea } = Input;
 
-const Step5 = ({ formData, setFormData, languages, isEditing }) => {
+const Step5 = ({ formData, setFormData, languages, isEditing, savePropertyRules }) => {
   const handleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,

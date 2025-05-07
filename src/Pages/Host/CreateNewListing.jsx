@@ -150,11 +150,48 @@ const CreateNewListing = () => {
     // Step 4: Room Photos
     roomPhotos: [],
 
-    // Step 5: Language Preference
+    // Step 5: Property Rules & Policies
+    // Must Read Rules
+    checkInTime: null,
+    checkOutTime: null,
+    minAge: 18,
+    acceptedIds: [],
+
+    // Guest Profile
+    unmarriedCouplesAllowed: false,
+    maleOnlyGroupsAllowed: false,
+    scantyBaggageAllowed: false,
+
+    // Smoking & Alcohol
+    smokingAllowed: false,
+    alcoholAllowed: false,
+
+    // Food Arrangement
+    nonVegAllowed: false,
+    outsideFoodAllowed: false,
+    foodDeliveryOptions: [],
+
+    // Property Accessibility
+    wheelchairAccessible: false,
+    wheelchairProvided: false,
+
+    // Pet Policy
+    petsAllowed: false,
+    petsOnProperty: false,
+
+    // Child & Extra Bed Policy
+    extraMattressChildCost: 0,
+    extraMattressAdultCost: 0,
+    extraCotCost: 0,
+
+    // Other Rules
+    otherRules: '',
+
+    // Step 6: Language Preference
     languages: [],
     otherLanguage: '',
 
-    // Step 6: House Rules
+    // Step 7: House Rules
     checkInTime: '',
     checkOutTime: '',
     petsAllowed: false,
@@ -162,7 +199,7 @@ const CreateNewListing = () => {
     alcoholAllowed: false,
     noiseRestrictions: false,
 
-    // Step 7: Pricing & Availability
+    // Step 8: Pricing & Availability
     pricePerNight: '',
     discounts: {
       longStay: false,
@@ -172,12 +209,12 @@ const CreateNewListing = () => {
     refundPolicy: '',
     availabilityCalendar: [],
 
-    // Step 8: Guest Booking Preferences
+    // Step 9: Guest Booking Preferences
     allowedGuests: [],
     instantBooking: false,
     manualApproval: false,
 
-    // Step 9: Payment Setup
+    // Step 10: Payment Setup
     paymentMethods: [],
     panGstId: '',
     bankDetails: {
@@ -186,12 +223,12 @@ const CreateNewListing = () => {
       accountHolderName: ''
     },
 
-    // Step 10: Verification
+    // Step 11: Verification
     idProof: null,
     propertyProof: null,
     termsAccepted: false,
 
-    // Step 11: App Owner Payment
+    // Step 12: App Owner Payment
     paymentMethod: '',
     paymentStatus: 'pending',
     cardDetails: {
@@ -555,65 +592,49 @@ const CreateNewListing = () => {
     }
   };
 
-  const saveLanguagePreferences = async () => {
+  const savePropertyRules = async () => {
     try {
       setIsLoading(true);
       const token = getAuthToken();
 
-      // Get default check-in and check-out times if not set
-      const defaultCheckIn = formData.checkInTime || '14:00:00';
-      const defaultCheckOut = formData.checkOutTime || '12:00:00';
-
       const response = await axios.post(
-        `${API_URL}/property`,
+        `${API_URL}/property/${user.id}`,
         {
-          user_id: user.id,
-          check_in_time: defaultCheckIn,
-          check_out_time: defaultCheckOut,
-          min_guest_age: 18,
-          guest_profile_rules: {
-            unmarried_couples_allowed: false,
-            male_only_groups_allowed: true,
-            scanty_baggage_allowed: false
-          },
-          smoking_alcohol_rules: {
-            smoking_allowed: false,
-            alcohol_allowed: false
-          },
-          food_rules: {
-            rules: JSON.stringify({
-              non_veg_allowed: true,
-              outside_food_allowed: true
-            })
-          },
-          food_delivery_options: {
-            options: JSON.stringify({
-              service_name: "All"
-            })
-          },
-          accessibility_rules: {
-            rules: JSON.stringify({
-              wheelchair_accessible: false,
-              wheelchair_provided: false
-            })
-          },
-          pet_policy: {
-            pets_allowed: false,
-            pets_on_property: JSON.stringify([])
-          },
-          extra_bed_policy: {
-            policy: JSON.stringify({
-              mattress_cost_child: 0,
-              mattress_cost_adult: 0,
-              cot_cost: 0
-            })
-          },
-          additional_rules: {
-            rule_description: JSON.stringify({
-              languages: formData.languages,
-              other_language: formData.otherLanguage
-            })
-          }
+          // Must Read Rules
+          checkInTime: formData.checkInTime,
+          checkOutTime: formData.checkOutTime,
+          minAge: formData.minAge,
+          acceptedIds: formData.acceptedIds,
+
+          // Guest Profile
+          unmarriedCouplesAllowed: formData.unmarriedCouplesAllowed,
+          maleOnlyGroupsAllowed: formData.maleOnlyGroupsAllowed,
+          scantyBaggageAllowed: formData.scantyBaggageAllowed,
+
+          // Smoking & Alcohol
+          smokingAllowed: formData.smokingAllowed,
+          alcoholAllowed: formData.alcoholAllowed,
+
+          // Food Arrangement
+          nonVegAllowed: formData.nonVegAllowed,
+          outsideFoodAllowed: formData.outsideFoodAllowed,
+          foodDeliveryOptions: formData.foodDeliveryOptions,
+
+          // Property Accessibility
+          wheelchairAccessible: formData.wheelchairAccessible,
+          wheelchairProvided: formData.wheelchairProvided,
+
+          // Pet Policy
+          petsAllowed: formData.petsAllowed,
+          petsOnProperty: formData.petsOnProperty,
+
+          // Child & Extra Bed Policy
+          extraMattressChildCost: formData.extraMattressChildCost,
+          extraMattressAdultCost: formData.extraMattressAdultCost,
+          extraCotCost: formData.extraCotCost,
+
+          // Other Rules
+          otherRules: formData.otherRules
         },
         {
           headers: {
@@ -633,7 +654,7 @@ const CreateNewListing = () => {
           progress: undefined,
         });
         setStep(step + 1);
-        setCompletedSteps(prev => new Set([...prev, 5]));
+        return true;
       } else {
         toast.error(response.data.message || 'Failed to save property rules. Please try again.', {
           position: "top-right",
@@ -644,6 +665,7 @@ const CreateNewListing = () => {
           draggable: true,
           progress: undefined,
         });
+        return false;
       }
     } catch (error) {
       console.error('Error saving property rules:', error);
@@ -656,6 +678,7 @@ const CreateNewListing = () => {
         draggable: true,
         progress: undefined,
       });
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -679,8 +702,12 @@ const CreateNewListing = () => {
       await saveRoomPhotos();
       setCompletedSteps(prev => new Set([...prev, 4]));
     } else if (step === 5) {
-      // Save language preferences when in step 5
-      await saveLanguagePreferences();
+      // Save property rules when in step 5
+      const success = await savePropertyRules();
+      if (success) {
+        setCompletedSteps(prev => new Set([...prev, 5]));
+        setStep(step + 1);
+      }
     } else if (step < 11) {
       setStep(step + 1);
     } else {
@@ -736,7 +763,7 @@ const CreateNewListing = () => {
         case 4:
           return <Step4 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
         case 5:
-          return <Step5 formData={formData} setFormData={setFormData} languages={languages} isEditing={isEditing} />;
+          return <Step5 formData={formData} setFormData={setFormData} languages={languages} isEditing={isEditing} savePropertyRules={savePropertyRules} />;
         case 6:
           return <Step6 formData={formData} setFormData={setFormData} isEditing={isEditing} />;
         case 7:
