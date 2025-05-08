@@ -139,12 +139,7 @@ const CreateNewListing = () => {
       name: '',
       floor: '',
       bhk: '',
-      capacity: '',
-      bedType: '',
-      hasBathroom: false,
-      hasBalcony: false,
-      balconyView: '',
-      facilities: []
+     
     }],
 
     // Step 4: Room Photos
@@ -481,11 +476,7 @@ const CreateNewListing = () => {
             floor: room.floor,
             room_type: room.bhk,
             number_of_rooms: 1, // Assuming 1 room per entry
-            capacity: room.capacity,
-            bed_type: room.bedType,
-            has_attached_bathroom: room.hasBathroom,
-            has_balcony: room.hasBalcony,
-            facilities: room.facilities
+           
           },
           {
             headers: {

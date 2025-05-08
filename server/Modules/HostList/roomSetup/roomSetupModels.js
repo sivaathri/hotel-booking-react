@@ -23,20 +23,20 @@ class Room {
       floor,
       room_type,
       number_of_rooms,
-      capacity,
+     
     } = data;
   
     const [result] = await db.query(
       `INSERT INTO room_setup 
-      (user_id, property_id, floor, room_type, number_of_rooms, capacity) 
-      VALUES (?, ?, ?, ?, ?, ?)`,
+      (user_id, property_id, floor, room_type, number_of_rooms) 
+      VALUES (?, ?, ?, ?, ?)`,
       [
         user_id,
         property_id,
         floor,
         room_type,
         number_of_rooms,
-        capacity,
+      
       ]
     );
     return result.insertId;
@@ -48,27 +48,18 @@ class Room {
       floor,
       room_type,
       number_of_rooms,
-      capacity,
-      bed_type,
-      has_attached_bathroom,
-      has_balcony,
-      facilities
+  
     } = data;
 
     const [result] = await db.query(
-      `UPDATE room_setup SET user_id = ?, floor = ?, room_type = ?, number_of_rooms = ?, capacity = ?, 
-      bed_type = ?, has_attached_bathroom = ?, has_balcony = ?, facilities = ?
+      `UPDATE room_setup SET user_id = ?, floor = ?, room_type = ?, number_of_rooms = ? 
+      
       WHERE room_id = ?`,
       [
         user_id,
         floor,
         room_type,
         number_of_rooms,
-        capacity,
-        bed_type,
-        has_attached_bathroom,
-        has_balcony,
-        facilities,
         room_id
       ]
     );
