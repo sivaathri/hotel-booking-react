@@ -5,35 +5,48 @@ import HostHeader from './HostHeader';
 import { API_URL } from '../../config/api.config';
 import { getAuthToken } from '../../utils/getAuthToken';
 import axios from 'axios';
+import { useUser } from '../../context/UserContext';
 
 const Listings = () => {
+  const { user } = useUser();
   const navigate = useNavigate();
   const token = getAuthToken();
   const [propertydetails, setpropertydetails] = useState([]);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
-  const getPropertyDetails = async () => {
-    if (!token) {
-      alert('Please log in to continue');
-      return;
-    }
-
-    try {
-      const response = await axios.get(`${API_URL}/basicInfo/properties`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (Array.isArray(response.data.data)) {
-        setpropertydetails(response.data.data);
-      } else {
-        console.error('Expected an array but got:', response.data);
+  useEffect(() => {
+    const fetchPropertyDetails = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const response = await axios.get(`http://localhost:3000/api/getall/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        // Handle the nested data structure
+        if (response.data.success && response.data.data) {
+          // Convert the single property object to an array if it's not already
+          const propertyData = Array.isArray(response.data.data) 
+            ? response.data.data 
+            : [response.data.data];
+            
+          // Parse the image_paths string to array if it exists
+          const propertiesWithParsedImages = propertyData.map(property => ({
+            ...property,
+            images: property.image_paths ? JSON.parse(property.image_paths) : []
+          }));
+          
+          setpropertydetails(propertiesWithParsedImages);
+          console.log('Property Details:', propertiesWithParsedImages);
+        }
+      } catch (error) {
+        console.error('Error fetching property details:', error);
       }
-    } catch (error) {
-      console.error('Error fetching property details:', error);
-    }
-  };
+    };
+
+    fetchPropertyDetails();
+  }, [token, user?.id]);
 
   const handleDeleteProperty = async (propertyId) => {
     if (!window.confirm('Are you sure you want to delete this property?')) {
@@ -53,10 +66,6 @@ const Listings = () => {
       alert('Failed to delete property. Please try again.');
     }
   };
-
-  useEffect(() => {
-    getPropertyDetails();
-  }, []);
 
   return (
     <>
@@ -141,7 +150,48 @@ const Listings = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/host/edit-listing/${property.id}`);
+                          navigate(`/host/edit-listing/${property.property_id}`, {
+                            state: {
+                              propertyData: {
+                                ...property,
+                                // Parse any JSON strings to objects
+                                occupancy_price_adjustments: property.occupancy_price_adjustments 
+                                  ? JSON.parse(property.occupancy_price_adjustments) 
+                                  : [],
+                                images: property.image_paths 
+                                  ? JSON.parse(property.image_paths) 
+                                  : [],
+                                // Convert numeric strings to numbers
+                                base_price: parseFloat(property.base_price),
+                                min_guest_age: parseInt(property.min_guest_age),
+                                total_capacity: parseInt(property.total_capacity),
+                                number_of_rooms: parseInt(property.number_of_rooms),
+                                // Convert boolean strings to actual booleans
+                                instant_booking: Boolean(property.instant_booking),
+                                manual_approval: Boolean(property.manual_approval),
+                                instant_payment_enabled: Boolean(property.instant_payment_enabled),
+                                free_cancellation_enabled: Boolean(property.free_cancellation_enabled),
+                                // Convert refund policy
+                                refund_policy: {
+                                  policy1: {
+                                    refundable: Boolean(property.refundable1),
+                                    days_before: parseInt(property.days_before1),
+                                    refund_percent: property.refund_percent1 ? parseInt(property.refund_percent1) : null
+                                  },
+                                  policy2: {
+                                    refundable: Boolean(property.refundable2),
+                                    days_before: parseInt(property.days_before2),
+                                    refund_percent: property.refund_percent2 ? parseInt(property.refund_percent2) : null
+                                  },
+                                  policy3: {
+                                    refundable: Boolean(property.refundable3),
+                                    days_before: parseInt(property.days_before3),
+                                    refund_percent: property.refund_percent3 ? parseInt(property.refund_percent3) : null
+                                  }
+                                }
+                              }
+                            }
+                          });
                         }}
                         className="p-2 bg-white rounded-full shadow-sm hover:shadow-md transition"
                       >
@@ -215,7 +265,51 @@ const Listings = () => {
                       </h3>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => navigate(`/host/edit-listing/${property.id}`)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/host/edit-listing/${property.property_id}`, {
+                              state: {
+                                propertyData: {
+                                  ...property,
+                                  // Parse any JSON strings to objects
+                                  occupancy_price_adjustments: property.occupancy_price_adjustments 
+                                    ? JSON.parse(property.occupancy_price_adjustments) 
+                                    : [],
+                                  images: property.image_paths 
+                                    ? JSON.parse(property.image_paths) 
+                                    : [],
+                                  // Convert numeric strings to numbers
+                                  base_price: parseFloat(property.base_price),
+                                  min_guest_age: parseInt(property.min_guest_age),
+                                  total_capacity: parseInt(property.total_capacity),
+                                  number_of_rooms: parseInt(property.number_of_rooms),
+                                  // Convert boolean strings to actual booleans
+                                  instant_booking: Boolean(property.instant_booking),
+                                  manual_approval: Boolean(property.manual_approval),
+                                  instant_payment_enabled: Boolean(property.instant_payment_enabled),
+                                  free_cancellation_enabled: Boolean(property.free_cancellation_enabled),
+                                  // Convert refund policy
+                                  refund_policy: {
+                                    policy1: {
+                                      refundable: Boolean(property.refundable1),
+                                      days_before: parseInt(property.days_before1),
+                                      refund_percent: property.refund_percent1 ? parseInt(property.refund_percent1) : null
+                                    },
+                                    policy2: {
+                                      refundable: Boolean(property.refundable2),
+                                      days_before: parseInt(property.days_before2),
+                                      refund_percent: property.refund_percent2 ? parseInt(property.refund_percent2) : null
+                                    },
+                                    policy3: {
+                                      refundable: Boolean(property.refundable3),
+                                      days_before: parseInt(property.days_before3),
+                                      refund_percent: property.refund_percent3 ? parseInt(property.refund_percent3) : null
+                                    }
+                                  }
+                                }
+                              }
+                            });
+                          }}
                           className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
                         >
                           <FiEdit2 className="text-gray-600" />
