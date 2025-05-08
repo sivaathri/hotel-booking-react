@@ -326,10 +326,16 @@ const CreateNewListing = () => {
   
       if (response.data.success) {
         // Store the property_id in formData
+        const property_id = response.data.data.property_id;
+        console.log('Received property_id:', property_id); // Debug log
+        
         setFormData(prev => ({
           ...prev,
-          property_id: response.data.data.property_id
+          property_id: property_id
         }));
+
+        // Verify property_id was set
+        console.log('Updated formData:', { ...formData, property_id }); // Debug log
 
         toast.success('Basic information saved successfully!', {
           position: "top-right",
@@ -632,59 +638,65 @@ const CreateNewListing = () => {
       setIsLoading(true);
       const token = getAuthToken();
 
+      // Validate property_id exists
+      if (!formData.property_id) {
+        toast.error('Property ID is missing. Please complete Step 1 first.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return false;
+      }
+
       // Format the data according to the database schema
       const propertyData = {
+        property_id: formData.property_id,
+        user_id: user.id,
         // Basic property rules
-       
         check_in_time: formData.checkInTime,
         check_out_time: formData.checkOutTime,
         min_guest_age: formData.minAge,
 
-        // ID proofs
-        proof_type: formData.acceptedIds,
+        // ID proof - take the first selected ID type
+        proof_type: formData.acceptedIds[0] || null,
 
         // Guest profile rules
-       
-          unmarried_couples_allowed: formData.unmarriedCouplesAllowed,
-          male_only_groups_allowed: formData.maleOnlyGroupsAllowed,
-          scanty_baggage_allowed: formData.scantyBaggageAllowed,
-      
+        unmarried_couples_allowed: formData.unmarriedCouplesAllowed,
+        male_only_groups_allowed: formData.maleOnlyGroupsAllowed,
+        scanty_baggage_allowed: formData.scantyBaggageAllowed,
 
         // Smoking & alcohol rules
-       
-          smoking_allowed: formData.smokingAllowed,
-          alcohol_allowed: formData.alcoholAllowed
-        ,
+        smoking_allowed: formData.smokingAllowed,
+        alcohol_allowed: formData.alcoholAllowed,
 
         // Food rules
-       
-          non_veg_allowed: formData.nonVegAllowed,
-          outside_food_allowed: formData.outsideFoodAllowed
-        ,
-        food_delivery: formData.foodDeliveryOptions,
+        non_veg_allowed: formData.nonVegAllowed,
+        outside_food_allowed: formData.outsideFoodAllowed,
+        // Take the first food delivery service if any are selected
+        food_delivery_service: formData.foodDeliveryOptions[0] || null,
 
         // Accessibility rules
-       
-          wheelchair_accessible: formData.wheelchairAccessible,
-          wheelchair_provided: formData.wheelchairProvided
-        ,
+        wheelchair_accessible: formData.wheelchairAccessible,
+        wheelchair_provided: formData.wheelchairProvided,
 
         // Pet policy
-       
-          pets_allowed: formData.petsAllowed,
-          pets_on_property: formData.petsOnProperty
-        ,
+        pets_allowed: formData.petsAllowed,
+        pets_on_property: formData.petsOnProperty,
 
         // Extra bed policy
-       
-          mattress_cost_child: formData.extraMattressChildCost,
-          mattress_cost_adult: formData.extraMattressAdultCost,
-          cot_cost: formData.extraCotCost
-        ,
+        mattress_cost_child: formData.extraMattressChildCost,
+        mattress_cost_adult: formData.extraMattressAdultCost,
+        cot_cost: formData.extraCotCost,
 
         // Additional rules
         rule_description: formData.otherRules
       };
+
+      console.log('Sending property rules data:', propertyData); // Debug log
 
       const response = await axios.post(
         `${API_URL}/property/rules/create/${user.id}`,
@@ -722,7 +734,12 @@ const CreateNewListing = () => {
       }
     } catch (error) {
       console.error('Error saving property rules:', error);
-      toast.error(error.response?.data?.message || 'An error occurred while saving. Please try again.', {
+      // More detailed error message
+      const errorMessage = error.response?.data?.message || 
+        (error.response?.status === 404 ? 'Property not found. Please complete Step 1 first.' : 
+        'An error occurred while saving. Please try again.');
+      
+      toast.error(errorMessage, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,

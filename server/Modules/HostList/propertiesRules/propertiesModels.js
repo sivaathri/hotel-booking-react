@@ -23,7 +23,7 @@ class PropertyRules {
   // Create new rules
   static async createRules(user_id, data) {
     const fields = [
-      "user_id", "check_in_time", "check_out_time", "min_guest_age", "proof_type",
+      "property_id", "user_id", "check_in_time", "check_out_time", "min_guest_age", "proof_type",
       "unmarried_couples_allowed", "male_only_groups_allowed", "scanty_baggage_allowed",
       "smoking_allowed", "alcohol_allowed", "non_veg_allowed", "outside_food_allowed",
       "food_delivery_service", "wheelchair_accessible", "wheelchair_provided",
@@ -31,7 +31,11 @@ class PropertyRules {
       "cot_cost", "rule_description"
     ];
 
-    const values = fields.map(field => field === "user_id" ? user_id : data[field] ?? null);
+    const values = fields.map(field => {
+      if (field === "user_id") return user_id;
+      if (field === "property_id") return data.property_id;
+      return data[field] ?? null;
+    });
 
     const placeholders = fields.map(() => "?").join(", ");
     const sql = `INSERT INTO property_rules (${fields.join(", ")}) VALUES (${placeholders})`;
