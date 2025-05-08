@@ -863,6 +863,115 @@ const CreateNewListing = () => {
     }
   };
 
+  const saveRoomPricing = async () => {
+    try {
+      setIsLoading(true);
+      const token = getAuthToken();
+
+      if (!formData.property_id) {
+        toast.error('Property ID is missing. Please complete Step 1 first.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return false;
+      }
+
+      // Process each room's pricing data
+      const roomPricingPromises = formData.rooms.map(async (room) => {
+        // Calculate total capacity from individual room capacities
+        const totalCapacity = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => sum + capacity, 0) || (room.capacity * room.numberOfRooms);
+
+        // Format occupancy price adjustments
+        const occupancyPriceAdjustments = (room.occupancyRanges || []).map(range => ({
+          minGuests: range.minGuests,
+          maxGuests: range.maxGuests,
+          adjustment: range.value,
+          type: range.type
+        }));
+
+        const pricingData = {
+          property_id: formData.property_id,
+          floor: room.floor,
+          room_type: room.bhk,
+          number_of_rooms: room.numberOfRooms,
+          total_capacity: totalCapacity,
+          base_price: parseFloat(room.pricePerNight),
+          occupancy_price_adjustments: JSON.stringify(occupancyPriceAdjustments),
+          instant_payment_enabled: formData.instantPayment || false,
+          free_cancellation_enabled: formData.freeCancellation || false,
+          // Refund Policy 1 - Fully Refundable
+          refundable1: formData.refundPolicies?.[0]?.type === 'Fully Refundable',
+          days_before1: formData.refundPolicies?.[0]?.daysBeforeCheckIn || null,
+          refund_percent1: formData.refundPolicies?.[0]?.percentage || null,
+          // Refund Policy 2 - Partially Refundable
+          refundable2: formData.refundPolicies?.[1]?.type === 'Partial Refund',
+          days_before2: formData.refundPolicies?.[1]?.daysBeforeCheckIn || null,
+          refund_percent2: formData.refundPolicies?.[1]?.percentage || null,
+          // Refund Policy 3 - Non-Refundable
+          refundable3: formData.refundPolicies?.[2]?.type === 'Non-refundable',
+          days_before3: formData.refundPolicies?.[2]?.daysBeforeCheckIn || null,
+          refund_percent3: formData.refundPolicies?.[2]?.percentage || null
+        };
+
+        const response = await axios.post(
+          `${API_URL}/roomPricing/create`,
+          pricingData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        return response.data;
+      });
+
+      const results = await Promise.all(roomPricingPromises);
+      
+      if (results.every(result => result.success)) {
+        toast.success('Room pricing saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return true;
+      } else {
+        toast.error('Failed to save some room pricing details. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving room pricing:', error);
+      toast.error(error.response?.data?.message || 'An error occurred while saving. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       // Save basic information when in step 1
@@ -892,6 +1001,13 @@ const CreateNewListing = () => {
       const success = await saveFacilities();
       if (success) {
         setCompletedSteps(prev => new Set([...prev, 6]));
+        setStep(step + 1);
+      }
+    } else if (step === 7) {
+      // Save room pricing when in step 7
+      const success = await saveRoomPricing();
+      if (success) {
+        setCompletedSteps(prev => new Set([...prev, 7]));
         setStep(step + 1);
       }
     } else if (step < 11) {
