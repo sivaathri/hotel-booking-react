@@ -44,7 +44,6 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
         floor: details.floor || '',
         bhk: type,
         numberOfRooms: details.numberOfRooms || '',
-        capacity: details.capacity || '',
         bedType: details.bedType || '',
         hasBathroom: details.hasBathroom || false,
         hasBalcony: details.hasBalcony || false,
@@ -171,17 +170,6 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
                     disabled={!isEditing}
                     className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     placeholder="e.g. 2, 3, 4"
-                  />
-                </div>
-                <div className="flex-1 min-w-[180px]">
-                  <label className="block text-sm font-medium mb-2">Capacity for Each rooms</label>
-                  <input
-                    type="number"
-                    value={roomDetails[type]?.capacity || ''}
-                    onChange={e => handleDetailChange(type, 'capacity', e.target.value)}
-                    disabled={!isEditing}
-                    className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                    placeholder="Number of guests"
                   />
                 </div>
               </div>

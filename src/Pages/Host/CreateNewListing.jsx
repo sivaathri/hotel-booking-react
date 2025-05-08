@@ -972,6 +972,89 @@ const CreateNewListing = () => {
     }
   };
 
+  const saveGuestBookingPreferences = async () => {
+    try {
+      setIsLoading(true);
+      const token = getAuthToken();
+
+      if (!formData.property_id) {
+        toast.error('Property ID is missing. Please complete Step 1 first.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return false;
+      }
+
+      const bookingPreferencesData = {
+        property_id: formData.property_id,
+        description: formData.description || '',
+        nearest_beach_distance: formData.nearestBeachDistance || 0,
+        nearest_railway_station_distance: formData.nearestRailwayStationDistance || 0,
+        nearest_airport_distance: formData.nearestAirportDistance || 0,
+        nearest_bus_stand_distance: formData.nearestBusStandDistance || 0,
+        can_book_married_couples: formData.allowedGuests?.includes('Married Couples') || false,
+        can_book_families: formData.allowedGuests?.includes('Families') || false,
+        can_book_solo_travelers: formData.allowedGuests?.includes('Solo Travelers') || false,
+        can_book_friends: formData.allowedGuests?.includes('Friends') || false,
+        instant_booking: formData.instantBooking || false,
+        manual_approval: formData.manualApproval || false
+      };
+
+      const response = await axios.post(
+        `${API_URL}/propertyDetails/create-or-update`,
+        bookingPreferencesData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Guest booking preferences saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return true;
+      } else {
+        toast.error(response.data.message || 'Failed to save guest booking preferences. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving guest booking preferences:', error);
+      toast.error(error.response?.data?.message || 'An error occurred while saving. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       // Save basic information when in step 1
@@ -1008,6 +1091,13 @@ const CreateNewListing = () => {
       const success = await saveRoomPricing();
       if (success) {
         setCompletedSteps(prev => new Set([...prev, 7]));
+        setStep(step + 1);
+      }
+    } else if (step === 8) {
+      // Save guest booking preferences when in step 8
+      const success = await saveGuestBookingPreferences();
+      if (success) {
+        setCompletedSteps(prev => new Set([...prev, 8]));
         setStep(step + 1);
       }
     } else if (step < 11) {

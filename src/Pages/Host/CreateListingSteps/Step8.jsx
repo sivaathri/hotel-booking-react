@@ -43,7 +43,7 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
       <Card title="Distance" className="mb-6">
         <Form.Item label="How many kilometers to the nearest beach?">
           <InputNumber
-            value={formData.beachDistance}
+            value={formData.beachDistance || 0}
             onChange={(value) => setFormData(prev => ({ ...prev, beachDistance: value }))}
             disabled={!isEditing}
             min={0}
@@ -55,7 +55,7 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
         </Form.Item>
         <Form.Item label="How many kilometers to the nearest railway station?">
           <InputNumber
-            value={formData.railwayDistance}
+            value={formData.railwayDistance || 0}
             onChange={(value) => setFormData(prev => ({ ...prev, railwayDistance: value }))}
             disabled={!isEditing}
             min={0}
@@ -67,7 +67,7 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
         </Form.Item>
         <Form.Item label="How many kilometers to the nearest airport?">
           <InputNumber
-            value={formData.airportDistance}
+            value={formData.airportDistance || 0}
             onChange={(value) => setFormData(prev => ({ ...prev, airportDistance: value }))}
             disabled={!isEditing}
             min={0}
@@ -79,7 +79,7 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
         </Form.Item>
         <Form.Item label="How many kilometers to the nearest bus stand?">
           <InputNumber
-            value={formData.busStandDistance}
+            value={formData.busStandDistance || 0}
             onChange={(value) => setFormData(prev => ({ ...prev, busStandDistance: value }))}
             disabled={!isEditing}
             min={0}
