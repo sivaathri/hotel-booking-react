@@ -754,6 +754,124 @@ const CreateNewListing = () => {
     }
   };
 
+  const saveFacilities = async () => {
+    try {
+      setIsLoading(true);
+      const token = getAuthToken();
+
+      if (!formData.property_id) {
+        toast.error('Property ID is missing. Please complete Step 1 first.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return false;
+      }
+
+      // Create facilities object from formData with exact database column names
+      const facilitiesData = {
+        gym: formData.gym || false,
+        swimming_pool: formData.swimmingPool || false,
+        spa: formData.spa || false,
+        restaurant: formData.restaurant || false,
+        room_service_24hr: formData.roomService || false,
+        lounge: formData.lounge || false,
+        steam_sauna: formData.steamSauna || false,
+        bar: formData.bar || false,
+        free_parking: formData.freeParking || false,
+        free_wifi: formData.freeWifi || false,
+        refrigerator: formData.refrigerator || false,
+        laundry_service: formData.laundryService || false,
+        housekeeping: formData.housekeeping || false,
+        air_conditioning: formData.airConditioning || false,
+        power_backup: formData.powerBackup || false,
+        ev_charging: formData.evCharging || false,
+        smoke_detector: formData.smokeDetector || false,
+        umbrellas: formData.umbrellas || false,
+        elevator: formData.elevator || false,
+        paid_lan: formData.paidLan || false,
+        dining_area: formData.diningArea || false,
+        cafe_24hr: formData.cafe24h || false,
+        barbeque: formData.barbeque || false,
+        bakery: formData.bakery || false,
+        coffee_shop_24hr: formData.coffeeShop24h || false,
+        fire_extinguishers: formData.fireExtinguishers || false,
+        cctv: formData.cctv || false,
+        security_alarms: formData.securityAlarms || false,
+        reflexology: formData.reflexology || false,
+        first_aid: formData.firstAid || false,
+        tv: formData.tv || false,
+        luggage_storage: formData.luggageStorage || false,
+        wake_up_call: formData.wakeupCall || false,
+        concierge: formData.concierge || false,
+        doctor_on_call: formData.doctorOnCall || false,
+        wheelchair: formData.wheelchair || false,
+        luggage_assistance: formData.luggageAssistance || false,
+        bellboy_service: formData.bellboyService || false,
+        accessible_facilities: formData.disabledFacilities || false,
+        pool_beach_towels: formData.poolTowels || false,
+        multilingual_staff: formData.multilingualStaff || false,
+        massage: formData.massage || false,
+        printer: formData.printer || false,
+        photocopying: formData.photocopying || false,
+        conference_room: formData.conferenceRoom || false,
+        banquet: formData.banquet || false
+      };
+
+      const response = await axios.post(
+        `${API_URL}/amenities/facilities/${formData.property_id}`,
+        facilitiesData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Facilities saved successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return true;
+      } else {
+        toast.error(response.data.message || 'Failed to save facilities. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving facilities:', error);
+      toast.error(error.response?.data?.message || 'An error occurred while saving. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       // Save basic information when in step 1
@@ -776,6 +894,13 @@ const CreateNewListing = () => {
       const success = await savePropertyRules();
       if (success) {
         setCompletedSteps(prev => new Set([...prev, 5]));
+        setStep(step + 1);
+      }
+    } else if (step === 6) {
+      // Save facilities when in step 6
+      const success = await saveFacilities();
+      if (success) {
+        setCompletedSteps(prev => new Set([...prev, 6]));
         setStep(step + 1);
       }
     } else if (step < 11) {
