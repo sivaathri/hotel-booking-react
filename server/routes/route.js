@@ -13,7 +13,7 @@ const roomSetupRoutes = require('../Modules/HostList/roomSetup/roomSetupRoutes')
 const getall = require('../Modules/HostList/getAll/getAllRoutes');
 const uploadImagesRoutes = require('../Modules/HostList/UploadImages/UploadImagesRoutes');
 const property = require ('../Modules/HostList/propertiesRules/propertiesRoutes')
-
+const amenitiesRoutes = require('../Modules/HostList/amenities/routes');
 // API Routes
 router.use('/auth', userRoutes)
 router.use('/basicInfo', basicInfoRoutes)
@@ -22,6 +22,7 @@ router.use('/roomSetup', roomSetupRoutes)
 router.use('/getall', getall)   
 router.use('/uploadImages', uploadImagesRoutes)
 router.use('/property', property)
+router.use('/amenities', amenitiesRoutes)
 
 
 
