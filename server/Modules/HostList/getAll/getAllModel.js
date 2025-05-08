@@ -36,25 +36,34 @@ class GetAllInfo {
 
     static async getCombinedInfoById(id) {
         try {
-            // Get basic info
-            const basicInfo = await BasicInfo.getPropertyById(id);
+            const query = `
+                SELECT 
+                    bi.*,
+                    fa.*,
+                    ld.*,
+                    pd.*,
+                    pr.*,
+                    ri.*,
+                    rpa.*,
+                    rs.*
+                FROM basic_info bi
+                LEFT JOIN facilities_amenities fa ON bi.property_id = fa.property_id
+                LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
+                LEFT JOIN property_details pd ON bi.property_id = pd.property_id
+                LEFT JOIN property_rules pr ON bi.property_id = pr.property_id AND bi.user_id = pr.user_id
+                LEFT JOIN room_images ri ON bi.property_id = ri.property_id
+                LEFT JOIN room_pricing_availability rpa ON bi.property_id = rpa.property_id
+                LEFT JOIN room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
+                WHERE bi.user_id = ?
+            `;
             
-            if (!basicInfo) {
+            const [results] = await db.query(query, [id]);
+            
+            if (!results || results.length === 0) {
                 return null;
             }
             
-            // Get location details using user_id instead of id
-            const locationDetails = await LocationDetails.getLocationDetailsByUserId(basicInfo.user_id);
-            
-            // Get rooms
-            const rooms = await Room.getRoomsByUserId(basicInfo.user_id);
-            
-            // Combine the data
-            return {
-                ...basicInfo,
-                location: locationDetails || null,
-                rooms: rooms || []
-            };
+            return results[0];
         } catch (error) {
             console.error('Error getting combined info by ID:', error);
             throw error;

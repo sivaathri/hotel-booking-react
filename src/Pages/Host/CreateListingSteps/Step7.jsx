@@ -172,7 +172,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => sum + capacity, 0) || (room.capacity * room.numberOfRooms)} guests
+                    {Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => sum + capacity, 0) || (room.capacity * room.numberOfRooms) || 0} guests
                   </td>
                   <td className="px-6 py-4">
                     <input

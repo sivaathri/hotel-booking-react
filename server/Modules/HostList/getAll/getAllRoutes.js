@@ -6,4 +6,10 @@ router.get('/all', getAllcontroller.getallinfo);
 router.get('/:id', getAllcontroller.getHostById);
 router.put('/:id', getAllcontroller.updateHost);
 
+
+
+
+
+
+
 module.exports = router;   
