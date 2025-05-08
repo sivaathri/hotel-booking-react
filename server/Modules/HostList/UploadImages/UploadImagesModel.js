@@ -3,7 +3,19 @@ const db = require("../../../config/db");
 class UploadImagesModel {
     static async saveImages(roomId, imagePaths) {
         try {
-            // First, check if there's already an entry for this room
+            // First, get the property_id from room_setup
+            const [room] = await db.query(
+                'SELECT property_id FROM room_setup WHERE room_id = ?',
+                [roomId]
+            );
+
+            if (!room || room.length === 0) {
+                throw new Error('Room not found');
+            }
+
+            const property_id = room[0].property_id;
+
+            // Check if there's already an entry for this room
             const checkQuery = `
                 SELECT id, image_paths 
                 FROM room_images 
@@ -26,10 +38,10 @@ class UploadImagesModel {
             } else {
                 // Create new record
                 const insertQuery = `
-                    INSERT INTO room_images (room_id, image_paths)
-                    VALUES (?, ?)
+                    INSERT INTO room_images (room_id, property_id, image_paths)
+                    VALUES (?, ?, ?)
                 `;
-                const [result] = await db.query(insertQuery, [roomId, JSON.stringify(imagePaths)]);
+                const [result] = await db.query(insertQuery, [roomId, property_id, JSON.stringify(imagePaths)]);
                 return { id: result.insertId, updated: false };
             }
         } catch (error) {
