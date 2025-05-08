@@ -3,7 +3,7 @@ const LocationDetails = require('./locationDetailsModels');
 const locationDetailsController = {
     createLocation: async (req, res) => {
         try {
-            const { addressLine1, addressLine2, city, state_province, country, postalCode, latitude, longitude } = req.body;
+            const { addressLine1, addressLine2, city, state_province, country, postalCode, latitude, longitude, property_id } = req.body;
             const userId = req.params.userId;
 
             // Validate required fields
@@ -55,9 +55,16 @@ const locationDetailsController = {
                     message: "User ID is required"
                 });
             }
+            if (!property_id) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Property ID is required"
+                });
+            }
 
             const locationData = {
                 userId: userId,
+                property_id: property_id,
                 addressLine1: addressLine1,
                 addressLine2: addressLine2 || null,
                 city: city,

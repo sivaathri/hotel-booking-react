@@ -236,7 +236,8 @@ const CreateNewListing = () => {
       expiryDate: '',
       cvv: ''
     },
-    roomIds: []
+    roomIds: [],
+    property_id: null
   });
 
   const propertyTypes = [
@@ -324,6 +325,12 @@ const CreateNewListing = () => {
       );
   
       if (response.data.success) {
+        // Store the property_id in formData
+        setFormData(prev => ({
+          ...prev,
+          property_id: response.data.data.property_id
+        }));
+
         toast.success('Basic information saved successfully!', {
           position: "top-right",
           autoClose: 3000,
@@ -366,8 +373,22 @@ const CreateNewListing = () => {
       setIsLoading(true);
       const token = getAuthToken();
 
+      if (!formData.property_id) {
+        toast.error('Property ID is missing. Please complete Step 1 first.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
+
       // Ensure all required fields are present and not null
       const locationData = {
+        property_id: formData.property_id,
         addressLine1: formData.addressLine1 || '',
         addressLine2: formData.addressLine2 || '',
         city: formData.city || '',
@@ -431,11 +452,25 @@ const CreateNewListing = () => {
       setIsLoading(true);
       const token = getAuthToken();
 
+      if (!formData.property_id) {
+        toast.error('Property ID is missing. Please complete Step 1 first.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
+
       // Process each room in the formData
       const roomPromises = formData.rooms.map(async (room) => {
         const response = await axios.post(
           `${API_URL}/roomSetup/`,
           {
+            property_id: formData.property_id,
             user_id: user.id,
             floor: room.floor,
             room_type: room.bhk,

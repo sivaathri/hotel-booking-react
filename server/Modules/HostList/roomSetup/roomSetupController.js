@@ -25,6 +25,28 @@ const getRoomById = async (req, res) => {
 // POST create room
 const createRoom = async (req, res) => {
   try {
+    const { property_id, user_id, floor, room_type, number_of_rooms, capacity } = req.body;
+
+    // Validate required fields
+    if (!property_id) {
+      return res.status(400).json({ message: 'Property ID is required' });
+    }
+    if (!user_id) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    if (!floor) {
+      return res.status(400).json({ message: 'Floor is required' });
+    }
+    if (!room_type) {
+      return res.status(400).json({ message: 'Room type is required' });
+    }
+    if (!number_of_rooms) {
+      return res.status(400).json({ message: 'Number of rooms is required' });
+    }
+    if (!capacity) {
+      return res.status(400).json({ message: 'Capacity is required' });
+    }
+
     const insertId = await Room.createRoom(req.body);
     res.status(201).json({ success: true, insertId });
   } catch (error) {

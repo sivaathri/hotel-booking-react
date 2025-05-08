@@ -48,10 +48,11 @@ class LocationDetails {
 
       const [result] = await db.query(
         `INSERT INTO location_details 
-        (user_id, address_line1, address_line2, city, state_province, country, postal_code, latitude, longitude) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (user_id, property_id, address_line1, address_line2, city, state_province, country, postal_code, latitude, longitude) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           locationData.userId,
+          locationData.property_id,
           locationData.addressLine1,
           locationData.addressLine2 || null,
           locationData.city,

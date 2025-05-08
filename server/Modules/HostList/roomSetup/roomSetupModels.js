@@ -19,26 +19,24 @@ class Room {
   static async createRoom(data) {
     const {
       user_id,
+      property_id,
       floor,
       room_type,
       number_of_rooms,
       capacity,
-    
     } = data;
-  
-    
   
     const [result] = await db.query(
       `INSERT INTO room_setup 
-      (user_id, floor, room_type, number_of_rooms, capacity) 
-      VALUES (?, ?, ?, ?, ?)`,
+      (user_id, property_id, floor, room_type, number_of_rooms, capacity) 
+      VALUES (?, ?, ?, ?, ?, ?)`,
       [
         user_id,
+        property_id,
         floor,
         room_type,
         number_of_rooms,
         capacity,
-      
       ]
     );
     return result.insertId;
