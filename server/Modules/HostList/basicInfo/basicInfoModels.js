@@ -14,7 +14,7 @@ class BasicInfo {
     }
 
     const [rows] = await db.query(
-      'SELECT * FROM basic_info WHERE id = ?',
+      'SELECT * FROM basic_info WHERE property_id = ?',
       [parseInt(id)]
     );
 
@@ -28,7 +28,7 @@ class BasicInfo {
   // Check if property name exists
   static async checkPropertyNameExists(property_name) {
     const [rows] = await db.query(
-      'SELECT id FROM basic_info WHERE property_name = ?',
+      'SELECT property_id FROM basic_info WHERE property_name = ?',
       [property_name]
     );
     return rows.length > 0;
@@ -51,11 +51,12 @@ class BasicInfo {
     );
     
     return {
-      id: result.insertId,
+      property_id: result.insertId,
       user_id,
       property_name,
       property_type,
-    }
+    };
+    
   }
 
   // Update property by ID
@@ -66,7 +67,7 @@ class BasicInfo {
 
     // First check if property exists and get current data
     const [existingProperty] = await db.query(
-      'SELECT * FROM basic_info WHERE id = ?',
+      'SELECT * FROM basic_info WHERE property_id = ?',
       [parseInt(id)]
     );
 
@@ -81,7 +82,7 @@ class BasicInfo {
     // Only check for duplicate name if name is being updated
     if (updates.property_name) {
       const [existing] = await db.query(
-        'SELECT id FROM basic_info WHERE property_name = ? AND id != ?',
+        'SELECT property_id FROM basic_info WHERE property_name = ? AND property_id != ?',
         [property_name, id]
       );
       
@@ -99,7 +100,7 @@ class BasicInfo {
     }
 
     const [result] = await db.query(
-      `UPDATE basic_info SET property_name = ?, property_type = ? WHERE id = ?`,
+      `UPDATE basic_info SET property_name = ?, property_type = ? WHERE property_id = ?`,
       [property_name, property_type, parseInt(id)]
     );
     
@@ -109,7 +110,7 @@ class BasicInfo {
 
     // Get the updated property
     const [updated] = await db.query(
-      'SELECT * FROM basic_info WHERE id = ?',
+      'SELECT * FROM basic_info WHERE property_id = ?',
       [parseInt(id)]
     );
     
@@ -119,7 +120,7 @@ class BasicInfo {
   // Delete property by ID
   static async deletePropertyById(id) {
     const [result] = await db.query(
-      'DELETE FROM basic_info WHERE id = ?',
+      'DELETE FROM basic_info WHERE property_id = ?',
       [id]
     );
     
