@@ -106,6 +106,22 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
     }));
   };
 
+  const handleRoomCapacityChange = (index, roomNumber, value) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      rooms: prev.rooms.map((room, i) =>
+        i === index ? {
+          ...room,
+          individualRoomCapacities: {
+            ...(room.individualRoomCapacities || {}),
+            [roomNumber]: parseInt(value)
+          }
+        } : room
+      )
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Pricing & Availability</h2>
@@ -143,8 +159,9 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                             <input
                               type="number"
                               value={currentCapacity}
-                              disabled={true}
-                              className="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
+                              onChange={(e) => handleRoomCapacityChange(index, roomNumber, e.target.value)}
+                              disabled={!isEditing}
+                              className={`w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
                               min="1"
                               max={room.capacity}
                             />
