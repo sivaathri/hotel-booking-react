@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import {
   Home,
   Calendar,
@@ -97,6 +98,7 @@ const PropertyCard = ({ property }) => (
 
 const HostUserDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
 
   const stats = [
     { title: 'Total Properties', value: '5', icon: Home, trend: '+2 this month', color: 'text-blue-500' },
@@ -119,6 +121,20 @@ const HostUserDashboard = () => {
       amount: '12,500',
       dates: '22-25 Mar 2024',
       status: 'Pending'
+    },
+    {
+      guestName: 'Mike Johnson',
+      propertyName: 'City Center Apartment',
+      amount: '8,000',
+      dates: '28-30 Mar 2024',
+      status: 'Cancelled'
+    },
+    {
+      guestName: 'Mike Johnson',
+      propertyName: 'City Center Apartment',
+      amount: '8,000',
+      dates: '28-30 Mar 2024',
+      status: 'Cancelled'
     },
     {
       guestName: 'Mike Johnson',
@@ -206,7 +222,7 @@ const HostUserDashboard = () => {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                 <div className="space-y-4">
-                  <button className="w-full px-4 py-3 bg-[#FF5A5F] text-white rounded-lg hover:bg-[#FF5A5F]/90 transition-colors">
+                  <button className="w-full px-4 py-3 bg-[#FF5A5F] text-white rounded-lg hover:bg-[#FF5A5F]/90 transition-colors" onClick={() => navigate('/listings')}>
                     Add New Property
                   </button>
                   <button className="w-full px-4 py-3 bg-white border border-[#FF5A5F] text-[#FF5A5F] rounded-lg hover:bg-[#FF5A5F]/5 transition-colors">
@@ -230,6 +246,7 @@ const HostUserDashboard = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="flex flex-col items-center justify-center bg-white rounded-xl shadow-sm p-6 border-2 border-dashed border-gray-300 hover:border-[#FF5A5F] transition-colors"
+              onClick={() => navigate('/listings')}
             >
               <Home className="w-12 h-12 text-gray-400 mb-2" />
               <span className="text-gray-600 font-medium">Add New Property</span>
