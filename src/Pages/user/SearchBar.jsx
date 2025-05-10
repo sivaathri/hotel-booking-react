@@ -27,9 +27,9 @@ export default function SearchBar() {
     <div className="bg-gradient-to-r from-gray-900 mt-1 to-gray-800 text-white py-8">
       <div className="container mx-auto px-4">
         <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Destination */}
-            <div className="group">
+            <div className="group md:col-span-3">
               <label className="block mb-2 text-sm font-medium text-gray-200">Where do you want to stay?</label>
               <div className="relative">
                 <input
@@ -44,7 +44,7 @@ export default function SearchBar() {
             </div>
 
             {/* Check-in */}
-            <div className="group">
+            <div className="group md:col-span-2">
               <label className="block mb-2 text-sm font-medium text-gray-200">Check-in</label>
               <div className="relative">
                 <input
@@ -58,7 +58,7 @@ export default function SearchBar() {
             </div>
 
             {/* Check-out */}
-            <div className="group">
+            <div className="group md:col-span-2">
               <label className="block mb-2 text-sm font-medium text-gray-200">Check-out</label>
               <div className="relative">
                 <input
@@ -72,7 +72,7 @@ export default function SearchBar() {
             </div>
 
             {/* Guests */}
-            <div className="relative group">
+            <div className="relative group md:col-span-3">
               <label className="block mb-2 text-sm font-medium text-gray-200">Guests and rooms</label>
               <div
                 className="relative w-full p-3 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl flex justify-between items-center cursor-pointer hover:border-blue-500 transition-all duration-300"
@@ -134,7 +134,7 @@ export default function SearchBar() {
             </div>
 
             {/* Search Button */}
-            <div className="flex items-end">
+            <div className="flex items-end md:col-span-2">
               <button className="w-full mb-2 h-[46px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
                 <Search className="h-5 w-5 mr-2" />
                 Search
