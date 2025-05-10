@@ -113,9 +113,42 @@ const deleteHost = async (req, res) => {
     }
 };
 
+const getPropertyById = async (req, res) => {
+    try {
+        const { propertyId } = req.params;
+        
+        if (!propertyId) {
+            return res.status(400).json({
+                success: false,
+                message: "Property ID is required"
+            });
+        }
+
+        const property = await GetAllInfo.getCombinedInfoBypropertyId(propertyId);
+        
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: property
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     getallinfo,
     getHostById,
     updateHost,
-    deleteHost
+    deleteHost,
+    getPropertyById
 };
