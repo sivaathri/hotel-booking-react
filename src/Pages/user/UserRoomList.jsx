@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, MapPin, Calendar, Users, Star, Coffee, CheckCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import Header from './Header';
+import PriceMapPage from '../PriceMapPage';
 
 export default function UserRoomList() {
   const [destination, setDestination] = useState('Pondicherry');
@@ -15,7 +16,15 @@ export default function UserRoomList() {
     breakfast: false,
     beachfront: false,
     earlyBird: false,
-    priceRange: [0, 15000]
+    priceRange: [0, 15000],
+    starRating: [],
+    propertyType: [],
+    wifi: false,
+    pool: false,
+    parking: false,
+    ac: false,
+    spa: false,
+    gym: false
   });
 
   const hotels = [
@@ -77,7 +86,29 @@ export default function UserRoomList() {
     { id: 'breakfast', label: 'Breakfast Included', count: 342 },
     { id: 'meal-plan', label: 'Breakfast + Lunch/Dinner Included', count: 10 },
     { id: 'beachfront', label: 'Beachfront', count: 8 },
-    { id: 'couples', label: 'Allows Unmarried Couples', count: 344 }
+    { id: 'couples', label: 'Allows Unmarried Couples', count: 344 },
+    { id: 'wifi', label: 'Free WiFi', count: 412 },
+    { id: 'pool', label: 'Swimming Pool', count: 156 },
+    { id: 'parking', label: 'Free Parking', count: 289 },
+    { id: 'ac', label: 'Air Conditioning', count: 478 },
+    { id: 'spa', label: 'Spa & Wellness', count: 89 },
+    { id: 'gym', label: 'Fitness Center', count: 123 }
+  ];
+
+  const starRatingOptions = [
+    { id: '5-star', label: '5 Star', count: 12 },
+    { id: '4-star', label: '4 Star', count: 45 },
+    { id: '3-star', label: '3 Star', count: 78 },
+    { id: '2-star', label: '2 Star', count: 92 },
+    { id: '1-star', label: '1 Star', count: 34 }
+  ];
+
+  const propertyTypeOptions = [
+    { id: 'hotel', label: 'Hotels', count: 234 },
+    { id: 'resort', label: 'Resorts', count: 56 },
+    { id: 'guesthouse', label: 'Guest Houses', count: 89 },
+    { id: 'apartment', label: 'Apartments', count: 45 },
+    { id: 'villa', label: 'Villas', count: 23 }
   ];
 
   const handleGuestChange = (type, value) => {
@@ -263,6 +294,52 @@ export default function UserRoomList() {
               ))}
             </div>
 
+            {/* Star Rating */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg">
+              <h3 className="text-lg font-bold mb-4 text-gray-800">Star Rating</h3>
+              {starRatingOptions.map((option) => (
+                <div key={option.id} className="flex items-center mb-3">
+                  <input
+                    type="checkbox"
+                    id={option.id}
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked={filters.starRating.includes(option.id)}
+                    onChange={() => {
+                      const newStarRating = filters.starRating.includes(option.id)
+                        ? filters.starRating.filter(id => id !== option.id)
+                        : [...filters.starRating, option.id];
+                      setFilters({ ...filters, starRating: newStarRating });
+                    }}
+                  />
+                  <label htmlFor={option.id} className="ml-3 flex-grow text-gray-700">{option.label}</label>
+                  <span className="text-gray-500 text-sm">({option.count})</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Property Type */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg">
+              <h3 className="text-lg font-bold mb-4 text-gray-800">Property Type</h3>
+              {propertyTypeOptions.map((option) => (
+                <div key={option.id} className="flex items-center mb-3">
+                  <input
+                    type="checkbox"
+                    id={option.id}
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked={filters.propertyType.includes(option.id)}
+                    onChange={() => {
+                      const newPropertyType = filters.propertyType.includes(option.id)
+                        ? filters.propertyType.filter(id => id !== option.id)
+                        : [...filters.propertyType, option.id];
+                      setFilters({ ...filters, propertyType: newPropertyType });
+                    }}
+                  />
+                  <label htmlFor={option.id} className="ml-3 flex-grow text-gray-700">{option.label}</label>
+                  <span className="text-gray-500 text-sm">({option.count})</span>
+                </div>
+              ))}
+            </div>
+
             {/* Price Range */}
             <div className="bg-white p-6 rounded-2xl shadow-lg">
               <h3 className="text-lg font-bold mb-4 text-gray-800">Price per night</h3>
@@ -281,7 +358,7 @@ export default function UserRoomList() {
           </div>
 
           {/* Hotel Listings - Middle */}
-          <div className="w-full lg:w-2/4">
+          <div className="w-full h-50px lg:w-2/4">
             {hotels.map((hotel) => (
               <div key={hotel.id} className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                 <div className="flex flex-col">
@@ -375,33 +452,7 @@ export default function UserRoomList() {
 
           {/* Map Column - Right */}
           <div className="w-full lg:w-1/3 bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="relative h-full min-h-[800px]">
-              {/* Placeholder map */}
-              <div className="absolute inset-0 bg-gray-200">
-                <div className="h-full w-full relative">
-                  <img
-                    src="/api/placeholder/400/700"
-                    alt="Map of Pondicherry"
-                    className="w-full h-full object-cover"
-                  />
-
-                  {/* Price markers on map */}
-                  <div className="absolute top-1/4 left-1/4 bg-white shadow-lg rounded-lg px-3 py-1.5 text-sm font-bold">₹5,499</div>
-                  <div className="absolute top-1/2 left-1/3 bg-white shadow-lg rounded-lg px-3 py-1.5 text-sm font-bold">₹7,299</div>
-                  <div className="absolute bottom-1/4 right-1/4 bg-white shadow-lg rounded-lg px-3 py-1.5 text-sm font-bold">₹11,585</div>
-
-                  {/* Map controls */}
-                  <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    <button className="bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors duration-300">
-                      <ChevronUp className="h-5 w-5 text-gray-600" />
-                    </button>
-                    <button className="bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors duration-300">
-                      <ChevronDown className="h-5 w-5 text-gray-600" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+           <PriceMapPage/>
           </div>
         </div>
       </div>
