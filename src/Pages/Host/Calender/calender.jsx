@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import HostHeader from '../HostHeader';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Users, X } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Users, X, Settings, Home } from 'lucide-react';
 import moment from 'moment';
 
 const Calender = () => {
@@ -16,7 +16,214 @@ const Calender = () => {
         rooms: 1
     });
     const [showOccupancyModal, setShowOccupancyModal] = useState(false);
+    const [showOccupancySettingsModal, setShowOccupancySettingsModal] = useState(false);
+    const [showRoomSettingsModal, setShowRoomSettingsModal] = useState(false);
     const calendarRef = useRef(null);
+
+    // Room and pricing data
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const [rooms, setRooms] = useState([
+        {
+            id: 1,
+            name: "2BHK",
+            basePrice: 7500,
+            occupancyAdjustments: [
+                { minGuests: 1, maxGuests: 3, adjustment: 3000 },
+                { minGuests: 1, maxGuests: 4, adjustment: 4000 },
+                { minGuests: 1, maxGuests: 6, adjustment: 6000 }
+            ]
+        }
+    ]);
+
+    // Calculate total price based on occupancy and room
+    const calculateTotalPrice = (date) => {
+        if (!selectedRoom) return 0;
+        
+        const totalGuests = occupancy.adults + occupancy.children;
+        let price = selectedRoom.basePrice;
+
+        // Find applicable occupancy adjustment
+        const adjustment = selectedRoom.occupancyAdjustments.find(adj => 
+            totalGuests >= adj.minGuests && totalGuests <= adj.maxGuests
+        );
+
+        if (adjustment) {
+            price = adjustment.adjustment;
+        }
+
+        // Add any date-specific price adjustments
+        const dateStr = date.format('YYYY-MM-DD');
+        if (priceAdjustments[dateStr]) {
+            price = parseInt(priceAdjustments[dateStr]);
+        }
+
+        return price;
+    };
+
+    const handleRoomChange = (roomId) => {
+        const room = rooms.find(r => r.id === roomId);
+        setSelectedRoom(room);
+    };
+
+    const handleRoomSettingsChange = (roomId, field, value) => {
+        setRooms(prevRooms => 
+            prevRooms.map(room => 
+                room.id === roomId 
+                    ? { ...room, [field]: value }
+                    : room
+            )
+        );
+    };
+
+    const handleOccupancyAdjustmentChange = (roomId, index, field, value) => {
+        setRooms(prevRooms => 
+            prevRooms.map(room => {
+                if (room.id === roomId) {
+                    const newAdjustments = [...room.occupancyAdjustments];
+                    newAdjustments[index] = {
+                        ...newAdjustments[index],
+                        [field]: parseInt(value)
+                    };
+                    return { ...room, occupancyAdjustments: newAdjustments };
+                }
+                return room;
+            })
+        );
+    };
+
+    const addOccupancyAdjustment = (roomId) => {
+        setRooms(prevRooms => 
+            prevRooms.map(room => {
+                if (room.id === roomId) {
+                    return {
+                        ...room,
+                        occupancyAdjustments: [
+                            ...room.occupancyAdjustments,
+                            { minGuests: 1, maxGuests: 2, adjustment: 0 }
+                        ]
+                    };
+                }
+                return room;
+            })
+        );
+    };
+
+    const removeOccupancyAdjustment = (roomId, index) => {
+        setRooms(prevRooms => 
+            prevRooms.map(room => {
+                if (room.id === roomId) {
+                    return {
+                        ...room,
+                        occupancyAdjustments: room.occupancyAdjustments.filter((_, i) => i !== index)
+                    };
+                }
+                return room;
+            })
+        );
+    };
+
+    const renderRoomSettingsModal = () => (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Room Price Settings</h3>
+                    <button
+                        onClick={() => setShowRoomSettingsModal(false)}
+                        className="text-gray-500 hover:text-gray-700"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="space-y-6">
+                    {rooms.map(room => (
+                        <div key={room.id} className="border rounded-lg p-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <h4 className="font-medium text-lg">{room.name}</h4>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Base Price (₹)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={room.basePrice}
+                                    onChange={(e) => handleRoomSettingsChange(room.id, 'basePrice', parseInt(e.target.value))}
+                                    className="w-full p-2 border rounded"
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <h4 className="font-medium">Occupancy Adjustments</h4>
+                                    <button
+                                        onClick={() => addOccupancyAdjustment(room.id)}
+                                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    >
+                                        Add Adjustment
+                                    </button>
+                                </div>
+
+                                {room.occupancyAdjustments.map((adjustment, index) => (
+                                    <div key={index} className="flex items-center space-x-4 p-4 border rounded">
+                                        <div className="flex-1">
+                                            <label className="block text-sm text-gray-600 mb-1">Min Guests</label>
+                                            <input
+                                                type="number"
+                                                value={adjustment.minGuests}
+                                                onChange={(e) => handleOccupancyAdjustmentChange(room.id, index, 'minGuests', e.target.value)}
+                                                className="w-full p-2 border rounded"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="block text-sm text-gray-600 mb-1">Max Guests</label>
+                                            <input
+                                                type="number"
+                                                value={adjustment.maxGuests}
+                                                onChange={(e) => handleOccupancyAdjustmentChange(room.id, index, 'maxGuests', e.target.value)}
+                                                className="w-full p-2 border rounded"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="block text-sm text-gray-600 mb-1">Price (₹)</label>
+                                            <input
+                                                type="number"
+                                                value={adjustment.adjustment}
+                                                onChange={(e) => handleOccupancyAdjustmentChange(room.id, index, 'adjustment', e.target.value)}
+                                                className="w-full p-2 border rounded"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => removeOccupancyAdjustment(room.id, index)}
+                                            className="p-2 text-red-600 hover:text-red-800"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-6 flex justify-end space-x-2">
+                    <button
+                        onClick={() => setShowRoomSettingsModal(false)}
+                        className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => setShowRoomSettingsModal(false)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -180,7 +387,7 @@ const Calender = () => {
             const isInRange = selectedDates.length === 2 && 
                 date.isBetween(selectedDates[0], selectedDates[1], 'day', '[]');
             const isPast = date.isBefore(today, 'day');
-            const hasPriceAdjustment = priceAdjustments[date.format('YYYY-MM-DD')];
+            const price = calculateTotalPrice(date);
 
             days.push(
                 <div
@@ -194,11 +401,14 @@ const Calender = () => {
                 >
                     <div className="flex justify-between items-start">
                         <span className="text-sm">{day}</span>
-                        {hasPriceAdjustment && (
-                            <span className="text-xs bg-green-100 text-green-800 px-1 rounded">
-                                ₹{hasPriceAdjustment}
+                        <div className="flex flex-col items-end">
+                            <span className="text-xs bg-green-100 text-green-800 px-1 rounded mb-1">
+                                ₹{price}
                             </span>
-                        )}
+                            <span className="text-xs text-gray-500">
+                                {occupancy.adults + occupancy.children} guests
+                            </span>
+                        </div>
                     </div>
                     {!isPast && (
                         <button
@@ -231,6 +441,27 @@ const Calender = () => {
                 <div className="bg-white rounded-lg shadow-lg p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-semibold text-gray-900">Calendar & Pricing</h2>
+                        <div className="flex items-center space-x-4">
+                            <select
+                                value={selectedRoom?.id || ''}
+                                onChange={(e) => handleRoomChange(parseInt(e.target.value))}
+                                className="p-2 border rounded"
+                            >
+                                <option value="">Select Room</option>
+                                {rooms.map(room => (
+                                    <option key={room.id} value={room.id}>
+                                        {room.name} - ₹{room.basePrice}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                onClick={() => setShowRoomSettingsModal(true)}
+                                className="p-2 text-blue-600 hover:text-blue-800"
+                                title="Manage Room Prices"
+                            >
+                                <Home className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Booking.com style search bar */}
@@ -329,6 +560,8 @@ const Calender = () => {
                     </div>
                 </div>
             )}
+
+            {showRoomSettingsModal && renderRoomSettingsModal()}
         </div>
     );
 };
