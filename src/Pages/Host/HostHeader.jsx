@@ -1,20 +1,24 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useUser } from '../../context/UserContext';
 import {
-
   Settings,
   MessageSquare,
-
   Bell
 } from 'lucide-react';
+
 const HostHeader = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, logout } = useUser();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     window.location.href = '/';
+  };
+
+  const isActive = (path) => {
+    return location.pathname === path;
   };
 
   return (
@@ -22,17 +26,37 @@ const HostHeader = () => {
       <nav className="flex items-center justify-between px-6 py-4">
         <div className="bg-white p-0">
           {/* Header Start */}
-          <Link to="/listings" className="navbar-brand w-10 h-10 ml-5 mt-2 p-0 d-flex">
+          <Link to="/" className="navbar-brand w-10 h-10 ml-5 mt-2 p-0 d-flex">
             <h1 className="m-0 text-primary text-uppercase">Hotelier</h1>
           </Link>
         </div>
 
         {/* Navigation Links */}
         <div className="flex items-center space-x-10 text-center ml-48">
-          <Link to="/hostuserdashboard" className="text-black hover:text-black">Dashboard</Link>
-          <Link to="/calender" className="text-black hover:text-black">Calendar</Link>
-          <Link to="/listings" className="text-black hover:text-black">Listings</Link>
-          <Link to="/messages" className="text-black hover:text-black">Messages</Link>
+          <Link 
+            to="/hostuserdashboard" 
+            className={`text-black hover:text-black ${isActive('/hostuserdashboard') ? 'font-bold border-b-2 border-black' : ''}`}
+          >
+            Dashboard
+          </Link>
+          <Link 
+            to="/calender" 
+            className={`text-black hover:text-black ${isActive('/calender') ? 'font-bold border-b-2 border-black' : ''}`}
+          >
+            Calendar
+          </Link>
+          <Link 
+            to="/listings" 
+            className={`text-black hover:text-black ${isActive('/listings') ? 'font-bold border-b-2 border-black' : ''}`}
+          >
+            Listings
+          </Link>
+          <Link 
+            to="/messages" 
+            className={`text-black hover:text-black ${isActive('/messages') ? 'font-bold border-b-2 border-black' : ''}`}
+          >
+            Messages
+          </Link>
         </div>
         <div className="flex items-center space-x-4">
           <button className="p-2 text-gray-500 hover:text-gray-700">

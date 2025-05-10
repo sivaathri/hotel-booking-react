@@ -222,7 +222,7 @@ const HostUserDashboard = () => {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                 <div className="space-y-4">
-                  <button className="w-full px-4 py-3 bg-[#FF5A5F] text-white rounded-lg hover:bg-[#FF5A5F]/90 transition-colors" onClick={() => navigate('/listings')}>
+                  <button className="w-full px-4 py-3 bg-[#FF5A5F] text-white rounded-lg hover:bg-[#FF5A5F]/90 transition-colors" onClick={() => navigate('/create-listing')}>
                     Add New Property
                   </button>
                   <button className="w-full px-4 py-3 bg-white border border-[#FF5A5F] text-[#FF5A5F] rounded-lg hover:bg-[#FF5A5F]/5 transition-colors">
