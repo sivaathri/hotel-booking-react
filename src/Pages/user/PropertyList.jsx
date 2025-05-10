@@ -1,6 +1,9 @@
 import { CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function PropertyList({ properties, loading, error }) {
+  const navigate = useNavigate();
+
   // Helper function to calculate GST
   const calculateGST = (price) => {
     // Convert price to number and handle invalid values
@@ -45,7 +48,11 @@ export default function PropertyList({ properties, loading, error }) {
         const gst = calculateGST(basePrice);
         
         return (
-          <div key={property.property_id} className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6">
+          <div
+            key={property.property_id}
+            className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6 cursor-pointer"
+            onClick={() => navigate(`/property/${property.property_id}`)}
+          >
             {/* Image Gallery */}
             <div className="relative w-full md:w-1/3">
               <img 

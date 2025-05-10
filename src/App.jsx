@@ -39,6 +39,8 @@ import PriceMapPage from './Pages/PriceMapPage';
 import Calender from './Pages/Host/Calender/calender';
 // Protected Routes
 import ProtectedRoute from './components/ProtectedRoute';
+import PropertyDetails from './Pages/user/PropertyDetails';
+
 
 function App() {
   return (
@@ -111,6 +113,7 @@ function App() {
           />
 
 
+<Route path="/property/:propertyId" element={<PropertyDetails />} />
 
           <Route path="/admin/customers" element={<CustomersList />} />
           <Route path="/admin/invoices" element={<InvoiceList />} />
