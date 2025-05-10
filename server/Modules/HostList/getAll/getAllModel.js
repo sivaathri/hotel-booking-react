@@ -7,35 +7,43 @@ class GetAllInfo {
     static async getAllCombinedInfo(userId) {
         try {
             const query = `
-                SELECT 
-                    bi.*,
-                    fa.*,
-                    ld.*,
-                    pd.*,
-                    pr.*,
-                    ri.*,
-                    rpa.*,
-                    rs.*
-                FROM basic_info bi
-                LEFT JOIN facilities_amenities fa ON bi.property_id = fa.property_id
-                LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
-                LEFT JOIN property_details pd ON bi.property_id = pd.property_id
-                LEFT JOIN property_rules pr ON bi.property_id = pr.property_id AND bi.user_id = pr.user_id
-                LEFT JOIN room_images ri ON bi.property_id = ri.property_id
-                LEFT JOIN room_pricing_availability rpa ON bi.property_id = rpa.property_id
-                LEFT JOIN room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
-                WHERE bi.user_id = ?
+               SELECT 
+    bi.*,                      -- All columns from basic_info
+    fa.*,                      -- All columns from facilities_amenities
+    ld.*,                      -- All columns from location_details
+    pd.*,                      -- All columns from property_details
+    pr.*,                      -- All columns from property_rules
+    ri.*,                      -- All columns from room_images
+    rpa.*,                     -- All columns from room_pricing_availability
+    rs.*                       -- All columns from room_setup
+FROM 
+    basic_info bi
+LEFT JOIN 
+    facilities_amenities fa ON bi.property_id = fa.property_id
+LEFT JOIN 
+    location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
+LEFT JOIN 
+    property_details pd ON bi.property_id = pd.property_id
+LEFT JOIN 
+    property_rules pr ON bi.property_id = pr.property_id AND bi.user_id = pr.user_id
+LEFT JOIN 
+    room_images ri ON bi.property_id = ri.property_id
+LEFT JOIN 
+    room_pricing_availability rpa ON bi.property_id = rpa.property_id
+LEFT JOIN 
+    room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id;
+
             `;
-            
+
             const [results] = await db.query(query, [userId]);
-            
+
             if (!results || results.length === 0) {
                 return [];
             }
 
             // Group results by property_id
             const propertiesMap = new Map();
-            
+
             results.forEach(result => {
                 if (!propertiesMap.has(result.property_id)) {
                     propertiesMap.set(result.property_id, {
@@ -193,16 +201,16 @@ class GetAllInfo {
                 LEFT JOIN room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
                 WHERE bi.user_id = ?
             `;
-            
+
             const [results] = await db.query(query, [id]);
-            
+
             if (!results || results.length === 0) {
                 return null;
             }
 
             // Group results by property_id
             const propertiesMap = new Map();
-            
+
             results.forEach(result => {
                 if (!propertiesMap.has(result.property_id)) {
                     propertiesMap.set(result.property_id, {
@@ -359,16 +367,16 @@ class GetAllInfo {
                 LEFT JOIN room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
                 WHERE bi.property_id = ?
             `;
-            
+
             const [results] = await db.query(query, [id]);
-            
+
             if (!results || results.length === 0) {
                 return null;
             }
 
             // Group results by property_id
             const propertiesMap = new Map();
-            
+
             results.forEach(result => {
                 if (!propertiesMap.has(result.property_id)) {
                     propertiesMap.set(result.property_id, {
@@ -507,7 +515,7 @@ class GetAllInfo {
         try {
             // Get the current host info to ensure it exists
             const currentHost = await this.getCombinedInfoById(id);
-            
+
             if (!currentHost) {
                 return null;
             }
@@ -547,7 +555,7 @@ class GetAllInfo {
         try {
             // Get the current host info to ensure it exists
             const currentHost = await this.getCombinedInfoById(id);
-            
+
             if (!currentHost) {
                 return null;
             }
