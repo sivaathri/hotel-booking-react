@@ -1,9 +1,9 @@
 import React from 'react';
 import PriceMap from '../components/PriceMap';
 
-const PriceMapPage = () => {
+const PriceMapPage = ({ properties }) => {
   return (
-    <PriceMap />
+    <PriceMap properties={properties} />
   );
 };
 

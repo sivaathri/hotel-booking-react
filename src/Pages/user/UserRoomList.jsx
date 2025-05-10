@@ -228,7 +228,7 @@ export default function UserRoomList() {
 
           {/* Map Column - Right */}
           <div className="w-full lg:w-1/3 bg-white rounded-2xl shadow-lg overflow-hidden">
-            <PriceMapPage />
+            <PriceMapPage  properties={properties}/>
           </div>
         </div>
       </div>

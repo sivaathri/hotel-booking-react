@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icons
+// Fix default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -11,12 +11,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const prices = [
-  { lat: 11.9404, lng: 79.8083, price: '₹1,300', name: 'Hotel A' },
-  { lat: 11.9435, lng: 79.8195, price: '₹3,392', name: 'Hotel B' },
-];
-
-const PriceMap = () => {
+const PriceMap = ({ properties }) => {
   const createCustomIcon = (price) => {
     return L.divIcon({
       className: 'custom-div-icon',
@@ -24,7 +19,7 @@ const PriceMap = () => {
                <span class="text-[#FF5A5F] font-medium">${price}</span>
              </div>`,
       iconSize: [60, 20],
-      iconAnchor: [30, 10]
+      iconAnchor: [30, 10],
     });
   };
 
@@ -33,29 +28,38 @@ const PriceMap = () => {
       <MapContainer 
         center={[11.9404, 79.8083]} 
         zoom={13} 
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {prices.map((place, index) => (
-          <Marker 
-            key={index} 
-            position={[place.lat, place.lng]}
-            icon={createCustomIcon(place.price)}
-          >
-            <Popup>
-              <div className="font-medium">
-                <p className="text-lg">{place.name}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+
+        {properties.map((property, index) => {
+          const lat = parseFloat(property.location.latitude);
+          const lng = parseFloat(property.location.longitude);
+          const price = `₹${property.room?.base_price || '0'}`;
+          const name = property.property_name;
+
+          return (
+            <Marker 
+              key={index} 
+              position={[lat, lng]}
+              icon={createCustomIcon(price)}
+            >
+              <Popup>
+                <div className="font-medium">
+                  <p className="text-lg">{name}</p>
+                  <p className="text-sm">{price}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );
 };
 
-export default PriceMap; 
+export default PriceMap;
