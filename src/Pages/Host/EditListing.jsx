@@ -19,6 +19,19 @@ import Step10 from './CreateListingSteps/Step10';
 const EditListing = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  
+  // Add debug logging
+  console.log('Route params:', useParams());
+  console.log('Property ID from params:', id);
+
+  // Add early return if no id
+  if (!id) {
+    console.error('No property ID found in URL parameters');
+    toast.error('Invalid property ID');
+    navigate('/host/listings');
+    return null;
+  }
+
   const [step, setStep] = useState(1);
   const [showMap, setShowMap] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -140,9 +153,15 @@ const EditListing = () => {
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
+        console.log('Property ID:', id); // Debug log
+        if (!id) {
+          toast.error('Property ID is missing');
+          navigate('/host/listings');
+          return;
+        }
         setIsLoading(true);
         const token = getAuthToken();
-        const response = await axios.get(`${API_URL}/getall/${id}`, {
+        const response = await axios.get(`${API_URL}/getall/property/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
