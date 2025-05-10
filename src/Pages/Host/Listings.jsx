@@ -230,7 +230,10 @@ const Listings = () => {
                     <div className="flex items-center gap-1 text-gray-500 mt-1">
                       <FiMapPin className="text-sm" />
                       <span className="text-sm truncate">
-                        {property.location || `${property.city || ''}, ${property.state || ''}`}
+                        {property.location ? 
+                          `${property.location.address_line1}, ${property.location.city}, ${property.location.state_province}` :
+                          `${property.city || ''}, ${property.state || ''}`
+                        }
                       </span>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">{property.property_type}</p>
@@ -329,7 +332,10 @@ const Listings = () => {
                     <div className="flex items-center gap-1 text-gray-500 mt-1">
                       <FiMapPin className="text-sm" />
                       <span>
-                        {property.location || `${property.city || ''}, ${property.state || ''}`}
+                        {property.location ? 
+                          `${property.location.address_line1}, ${property.location.city}, ${property.location.state_province}` :
+                          `${property.city || ''}, ${property.state || ''}`
+                        }
                       </span>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">{property.property_type}</p>
