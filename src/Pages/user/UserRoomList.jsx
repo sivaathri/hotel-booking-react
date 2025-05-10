@@ -358,93 +358,68 @@ export default function UserRoomList() {
           </div>
 
           {/* Hotel Listings - Middle */}
-          <div className="w-full h-50px lg:w-2/4">
+          <div className="w-full h-40px lg:w-4/5">
             {hotels.map((hotel) => (
-              <div key={hotel.id} className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-                <div className="flex flex-col">
-                  {/* Hotel Header */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold flex items-center text-gray-800">
-                        {hotel.name}
-                        {Array(hotel.rating).fill().map((_, i) => (
-                          <span key={i} className="text-yellow-400 ml-1">★</span>
-                        ))}
-                      </h3>
-                      <p className="text-gray-600 mt-1">{hotel.location}</p>
-                    </div>
+              <div key={hotel.id} className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6">
+                {/* Image Gallery */}
+                <div className="relative w-full md:w-1/3">
+                  <img src="/api/placeholder/400/320" alt="Hotel Main" className="w-full h-40 object-cover rounded-xl" />
+                  <div className="absolute bottom-2 left-2 flex gap-2">
+                    {/* Thumbnails */}
+                    <img src="/api/placeholder/80/60" className="w-12 h-8 object-cover rounded" />
+                    <img src="/api/placeholder/80/60" className="w-12 h-8 object-cover rounded" />
+                    <img src="/api/placeholder/80/60" className="w-12 h-8 object-cover rounded" />
+                    <div className="w-12 h-8 bg-black/60 text-white flex items-center justify-center rounded text-xs font-bold cursor-pointer">View All</div>
+                  </div>
+                  {/* Sponsored & MMT Luxe Badges */}
+                  <div className="absolute top-2 left-2 flex gap-2">
+                    <span className="bg-gray-800/90 text-white text-xs px-2 py-1 rounded font-semibold">SPONSORED</span>
+                    <span className="bg-yellow-200 text-yellow-900 text-xs px-2 py-1 rounded font-semibold border border-yellow-400">MMT Luxe</span>
+                  </div>
+                </div>
 
-                    <div className="bg-blue-50 p-3 rounded-xl">
-                      <div className="flex items-center">
-                        <div className="mr-3">
-                          <p className="font-bold text-sm text-blue-800">{hotel.reviewText}</p>
-                          <p className="text-xs text-blue-600">({hotel.reviewCount} reviews)</p>
-                        </div>
-                        <div className="bg-blue-600 text-white font-bold rounded-lg p-2 text-sm">
-                          {hotel.reviewScore}
-                        </div>
-                      </div>
+                {/* Hotel Info */}
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xl font-bold text-gray-800">Radisson Resort Pondicherry Bay</h3>
+                      <span className="text-yellow-400 text-lg">★★★★★</span>
+                    </div>
+                    <a href="#" className="text-blue-600 hover:underline text-sm">Central Pondicherry</a>
+                    <div className="flex gap-2 mt-2">
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-xs font-medium">Couple Friendly</span>
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      <div className="flex items-center text-green-600 text-sm"><CheckCircle className="h-4 w-4 mr-1" /> Free Cancellation</div>
+                      <div className="flex items-center text-green-600 text-sm"><CheckCircle className="h-4 w-4 mr-1" /> Book with ₹0 Payment</div>
+                      <div className="flex items-center text-green-600 text-sm"><CheckCircle className="h-4 w-4 mr-1" /> Breakfast Included</div>
+                    </div>
+                    <div className="flex items-center text-amber-600 mt-2 text-sm">
+                      <Coffee className="h-4 w-4 mr-1" /> Complimentary Hi tea once during the stay
                     </div>
                   </div>
-
-                  {/* Room Image */}
-                  <div className="relative w-full h-64 mb-4">
-                    <img
-                      src="/api/placeholder/400/320"
-                      alt={`${hotel.name} Room`}
-                      className="w-full h-full object-cover rounded-xl"
-                    />
-                    {hotel.sponsored && (
-                      <div className="absolute top-3 left-3 bg-gray-800/90 text-white text-xs px-3 py-1.5 rounded-full font-medium">
-                        SPONSORED
+                  {/* Review Section */}
+                  <div className="flex items-center mt-4">
+                    <div className="bg-blue-50 p-3 rounded-xl flex items-center">
+                      <div className="mr-3">
+                        <p className="font-bold text-sm text-blue-800">Excellent</p>
+                        <p className="text-xs text-blue-600">(886 Ratings)</p>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Room Info */}
-                  <div className="flex justify-between">
-                    <div className="w-2/3">
-                      {/* Amenities */}
-                      <div className="grid grid-cols-2 gap-2">
-                        {hotel.amenities.slice(0, 4).map((amenity, idx) => (
-                          <div key={idx} className="flex items-center text-green-600">
-                            <CheckCircle className="h-5 w-5 mr-2" />
-                            <span className="text-sm font-medium">{amenity}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {hotel.extraInfo && (
-                        <div className="flex items-center text-amber-600 mt-3">
-                          <Coffee className="h-5 w-5 mr-2" />
-                          <span className="text-sm font-medium">{hotel.extraInfo}</span>
-                        </div>
-                      )}
-
-                      {hotel.tags && (
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {hotel.tags.map((tag, idx) => (
-                            <span key={idx} className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full font-medium">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Price */}
-                    <div className="text-right">
-                      {hotel.originalPrice && (
-                        <p className="text-gray-500 line-through text-sm">₹{hotel.originalPrice.toLocaleString()}</p>
-                      )}
-                      <p className="text-3xl font-bold text-gray-800">₹{hotel.price.toLocaleString()}</p>
-                      <p className="text-sm text-gray-600">+ ₹{hotel.taxes.toLocaleString()} taxes & fees</p>
-                      <p className="text-sm text-gray-500 mb-3">Per Night</p>
-                      <button className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-sm font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
-                        Book Now
-                      </button>
+                      <div className="bg-blue-600 text-white font-bold rounded-lg p-2 text-sm">4.5</div>
                     </div>
                   </div>
+                </div>
+
+                {/* Price Section */}
+                <div className="flex flex-col items-end justify-between min-w-[160px]">
+                  <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded mb-2">No Cost EMI</span>
+                  <p className="text-gray-500 line-through text-sm">₹ 13,750</p>
+                  <p className="text-3xl font-bold text-gray-800">₹ 11,585</p>
+                  <p className="text-sm text-gray-600">+ ₹ 3,453 taxes & fees</p>
+                  <p className="text-sm text-gray-500 mb-3">Per Night</p>
+                  <button className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-sm font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+                    Book Now
+                  </button>
                 </div>
               </div>
             ))}
