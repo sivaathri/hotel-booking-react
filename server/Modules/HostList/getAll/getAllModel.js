@@ -331,9 +331,9 @@ class GetAllInfo {
                 }
             });
 
-            return Array.from(propertiesMap.values())[0];
+            return Array.from(propertiesMap.values());
         } catch (error) {
-            console.error('Error getting combined info:', error);
+            console.error('Error getting combined info by ID:', error);
             throw error;
         }
     }
@@ -497,9 +497,9 @@ class GetAllInfo {
                 }
             });
 
-            return Array.from(propertiesMap.values())[0];
+            return Array.from(propertiesMap.values());
         } catch (error) {
-            console.error('Error getting combined info:', error);
+            console.error('Error getting combined info by ID:', error);
             throw error;
         }
     }
