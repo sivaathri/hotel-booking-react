@@ -27,7 +27,7 @@ export default function SearchBar() {
     <div className="bg-gradient-to-r from-gray-900 mt-1 to-gray-800 text-white py-8">
       <div className="container mx-auto px-4">
         <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
             {/* Destination */}
             <div className="group">
               <label className="block mb-2 text-sm font-medium text-gray-200">Where do you want to stay?</label>
@@ -132,12 +132,14 @@ export default function SearchBar() {
                 </div>
               )}
             </div>
-          </div>
-          <div className="mt-6 flex justify-end">
-            <button className="px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
-              <Search className="h-5 w-5 mr-2" />
-              Search Hotels
-            </button>
+
+            {/* Search Button */}
+            <div className="flex items-end">
+              <button className="w-full mb-2 h-[46px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
+                <Search className="h-5 w-5 mr-2" />
+                Search
+              </button>
+            </div>
           </div>
         </div>
       </div>

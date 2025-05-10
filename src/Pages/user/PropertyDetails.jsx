@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { FaStar, FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake } from 'react-icons/fa';
 import Header from './Header';
+import SearchBar from './SearchBar';
 
 export default function PropertyDetails() {
   const { propertyId } = useParams();
@@ -39,7 +40,10 @@ export default function PropertyDetails() {
 
   return (
     <>
+      {/* Header Section */}
       <Header/>
+        {/* Search Bar Section */}
+        <SearchBar/>
       <div className="max-w-7xl mx-auto p-4">
         {/* Header Section */}
         <div className="mb-6">
