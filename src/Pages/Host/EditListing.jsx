@@ -405,6 +405,19 @@ const EditListing = () => {
               toast.error('Please add at least one room with required details');
               return;
             }
+            // Log the room data structure
+            console.log('Step 3 Room Data:', {
+              rooms: formData.rooms.map(room => ({
+                floor: room.floor,
+                room_type: room.bhk,
+                number_of_rooms: room.numberOfRooms,
+                capacity: room.capacity,
+                bed_type: room.bedType,
+                has_attached_bathroom: room.hasBathroom ? 1 : 0,
+                has_balcony: room.hasBalcony ? 1 : 0,
+                facilities: JSON.stringify(room.facilities)
+              }))
+            });
             updateData = {
               rooms: formData.rooms.map(room => ({
                 floor: room.floor,
