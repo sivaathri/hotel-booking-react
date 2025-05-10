@@ -28,7 +28,7 @@ const HostHeader = () => {
         </div>
 
         {/* Navigation Links */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-10 text-center ml-48">
           <Link to="/hostuserdashboard" className="text-black hover:text-black">Dashboard</Link>
           <Link to="/calender" className="text-black hover:text-black">Calendar</Link>
           <Link to="/listings" className="text-black hover:text-black">Listings</Link>
