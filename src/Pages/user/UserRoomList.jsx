@@ -122,7 +122,7 @@ export default function UserRoomList() {
           <span className="mx-2 text-gray-400">&gt;</span>
           <span className="text-gray-600">Hotels and more in Pondicherry</span>
         </div>
-        <h2 className="text-2xl font-bold mt-4 text-gray-800">414 Properties in Pondicherry</h2>
+        <h2 className="text-2xl font-bold mt-4 text-gray-800">{properties.length} Properties in Pondicherry</h2>
       </div>
 
       {/* Main Content - Three Column Layout */}
