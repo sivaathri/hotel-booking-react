@@ -64,8 +64,8 @@ class UploadImagesController {
 
     static async getImagesByRoomId(req, res) {
         try {
-            const { roomId } = req.params;
-            const images = await UploadImagesModel.getImagesByRoomId(roomId);
+            const { property_id } = req.params;
+            const images = await UploadImagesModel.getImagesByRoomId(property_id);
             
             if (!images || images.length === 0) {
                 return res.status(404).json({ 

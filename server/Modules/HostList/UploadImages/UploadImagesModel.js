@@ -68,16 +68,16 @@ class UploadImagesModel {
         }
     }
 
-    static async getImagesByRoomId(roomId) {
+    static async getImagesByRoomId(property_id) {
         try {
             const query = `
                 SELECT id, room_id, image_paths, created_at 
                 FROM room_images 
-                WHERE room_id = ?
+                WHERE property_id = ?
                 ORDER BY created_at DESC
             `;
             
-            const [images] = await db.query(query, [roomId]);
+            const [images] = await db.query(query, [property_id]);
             // Parse the JSON strings back to arrays
             return images.map(img => ({
                 ...img,
