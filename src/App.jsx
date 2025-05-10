@@ -36,7 +36,7 @@ import CreateListing from './Pages/Host/CreateListing';
 import CreateNewListing from './Pages/Host/CreateNewListing';
 import EditListing from './Pages/Host/EditListing';
 import PriceMapPage from './Pages/PriceMapPage';
-
+import Calender from './Pages/Host/Calender/calender';
 // Protected Routes
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -103,6 +103,14 @@ function App() {
               <EditListing />
             </ProtectedRoute>
           } />
+          <Route path="/calender" element=
+          {<ProtectedRoute>
+              <Calender />
+            </ProtectedRoute>
+          } 
+          />
+
+
 
           <Route path="/admin/customers" element={<CustomersList />} />
           <Route path="/admin/invoices" element={<InvoiceList />} />

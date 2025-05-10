@@ -24,7 +24,7 @@ const HostHeader = () => {
         {/* Navigation Links */}
         <div className="flex items-center space-x-6">
           <Link to="/hostuserdashboard" className="text-black hover:text-black">Dashboard</Link>
-          <Link to="/calendar" className="text-black hover:text-black">Calendar</Link>
+          <Link to="/calender" className="text-black hover:text-black">Calendar</Link>
           <Link to="/listings" className="text-black hover:text-black">Listings</Link>
           <Link to="/messages" className="text-black hover:text-black">Messages</Link>
         </div>
