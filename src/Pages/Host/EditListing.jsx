@@ -53,6 +53,8 @@ const EditListing = () => {
     mapLocation: null,
 
     // Step 3: Rooms Setup
+    selectedRoomTypes: [],
+    roomDetails: {},
     rooms: [{
       name: '',
       floor: '',
@@ -168,39 +170,39 @@ const EditListing = () => {
         });
 
         if (response.data.success) {
-          const property = response.data.data;
+          const property = response.data.data[0]; // Get first property from array
           
           // Log the raw property data
           console.log('Raw Property Data:', property);
           console.log('Location Data:', property.location);
 
-          // Parse facilities from string to array if it exists
-          const rooms = property.rooms?.map(room => ({
-            name: `Room ${room.room_id}`,
-            numberOfRooms: room.number_of_rooms || 1,
-            floor: room.floor ? `${room.floor}${room.floor === 1 ? 'st' : room.floor === 2 ? 'nd' : room.floor === 3 ? 'rd' : 'th'} Floor` : '',
-            bhk: room.room_type || '',
-            capacity: room.capacity?.toString() || '',
-            bedType: room.bed_type || '',
-            hasBathroom: room.has_attached_bathroom === 1,
-            hasBalcony: room.has_balcony === 1,
-            balconyView: '',
-            facilities: room.facilities ? JSON.parse(room.facilities) : []
-          })) || [];
-
-          // Initialize location data with empty values if location is null
-          const locationData = property.location || {
-            address_line1: '',
-            address_line2: '',
-            city: '',
-            state_province: '',
-            country: '',
-            postal_code: '',
-            coordinates: null
+          // Parse room data
+          const selectedRoomTypes = [property.room.room_type];
+          const roomDetails = {
+            [property.room.room_type]: {
+              floor: property.room.floor ? `${property.room.floor}${property.room.floor === 1 ? 'st' : property.room.floor === 2 ? 'nd' : property.room.floor === 3 ? 'rd' : 'th'} Floor` : '',
+              numberOfRooms: property.room.number_of_rooms || 1,
+              bedType: 'Single', // Default value since not in API
+              hasBathroom: true, // Default value since not in API
+              hasBalcony: false, // Default value since not in API
+              balconyView: '',
+              facilities: [], // Default empty array since not in API
+              pricePerNight: property.room.base_price?.toString() || '',
+              occupancyRanges: [],
+              individualRoomCapacities: {}
+            }
           };
 
-          // Log the processed location data
-          console.log('Processed Location Data:', locationData);
+          // Add debug logging for room data
+          console.log('Selected Room Types:', selectedRoomTypes);
+          console.log('Room Details:', roomDetails);
+          console.log('Original Room Data:', property.room);
+
+          // Parse room photos
+          const roomPhotos = property.room.image_paths ? JSON.parse(property.room.image_paths) : [];
+
+          // Parse rules
+          const rules = property.rules || {};
 
           setFormData(prev => ({
             ...prev,
@@ -209,60 +211,81 @@ const EditListing = () => {
             propertyType: property.property_type || '',
 
             // Step 2: Location
-            addressLine1: locationData.address_line1 || '',
-            addressLine2: locationData.address_line2 || '',
-            city: locationData.city || '',
-            state_province: locationData.state_province || '',
-            country: locationData.country || '',
-            postalCode: locationData.postal_code || '',
-            mapLocation: locationData.coordinates || null,
+            addressLine1: property.location?.address_line1 || '',
+            addressLine2: property.location?.address_line2 || '',
+            city: property.location?.city || '',
+            state_province: property.location?.state_province || '',
+            country: property.location?.country || '',
+            postalCode: property.location?.postal_code || '',
+            mapLocation: property.location?.latitude && property.location?.longitude ? {
+              lat: parseFloat(property.location.latitude),
+              lng: parseFloat(property.location.longitude)
+            } : null,
 
             // Step 3: Rooms Setup
-            rooms: rooms,
+            selectedRoomTypes: selectedRoomTypes,
+            roomDetails: roomDetails,
+            rooms: [{
+              name: `Room ${property.room.room_id}`,
+              numberOfRooms: property.room.number_of_rooms || 1,
+              floor: property.room.floor ? `${property.room.floor}${property.room.floor === 1 ? 'st' : property.room.floor === 2 ? 'nd' : property.room.floor === 3 ? 'rd' : 'th'} Floor` : '',
+              bhk: property.room.room_type || '',
+              capacity: property.room.total_capacity?.toString() || '',
+              bedType: 'Single', // Default value since not in API
+              hasBathroom: true, // Default value since not in API
+              hasBalcony: false, // Default value since not in API
+              balconyView: '',
+              facilities: [] // Default empty array since not in API
+            }],
 
             // Step 4: Room Photos
-            roomPhotos: property.room_photos || [],
+            roomPhotos: roomPhotos,
 
             // Step 5: Language Preference
-            languages: property.languages || [],
-            otherLanguage: property.other_language || '',
+            languages: [], // Default empty array since not in API
+            otherLanguage: '',
 
             // Step 6: House Rules
-            checkInTime: property.check_in_time || '',
-            checkOutTime: property.check_out_time || '',
-            petsAllowed: property.pets_allowed || false,
-            smokingAllowed: property.smoking_allowed || false,
-            alcoholAllowed: property.alcohol_allowed || false,
-            noiseRestrictions: property.noise_restrictions || false,
+            checkInTime: rules.check_in_time || '',
+            checkOutTime: rules.check_out_time || '',
+            petsAllowed: rules.pets_allowed || false,
+            smokingAllowed: rules.smoking_allowed || false,
+            alcoholAllowed: rules.alcohol_allowed || false,
+            noiseRestrictions: false, // Default value since not in API
 
             // Step 7: Pricing & Availability
-            pricePerNight: property.price_per_night || '',
-            discounts: property.discounts || {
+            pricePerNight: property.room.base_price?.toString() || '',
+            discounts: {
               longStay: false,
               earlyBird: false,
               lastMinute: false
             },
-            refundPolicy: property.refund_policy || '',
-            availabilityCalendar: property.availability_calendar || [],
+            refundPolicy: 'Fully Refundable', // Default value since not in API
+            availabilityCalendar: [],
 
             // Step 8: Guest Booking Preferences
-            allowedGuests: property.allowed_guests || [],
-            instantBooking: property.instant_booking || false,
-            manualApproval: property.manual_approval || false,
+            allowedGuests: [
+              ...(rules.can_book_married_couples ? ['Married Couples'] : []),
+              ...(rules.can_book_families ? ['Families'] : []),
+              ...(rules.can_book_solo_travelers ? ['Solo Travelers'] : []),
+              ...(rules.can_book_friends ? ['Friends'] : [])
+            ],
+            instantBooking: rules.instant_booking || false,
+            manualApproval: rules.manual_approval || false,
 
             // Step 9: Payment Setup
-            paymentMethods: property.payment_methods || [],
-            panGstId: property.pan_gst_id || '',
-            bankDetails: property.bank_details || {
+            paymentMethods: [], // Default empty array since not in API
+            panGstId: '', // Default empty string since not in API
+            bankDetails: {
               accountNumber: '',
               ifscCode: '',
               accountHolderName: ''
             },
 
             // Step 10: Verification
-            idProof: property.id_proof || null,
-            propertyProof: property.property_proof || null,
-            termsAccepted: property.terms_accepted || false,
+            idProof: null,
+            propertyProof: null,
+            termsAccepted: false,
           }));
           setIsEditing(true); // Enable editing mode since we have data
         }
