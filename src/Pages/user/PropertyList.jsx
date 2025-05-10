@@ -86,9 +86,6 @@ export default function PropertyList({ properties, loading, error }) {
           <div className="flex flex-col items-end justify-between min-w-[160px]">
             <p className="text-3xl font-bold text-gray-800">₹ {property.room.base_price}</p>
             <p className="text-sm text-gray-500 mb-3">Per Night</p>
-            <button className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-sm font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
-              Book Now
-            </button>
           </div>
         </div>
       ))}
