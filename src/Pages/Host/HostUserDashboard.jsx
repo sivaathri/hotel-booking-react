@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Home, 
-  Calendar, 
-  DollarSign, 
-  Users, 
-  Settings, 
+import {
+  Home,
+  Calendar,
+  DollarSign,
+  Users,
+  Settings,
   MessageSquare,
   Star,
   TrendingUp,
@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import HostHeader from '../Host/HostHeader';
 const StatCard = ({ title, value, icon: Icon, trend, color }) => (
-  <motion.div 
+  <motion.div
     className="bg-white rounded-xl p-6 shadow-sm"
     whileHover={{ y: -5 }}
     transition={{ duration: 0.2 }}
@@ -36,7 +36,7 @@ const StatCard = ({ title, value, icon: Icon, trend, color }) => (
 );
 
 const BookingCard = ({ booking }) => (
-  <motion.div 
+  <motion.div
     className="bg-white rounded-xl p-4 shadow-sm"
     whileHover={{ scale: 1.02 }}
     transition={{ duration: 0.2 }}
@@ -52,11 +52,10 @@ const BookingCard = ({ booking }) => (
       </div>
     </div>
     <div className="mt-3 flex items-center justify-between">
-      <span className={`px-2 py-1 rounded-full text-xs ${
-        booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-        booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-        'bg-red-100 text-red-800'
-      }`}>
+      <span className={`px-2 py-1 rounded-full text-xs ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
+          booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-red-100 text-red-800'
+        }`}>
         {booking.status}
       </span>
       <button className="text-sm text-[#FF5A5F] hover:underline">
@@ -67,14 +66,14 @@ const BookingCard = ({ booking }) => (
 );
 
 const PropertyCard = ({ property }) => (
-  <motion.div 
+  <motion.div
     className="bg-white rounded-xl overflow-hidden shadow-sm"
     whileHover={{ y: -5 }}
     transition={{ duration: 0.2 }}
   >
     <div className="relative h-40">
-      <img 
-        src={property.image} 
+      <img
+        src={property.image}
         alt={property.name}
         className="w-full h-full object-cover"
       />
@@ -156,26 +155,10 @@ const HostUserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <HostHeader />
       {/* Header */}
-      <header className="bg-orange-500 text-primary text-uppercase mt-5 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Host Dashboard</h1>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <Bell className="w-6 h-6" />
-              </button>
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <MessageSquare className="w-6 h-6" />
-              </button>
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <Settings className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <HostHeader />
+
+
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -194,11 +177,10 @@ const HostUserDashboard = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-4 text-sm font-medium capitalize ${
-                    activeTab === tab
+                  className={`px-6 py-4 text-sm font-medium capitalize ${activeTab === tab
                       ? 'border-b-2 border-[#FF5A5F] text-[#FF5A5F]'
                       : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   {tab}
                 </button>
