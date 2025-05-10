@@ -25,6 +25,10 @@ const RoomsList = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      <header className="bg-[#17202A] p-6 flex items-center justify-between">
+        <h1 className="text-white text-4xl font-bold">HOTELIER</h1>
+        <button className="bg-transparent border border-white text-white px-6 py-2 rounded">Rooms</button>
+      </header>
       <h2 className="text-3xl font-bold mb-6 text-center">Rooms Management</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">

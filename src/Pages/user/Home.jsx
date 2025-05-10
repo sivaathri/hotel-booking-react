@@ -9,8 +9,9 @@ import Header from "./Header";
 import "animate.css";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 const Home = () => {
+  const navigate = useNavigate();
   const [videoSrc, setVideoSrc] = useState(null);
   const [guests, setGuests] = useState({
     adults: 1,
@@ -329,6 +330,8 @@ const Home = () => {
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
               className="bg-white text-purple-600 font-bold py-4 px-8 rounded-full shadow-2xl hover:bg-yellow-50 hover:text-pink-600 transition-all duration-300 transform hover:-translate-y-1"
+
+              onClick={() => navigate('/rooms')}
             >
               Book Your Room Now
             </motion.button>
