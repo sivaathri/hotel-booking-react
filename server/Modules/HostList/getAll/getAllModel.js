@@ -167,6 +167,21 @@ LEFT JOIN
                             number_of_rooms: result.number_of_rooms,
                             created_at: result.created_at,
                             updated_at: result.updated_at
+                        },
+                        property_details: {
+                            description: result.description,
+                            nearest_beach_distance: result.nearest_beach_distance,
+                            nearest_railway_station_distance: result.nearest_railway_station_distance,
+                            nearest_airport_distance: result.nearest_airport_distance,
+                            nearest_bus_stand_distance: result.nearest_bus_stand_distance,
+                            can_book_married_couples: result.can_book_married_couples,
+                            can_book_families: result.can_book_families,
+                            can_book_solo_travelers: result.can_book_solo_travelers,
+                            can_book_friends: result.can_book_friends,
+                            instant_booking: result.instant_booking,
+                            manual_approval: result.manual_approval,
+                            created_at: result.created_at,
+                            updated_at: result.updated_at
                         }
                     });
                 }
@@ -334,6 +349,21 @@ LEFT JOIN
                             number_of_rooms: result.number_of_rooms,
                             created_at: result.created_at,
                             updated_at: result.updated_at
+                        },
+                        property_details: {
+                            description: result.description,
+                            nearest_beach_distance: result.nearest_beach_distance,
+                            nearest_railway_station_distance: result.nearest_railway_station_distance,
+                            nearest_airport_distance: result.nearest_airport_distance,
+                            nearest_bus_stand_distance: result.nearest_bus_stand_distance,
+                            can_book_married_couples: result.can_book_married_couples,
+                            can_book_families: result.can_book_families,
+                            can_book_solo_travelers: result.can_book_solo_travelers,
+                            can_book_friends: result.can_book_friends,
+                            instant_booking: result.instant_booking,
+                            manual_approval: result.manual_approval,
+                            created_at: result.created_at,
+                            updated_at: result.updated_at
                         }
                     });
                 }
@@ -498,6 +528,21 @@ LEFT JOIN
                             floor: result.floor,
                             room_type: result.room_type,
                             number_of_rooms: result.number_of_rooms,
+                            created_at: result.created_at,
+                            updated_at: result.updated_at
+                        },
+                        property_details: {
+                            description: result.description,
+                            nearest_beach_distance: result.nearest_beach_distance,
+                            nearest_railway_station_distance: result.nearest_railway_station_distance,
+                            nearest_airport_distance: result.nearest_airport_distance,
+                            nearest_bus_stand_distance: result.nearest_bus_stand_distance,
+                            can_book_married_couples: result.can_book_married_couples,
+                            can_book_families: result.can_book_families,
+                            can_book_solo_travelers: result.can_book_solo_travelers,
+                            can_book_friends: result.can_book_friends,
+                            instant_booking: result.instant_booking,
+                            manual_approval: result.manual_approval,
                             created_at: result.created_at,
                             updated_at: result.updated_at
                         }

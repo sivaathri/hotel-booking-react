@@ -75,9 +75,9 @@ export default function PropertyList({ properties, loading, error }) {
                   <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
                   <span className="text-yellow-400 text-lg">★★★★★</span>
                 </div>
-                <a href="#" className="text-blue-600 hover:underline text-sm">
-                  {property.location.address_line1}, {property.location.city}
-                </a>
+                <p className="text-blue-600 hover:underline text-sm">
+                  {property.location.address_line1}, {property.location.city}  | {property.location.state}
+                </p>
                 <div className="flex gap-2 mt-2">
                   {property.rules.unmarried_couples_allowed && (
                     <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-xs font-medium">Couple Friendly</span>
