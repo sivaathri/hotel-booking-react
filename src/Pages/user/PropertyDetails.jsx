@@ -1,4 +1,4 @@
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { FaStar } from 'react-icons/fa';
 import {
@@ -145,7 +145,15 @@ const mockReviews = {
 export default function PropertyDetails() {
   const { propertyId } = useParams();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [property, setProperty] = useState(location.state?.property || null);
+  const [searchParamsState, setSearchParamsState] = useState({
+    destination: searchParams.get('destination') || location.state?.searchParams?.destination || '',
+    checkIn: searchParams.get('checkIn') || location.state?.searchParams?.checkIn || '',
+    checkOut: searchParams.get('checkOut') || location.state?.searchParams?.checkOut || '',
+    adults: searchParams.get('adults') || location.state?.searchParams?.adults || '1',
+    children: searchParams.get('children') || location.state?.searchParams?.children || '0'
+  });
   const [loading, setLoading] = useState(!property);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -153,6 +161,33 @@ export default function PropertyDetails() {
   const [activeRulesTab, setActiveRulesTab] = useState("");
   const modalContentRef = useRef(null);
   const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
+
+  // Calculate guest capacity from search params
+  const capacity = Number(searchParams.get('adults') || 1) + Number(searchParams.get('children') || 0);
+
+  // Calculate price based on occupancy adjustments or base price
+  let totalPrice = Number(property.room?.base_price || 0) * capacity;
+  let occupancyAdjustments = [];
+  if (property.room?.occupancy_price_adjustments) {
+    let opa = property.room.occupancy_price_adjustments;
+    try {
+      if (typeof opa === 'string') {
+        opa = JSON.parse(opa); // first parse
+        if (typeof opa === 'string') {
+          opa = JSON.parse(opa); // second parse if still string
+        }
+      }
+      occupancyAdjustments = Array.isArray(opa) ? opa : [];
+      const found = occupancyAdjustments.find(adj =>
+        capacity >= Number(adj.minGuests) && capacity <= Number(adj.maxGuests)
+      );
+      if (found && found.adjustment) {
+        totalPrice = Number(found.adjustment);
+      }
+    } catch (e) {
+      // fallback to base price * capacity
+    }
+  }
 
   // Add scroll handler for rules modal
   const handleRulesModalScroll = useCallback(() => {
@@ -231,7 +266,7 @@ export default function PropertyDetails() {
   return (
     <>
       <Header />
-      <SearchBar />
+      {/* <SearchBar initialSearchParams={searchParamsState} /> */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -452,33 +487,47 @@ export default function PropertyDetails() {
             transition={{ delay: 0.5 }}
             className="col-span-1"
           >
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4 hover:shadow-md transition-all duration-300">
-              <h2 className="text-xl font-semibold mb-4 font-sans">Book Now</h2>
-              <div className="space-y-4">
-                <motion.div whileHover={{ scale: 1.02 }}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
-                  <input type="date" className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" />
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.02 }}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
-                  <input type="date" className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" />
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.02 }}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Guests</label>
-                  <select className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
-                    <option>1 Guest</option>
-                    <option>2 Guests</option>
-                    <option>3 Guests</option>
-                    <option>4 Guests</option>
-                  </select>
-                </motion.div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
-                >
-                  Check Availability
-                </motion.button>
+            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-4 border border-gray-100">
+              {/* Room Name & Type */}
+              <div className="mb-1">
+                <div className="font-bold text-lg text-gray-900">
+                  {property.room?.room_type || 'Deluxe room'}
+                  {property.room?.bed_type ? ` (${property.room.bed_type})` : ''}
+                </div>
+                <div className="text-gray-700 text-sm font-medium mb-2">
+                  Fits {property.room?.total_capacity || 2} Adults
+                </div>
+              </div>
+              {/* Perks */}
+              <ul className="mb-3 space-y-1 text-sm">
+                <li className="flex items-center text-gray-700">
+                  <span className="mr-2 text-lg">•</span> Book with ₹ 0 Payment
+                </li>
+                {property.facilities?.restaurant === 1 && (
+                  <li className="flex items-center text-green-600">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 8h14M7 8V6a5 5 0 0110 0v2" /></svg>
+                    Free Breakfast
+                  </li>
+                )}
+                {property.room?.free_cancellation_enabled === 1 && (
+                  <li className="flex items-center text-green-600">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+                    Free Cancellation before <span className="ml-1 font-medium">{property.rules?.free_cancellation_before || '12 May 12:59 PM'}</span>
+                  </li>
+                )}
+              </ul>
+              {/* Price Section */}
+              <div className="mb-2">
+                <div className="text-xs text-gray-500 mb-1">Per Night:</div>
+                <div className="flex items-end gap-1">
+                  <span className="text-2xl font-extrabold text-gray-900">₹ {Number(totalPrice).toLocaleString('en-IN')}</span>
+                  <span className="text-gray-500 font-medium text-sm">+ ₹ {Number(property.room?.taxes_and_fees || 660).toLocaleString('en-IN')} taxes & fees</span>
+                </div>
+              </div>
+              {/* Book Button & More Options */}
+              <div className="flex flex-col gap-2 mt-4">
+                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-base shadow transition">BOOK THIS NOW</button>
+                <button className="w-full text-blue-600 hover:underline text-sm font-medium bg-transparent">2 More Options</button>
               </div>
             </div>
           </motion.div>

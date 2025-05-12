@@ -1,10 +1,11 @@
 import { CheckCircle } from 'lucide-react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 
 export default function PropertyList({ properties, loading, error }) {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
 
   // Helper function to calculate GST
   const calculateGST = (price) => {
@@ -53,7 +54,24 @@ export default function PropertyList({ properties, loading, error }) {
           <div
             key={property.property_id}
             className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6 cursor-pointer"
-            onClick={() => navigate(`/property/${property.property_id}`, { state: { property } })}
+            onClick={() => {
+              const searchParamsObj = {
+                destination: searchParams.get('destination'),
+                checkIn: searchParams.get('checkIn'),
+                checkOut: searchParams.get('checkOut'),
+                adults: searchParams.get('adults'),
+                children: searchParams.get('children')
+              };
+              
+              // Create URL with search parameters
+              const searchParamsString = new URLSearchParams(searchParamsObj).toString();
+              navigate(`/property/${property.property_id}?${searchParamsString}`, { 
+                state: { 
+                  property,
+                  searchParams: searchParamsObj
+                } 
+              });
+            }}
           >
             {/* Image Gallery */}
             <div className="relative w-full md:w-1/3">

@@ -1,25 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Users } from 'lucide-react';
 
-export default function SearchBar() {
-  const [destination, setDestination] = useState('Pondicherry');
-  const [checkInDate, setCheckInDate] = useState('2025-05-21');
-  const [checkOutDate, setCheckOutDate] = useState('2025-05-28');
-  const [guests, setGuests] = useState('1 adult, 1 room');
+export default function SearchBar({ initialSearchParams }) {
+  const navigate = useNavigate();
+  const [destination, setDestination] = useState(initialSearchParams?.destination || '');
+  const [checkIn, setCheckIn] = useState(initialSearchParams?.checkIn || '');
+  const [checkOut, setCheckOut] = useState(initialSearchParams?.checkOut || '');
+  const [guests, setGuests] = useState({
+    adults: parseInt(initialSearchParams?.adults) || 1,
+    children: parseInt(initialSearchParams?.children) || 0
+  });
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
-  const [adults, setAdults] = useState(1);
-  const [rooms, setRooms] = useState(1);
+
+  const handleSearch = () => {
+    if (!destination || !checkIn || !checkOut) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    navigate(`/rooms?destination=${encodeURIComponent(destination)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&adults=${guests.adults}&children=${guests.children}`);
+  };
 
   const handleGuestChange = (type, value) => {
     if (type === 'adults') {
-      setAdults(Math.max(1, adults + value));
+      setGuests({ ...guests, adults: Math.max(1, guests.adults + value) });
     } else {
-      setRooms(Math.max(1, rooms + value));
+      setGuests({ ...guests, children: Math.max(0, guests.children + value) });
     }
   };
 
   const applyGuestSelection = () => {
-    setGuests(`${adults} adult${adults > 1 ? 's' : ''}, ${rooms} room${rooms > 1 ? 's' : ''}`);
     setShowGuestDropdown(false);
   };
 
@@ -49,8 +60,8 @@ export default function SearchBar() {
               <div className="relative">
                 <input
                   type="date"
-                  value={checkInDate}
-                  onChange={(e) => setCheckInDate(e.target.value)}
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
                   className="w-full p-2 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                 />
                 <Calendar className="absolute right-4 top-3.5 h-5 w-5 text-gray-400" />
@@ -63,8 +74,8 @@ export default function SearchBar() {
               <div className="relative">
                 <input
                   type="date"
-                  value={checkOutDate}
-                  onChange={(e) => setCheckOutDate(e.target.value)}
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
                   className="w-full p-2 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                 />
                 <Calendar className="absolute right-4 top-3.5 h-5 w-5 text-gray-400" />
@@ -78,7 +89,7 @@ export default function SearchBar() {
                 className="relative w-full p-2 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl flex justify-between items-center cursor-pointer hover:border-blue-500 transition-all duration-300"
                 onClick={() => setShowGuestDropdown(!showGuestDropdown)}
               >
-                <span className="font-medium">{guests}</span>
+                <span className="font-medium">{guests.adults + guests.children} Guests</span>
                 <Users className="h-5 w-5 text-gray-400" />
               </div>
 
@@ -95,7 +106,7 @@ export default function SearchBar() {
                         >
                           <span className="text-lg">-</span>
                         </button>
-                        <span className="text-lg font-medium">{adults}</span>
+                        <span className="text-lg font-medium">{guests.adults}</span>
                         <button
                           className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-300"
                           onClick={() => handleGuestChange('adults', 1)}
@@ -105,18 +116,18 @@ export default function SearchBar() {
                       </div>
                     </div>
                     <div className="flex justify-between items-center mb-6">
-                      <span className="font-medium">Rooms</span>
+                      <span className="font-medium">Children</span>
                       <div className="flex items-center space-x-4">
                         <button
                           className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-300"
-                          onClick={() => handleGuestChange('rooms', -1)}
+                          onClick={() => handleGuestChange('children', -1)}
                         >
                           <span className="text-lg">-</span>
                         </button>
-                        <span className="text-lg font-medium">{rooms}</span>
+                        <span className="text-lg font-medium">{guests.children}</span>
                         <button
                           className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-300"
-                          onClick={() => handleGuestChange('rooms', 1)}
+                          onClick={() => handleGuestChange('children', 1)}
                         >
                           <span className="text-lg">+</span>
                         </button>
@@ -135,7 +146,10 @@ export default function SearchBar() {
 
             {/* Search Button */}
             <div className="flex items-end md:col-span-2">
-              <button className="w-full h-[46px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
+              <button
+                onClick={handleSearch}
+                className="w-full h-[46px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
+              >
                 <Search className="h-5 w-5 mr-2" />
                 Search
               </button>
