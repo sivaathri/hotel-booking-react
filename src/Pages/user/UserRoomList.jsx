@@ -40,16 +40,46 @@ export default function UserRoomList() {
         const destination = searchParams.get('destination');
         const checkIn = searchParams.get('checkIn');
         const checkOut = searchParams.get('checkOut');
-        const adults = searchParams.get('adults');
-        const children = searchParams.get('children');
+        const adults = parseInt(searchParams.get('adults')) || 1; // Ensure adults is at least 1
+        const children = parseInt(searchParams.get('children')) || 0;
 
         // Construct API URL with search parameters
         const apiUrl = new URL('http://localhost:3000/api/getall/all');
         if (destination) apiUrl.searchParams.append('destination', destination);
         if (checkIn) apiUrl.searchParams.append('checkIn', checkIn);
         if (checkOut) apiUrl.searchParams.append('checkOut', checkOut);
-        if (adults) apiUrl.searchParams.append('adults', adults);
-        if (children) apiUrl.searchParams.append('children', children);
+        apiUrl.searchParams.append('adults', adults); // Always include adults
+        apiUrl.searchParams.append('children', children); // Always include children
+
+        // Add filter parameters
+        if (filters.freeCancel) apiUrl.searchParams.append('freeCancel', true);
+        if (filters.breakfast) apiUrl.searchParams.append('breakfast', true);
+        if (filters.beachfront) apiUrl.searchParams.append('beachfront', true);
+        if (filters.earlyBird) apiUrl.searchParams.append('earlyBird', true);
+        if (filters.wifi) apiUrl.searchParams.append('wifi', true);
+        if (filters.pool) apiUrl.searchParams.append('pool', true);
+        if (filters.parking) apiUrl.searchParams.append('parking', true);
+        if (filters.ac) apiUrl.searchParams.append('ac', true);
+        if (filters.spa) apiUrl.searchParams.append('spa', true);
+        if (filters.gym) apiUrl.searchParams.append('gym', true);
+        
+        // Add price range
+        if (filters.priceRange) {
+          apiUrl.searchParams.append('minPrice', filters.priceRange[0]);
+          apiUrl.searchParams.append('maxPrice', filters.priceRange[1]);
+        }
+
+        // Add star rating
+        if (filters.starRating.length > 0) {
+          apiUrl.searchParams.append('starRating', filters.starRating.join(','));
+        }
+
+        // Add property type
+        if (filters.propertyType.length > 0) {
+          apiUrl.searchParams.append('propertyType', filters.propertyType.join(','));
+        }
+
+        console.log('Fetching properties with URL:', apiUrl.toString()); // Debug log
 
         const response = await fetch(apiUrl);
         const result = await response.json();
@@ -67,7 +97,7 @@ export default function UserRoomList() {
     };
 
     fetchProperties();
-  }, [searchParams]); // Re-fetch when search parameters change
+  }, [searchParams, filters]); // Re-fetch when search parameters or filters change
 
   
   const priceRanges = [
