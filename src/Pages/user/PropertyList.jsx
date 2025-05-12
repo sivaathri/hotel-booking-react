@@ -76,7 +76,7 @@ export default function PropertyList({ properties, loading, error }) {
                   <span className="text-yellow-400 text-lg">★★★★★</span>
                 </div>
                 <p className="text-blue-600 hover:underline text-sm">
-                  {property.location.address_line1}, {property.location.city}  | {property.location.state}
+                  {property.location.city}  | {property.property_details.nearest_beach_distance} Km drive to Beach
                 </p>
                 <div className="flex gap-2 mt-2">
                   {property.rules.unmarried_couples_allowed && (
