@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 
@@ -6,6 +7,9 @@ export default function PropertyList({ properties, loading, error }) {
   const { state } = useLocation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
 
   // Debug log to check properties data
   console.log('Properties data:', properties);
@@ -65,14 +69,14 @@ export default function PropertyList({ properties, loading, error }) {
                 adults: searchParams.get('adults'),
                 children: searchParams.get('children')
               };
-              
+
               // Create URL with search parameters
               const searchParamsString = new URLSearchParams(searchParamsObj).toString();
-              navigate(`/property/${property.property_id}?${searchParamsString}`, { 
-                state: { 
+              navigate(`/property/${property.property_id}?${searchParamsString}`, {
+                state: {
                   property,
                   searchParams: searchParamsObj
-                } 
+                }
               });
             }}
           >
@@ -90,8 +94,8 @@ export default function PropertyList({ properties, loading, error }) {
               />
               <div className="absolute bottom-2 left-2 flex gap-2">
                 {property.room?.image_urls?.slice(1, 4).map((img, index) => (
-                  <img 
-                    key={index} 
+                  <img
+                    key={index}
                     src={`http://localhost:3000${img}`}
                     className="w-12 h-8 object-cover rounded"
                     onError={(e) => {
@@ -100,7 +104,17 @@ export default function PropertyList({ properties, loading, error }) {
                     }}
                   />
                 ))}
-                <div className="w-12 h-8 bg-black/60 text-white flex items-center justify-center rounded text-xs font-bold cursor-pointer">View All</div>
+                <div
+                  className="w-12 h-8 bg-black/60 text-white flex items-center justify-center rounded text-xs font-bold cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setModalImages(property.room?.image_urls || []);
+                    setCurrentImageIdx(0);
+                    setModalOpen(true);
+                  }}
+                >
+                  View All
+                </div>
               </div>
             </div>
 
@@ -178,6 +192,77 @@ export default function PropertyList({ properties, loading, error }) {
           </div>
         );
       })}
+
+      {modalOpen && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-80">
+    <div className="relative bg-white rounded-lg shadow-lg max-w-screen-xl w-full p-0 flex flex-col items-center">
+      {/* Close Button */}
+      <button
+        className="absolute top-3 right-3 text-white bg-black bg-opacity-60 rounded-full w-8 h-8 flex items-center justify-center text-2xl z-10"
+        onClick={() => setModalOpen(false)}
+      >
+        &times;
+      </button>
+
+      {/* Main Image */}
+      <div className="relative w-full flex items-center justify-center" style={{ minHeight: 320 }}>
+        {/* Left Arrow */}
+        <button
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white rounded-full w-8 h-8 flex items-center justify-center text-xl"
+          onClick={() =>
+            setCurrentImageIdx((prev) => (prev === 0 ? modalImages.length - 1 : prev - 1))
+          }
+        >
+          &#8592;
+        </button>
+
+        {/* Image */}
+        <img
+          src={`http://localhost:3000${modalImages[currentImageIdx]}`}
+          alt={`Property Image ${currentImageIdx + 1}`}
+          className="rounded-lg object-contain max-h-[500px] max-w-[90%]"
+          onError={(e) => {
+            e.target.src = 'https://placehold.co/600x400?text=No+Image';
+          }}
+        />
+
+        {/* Right Arrow */}
+        <button
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white rounded-full w-8 h-8 flex items-center justify-center text-xl"
+          onClick={() =>
+            setCurrentImageIdx((prev) => (prev === modalImages.length - 1 ? 0 : prev + 1))
+          }
+        >
+          &#8594;
+        </button>
+      </div>
+
+      {/* Thumbnails */}
+      <div className="flex gap-2 mt-4 mb-4 overflow-x-auto px-4">
+        {modalImages.map((img, idx) => (
+          <img
+            key={idx}
+            src={`http://localhost:3000${img}`}
+            alt={`Thumbnail ${idx + 1}`}
+            className={`w-16 h-12 object-cover rounded cursor-pointer border-2 ${
+              idx === currentImageIdx ? 'border-blue-500' : 'border-transparent'
+            }`}
+            onClick={() => setCurrentImageIdx(idx)}
+            onError={(e) => {
+              e.target.src = 'https://placehold.co/100x75?text=No+Image';
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Image Counter */}
+      <div className="text-gray-600 text-sm mb-4">
+        {currentImageIdx + 1} / {modalImages.length}
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 } 
