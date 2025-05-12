@@ -189,6 +189,11 @@ export default function PropertyDetails() {
     }
   }
 
+  // Calculate GST based on price range
+  const gstRate = totalPrice <= 7500 ? 0.12 : 0.18;
+  const gstAmount = totalPrice * gstRate;
+  const finalPrice = totalPrice + gstAmount;
+
   // Add scroll handler for rules modal
   const handleRulesModalScroll = useCallback(() => {
     if (!modalContentRef.current) return;
@@ -521,7 +526,10 @@ export default function PropertyDetails() {
                 <div className="text-xs text-gray-500 mb-1">Per Night:</div>
                 <div className="flex items-end gap-1">
                   <span className="text-2xl font-extrabold text-gray-900">₹ {Number(totalPrice).toLocaleString('en-IN')}</span>
-                  <span className="text-gray-500 font-medium text-sm">+ ₹ {Number(property.room?.taxes_and_fees || 660).toLocaleString('en-IN')} taxes & fees</span>
+                  <span className="text-gray-500 font-medium text-sm">+ ₹ {Number(gstAmount).toLocaleString('en-IN')} GST ({gstRate * 100}%)</span>
+                </div>
+                <div className="text-sm text-gray-600 mt-1">
+                  Total: ₹ {Number(finalPrice).toLocaleString('en-IN')}
                 </div>
               </div>
               {/* Book Button & More Options */}
