@@ -194,8 +194,8 @@ export default function PropertyList({ properties, loading, error }) {
       })}
 
       {modalOpen && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-80">
-    <div className="relative bg-white rounded-lg shadow-lg max-w-screen-xl w-full p-0 flex flex-col items-center">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50">
+    <div className="relative bg-white rounded-lg shadow-lg max-w-screen-xl w-[90%] p-0 flex flex-col items-center">
       {/* Close Button */}
       <button
         className="absolute top-3 right-3 text-white bg-black bg-opacity-60 rounded-full w-8 h-8 flex items-center justify-center text-2xl z-10"
