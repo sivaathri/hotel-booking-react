@@ -168,27 +168,36 @@ export default function PropertyDetails() {
   const capacity = Number(searchParams.get('adults') || 1) + Number(searchParams.get('children') || 0);
 
   // Calculate price based on occupancy adjustments or base price
-  let totalPrice = Number(property.room?.base_price || 0) * capacity;
+  let totalPrice = 0;
   let occupancyAdjustments = [];
+  
+  // Parse occupancy price adjustments if they exist
   if (property.room?.occupancy_price_adjustments) {
-    let opa = property.room.occupancy_price_adjustments;
     try {
+      let opa = property.room.occupancy_price_adjustments;
       if (typeof opa === 'string') {
-        opa = JSON.parse(opa); // first parse
+        opa = JSON.parse(opa);
         if (typeof opa === 'string') {
-          opa = JSON.parse(opa); // second parse if still string
+          opa = JSON.parse(opa);
         }
       }
       occupancyAdjustments = Array.isArray(opa) ? opa : [];
-      const found = occupancyAdjustments.find(adj =>
-        capacity >= Number(adj.minGuests) && capacity <= Number(adj.maxGuests)
-      );
-      if (found && found.adjustment) {
-        totalPrice = Number(found.adjustment);
-      }
     } catch (e) {
-      // fallback to base price * capacity
+      console.error('Error parsing occupancy price adjustments:', e);
     }
+  }
+
+  // Find matching occupancy adjustment for current capacity
+  const matchingAdjustment = occupancyAdjustments.find(adj => 
+    capacity >= Number(adj.minGuests) && capacity <= Number(adj.maxGuests)
+  );
+
+  if (matchingAdjustment && matchingAdjustment.adjustment) {
+    // Use the specific price adjustment for this occupancy
+    totalPrice = Number(matchingAdjustment.adjustment);
+  } else {
+    // Fallback to base price calculation
+    totalPrice = Number(property.room?.base_price || 0) * capacity;
   }
 
   // Calculate GST based on price range

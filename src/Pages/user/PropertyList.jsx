@@ -10,6 +10,8 @@ export default function PropertyList({ properties, loading, error }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImages, setModalImages] = useState([]);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   // Debug log to check properties data
   console.log('Properties data:', properties);
@@ -165,6 +167,24 @@ export default function PropertyList({ properties, loading, error }) {
                     ))}
                 </div>
               </div>
+              <p 
+                className='text-gray-500 text-sm cursor-pointer hover:text-blue-500 flex items-center gap-1'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedLocation({
+                    lat: property.location.latitude,
+                    lng: property.location.longitude,
+                    name: property.property_name
+                  });
+                  setMapModalOpen(true);
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                View on Map
+              </p>
             </div>
 
             {/* Price Section */}
@@ -262,6 +282,32 @@ export default function PropertyList({ properties, loading, error }) {
         </div>
       )}
 
+      {/* Map Modal */}
+      {mapModalOpen && selectedLocation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50">
+          <div className="relative bg-white rounded-lg shadow-lg max-w-screen-xl w-[90%] h-[80vh] p-4">
+            {/* Close Button */}
+            <button
+              className="absolute top-3 right-3 text-white bg-black bg-opacity-60 rounded-full w-8 h-8 flex items-center justify-center text-2xl z-10"
+              onClick={() => setMapModalOpen(false)}
+            >
+              &times;
+            </button>
+
+            {/* Map Container */}
+            <div className="w-full h-full rounded-lg overflow-hidden">
+              <iframe
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                style={{ border: 0 }}
+                src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${selectedLocation.lat},${selectedLocation.lng}&zoom=15`}
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
