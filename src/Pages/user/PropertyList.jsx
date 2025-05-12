@@ -87,21 +87,31 @@ export default function PropertyList({ properties, loading, error }) {
                   )}
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  {property.room.free_cancellation_enabled && (
-                    <div className="flex items-center text-green-600 text-sm">
-                      <CheckCircle className="h-4 w-4 mr-1" /> Free Cancellation
-                    </div>
-                  )}
-                  {property.facilities.free_wifi && (
-                    <div className="flex items-center text-green-600 text-sm">
-                      <CheckCircle className="h-4 w-4 mr-1" /> Free WiFi
-                    </div>
-                  )}
-                  {property.facilities.air_conditioning && (
-                    <div className="flex items-center text-green-600 text-sm">
-                      <CheckCircle className="h-4 w-4 mr-1" /> Air Conditioning
-                    </div>
-                  )}
+                  {[
+                    property.room.free_cancellation_enabled && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Cancellation" },
+                    property.facilities.free_wifi && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free WiFi" },
+                    property.facilities.air_conditioning && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Air Conditioning" },
+                    property.facilities.parking && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Parking" },
+                    property.facilities.gym && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Gym" },
+                    property.facilities.restaurant && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Restaurant" },
+                    property.facilities.bar && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Bar" },
+                    property.facilities.spa && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Spa" },
+                    property.facilities.laundry && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Laundry" },
+                    property.facilities.room_service && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Room Service" },
+                    property.facilities.business_centre && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Business Centre" },
+                    property.facilities.conference_hall && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Conference Hall" },
+                    property.facilities.kids_play_area && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Kids Play Area" },
+                    property.facilities.coffee_shop && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Coffee Shop" },
+                    property.facilities.cafe && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Cafe" },
+                    property.facilities.lounge && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Lounge" }
+                  ]
+                    .filter(Boolean)
+                    .slice(0, 3)
+                    .map((facility, index) => (
+                      <div key={index} className="flex items-center text-green-600 text-sm">
+                        {facility.icon} {facility.text}
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
