@@ -46,6 +46,17 @@ LEFT JOIN
 
             results.forEach(result => {
                 if (!propertiesMap.has(result.property_id)) {
+                    // Parse image paths and convert to full URLs
+                    let imageUrls = [];
+                    if (result.image_paths) {
+                        try {
+                            const paths = JSON.parse(result.image_paths);
+                            imageUrls = paths.map(path => `/assets/${path}`);
+                        } catch (e) {
+                            console.error('Error parsing image paths:', e);
+                        }
+                    }
+
                     propertiesMap.set(result.property_id, {
                         property_id: result.property_id,
                         user_id: result.user_id,
@@ -53,7 +64,7 @@ LEFT JOIN
                         property_type: result.property_type,
                         created_at: result.created_at,
                         updated_at: result.updated_at,
-                        location: {
+                         location: {
                             address_line1: result.address_line1,
                             address_line2: result.address_line2,
                             city: result.city,
@@ -141,7 +152,7 @@ LEFT JOIN
                         },
                         room: {
                             room_id: result.room_id,
-                            image_paths: result.image_paths,
+                            image_urls: imageUrls,
                             floor: result.floor,
                             room_type: result.room_type,
                             number_of_rooms: result.number_of_rooms,
