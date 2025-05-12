@@ -57,14 +57,15 @@ export default function HomeSearchBar() {
       destination,
       checkIn,
       checkOut,
-      adults: guests.adults || 1, // Ensure adults is at least 1
-      children: guests.children || 0
+      guests,
     };
 
     console.log("Search Data:", searchData);
 
     // Navigate to rooms page with query parameters
-    navigate(`/rooms?destination=${encodeURIComponent(destination)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&adults=${searchData.adults}&children=${searchData.children}`);
+    navigate(`/rooms?destination=${encodeURIComponent(destination)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&adults=${guests.adults}&children=${guests.children}`);
+
+    // Remove other commented options since we're using navigation
   };
 
   return (

@@ -15,6 +15,7 @@ export default function UserRoomList() {
   const [adults, setAdults] = useState(1);
   const [rooms, setRooms] = useState(1);
   const [properties, setProperties] = useState([]);
+  const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -40,52 +41,23 @@ export default function UserRoomList() {
         const destination = searchParams.get('destination');
         const checkIn = searchParams.get('checkIn');
         const checkOut = searchParams.get('checkOut');
-        const adults = parseInt(searchParams.get('adults')) || 1; // Ensure adults is at least 1
-        const children = parseInt(searchParams.get('children')) || 0;
+        const adults = searchParams.get('adults');
+        const children = searchParams.get('children');
 
         // Construct API URL with search parameters
         const apiUrl = new URL('http://localhost:3000/api/getall/all');
         if (destination) apiUrl.searchParams.append('destination', destination);
         if (checkIn) apiUrl.searchParams.append('checkIn', checkIn);
         if (checkOut) apiUrl.searchParams.append('checkOut', checkOut);
-        apiUrl.searchParams.append('adults', adults); // Always include adults
-        apiUrl.searchParams.append('children', children); // Always include children
-
-        // Add filter parameters
-        if (filters.freeCancel) apiUrl.searchParams.append('freeCancel', true);
-        if (filters.breakfast) apiUrl.searchParams.append('breakfast', true);
-        if (filters.beachfront) apiUrl.searchParams.append('beachfront', true);
-        if (filters.earlyBird) apiUrl.searchParams.append('earlyBird', true);
-        if (filters.wifi) apiUrl.searchParams.append('wifi', true);
-        if (filters.pool) apiUrl.searchParams.append('pool', true);
-        if (filters.parking) apiUrl.searchParams.append('parking', true);
-        if (filters.ac) apiUrl.searchParams.append('ac', true);
-        if (filters.spa) apiUrl.searchParams.append('spa', true);
-        if (filters.gym) apiUrl.searchParams.append('gym', true);
-        
-        // Add price range
-        if (filters.priceRange) {
-          apiUrl.searchParams.append('minPrice', filters.priceRange[0]);
-          apiUrl.searchParams.append('maxPrice', filters.priceRange[1]);
-        }
-
-        // Add star rating
-        if (filters.starRating.length > 0) {
-          apiUrl.searchParams.append('starRating', filters.starRating.join(','));
-        }
-
-        // Add property type
-        if (filters.propertyType.length > 0) {
-          apiUrl.searchParams.append('propertyType', filters.propertyType.join(','));
-        }
-
-        console.log('Fetching properties with URL:', apiUrl.toString()); // Debug log
+        if (adults) apiUrl.searchParams.append('adults', adults);
+        if (children) apiUrl.searchParams.append('children', children);
 
         const response = await fetch(apiUrl);
         const result = await response.json();
         
         if (result.success) {
           setProperties(result.data);
+          setFilteredProperties(result.data);
         } else {
           setError('Failed to fetch properties');
         }
@@ -97,9 +69,64 @@ export default function UserRoomList() {
     };
 
     fetchProperties();
-  }, [searchParams, filters]); // Re-fetch when search parameters or filters change
+  }, [searchParams]); // Re-fetch when search parameters change
 
-  
+  // Filter properties based on search criteria
+  useEffect(() => {
+    const destination = searchParams.get('destination')?.toLowerCase();
+    const totalGuests = parseInt(searchParams.get('adults') || '1') + parseInt(searchParams.get('children') || '0');
+    const requestedRooms = parseInt(searchParams.get('rooms') || '1');
+
+    const filtered = properties.filter(property => {
+      // Filter by destination (city)
+      const matchesDestination = !destination || 
+        property.location.city.toLowerCase().includes(destination) ||
+        property.location.state_province.toLowerCase().includes(destination);
+
+      // Filter by room capacity and number of rooms
+      const matchesRoomRequirements = property.room.total_capacity >= totalGuests;
+
+      // Filter by property type if specified
+      const matchesPropertyType = filters.propertyType.length === 0 || 
+        filters.propertyType.includes(property.property_type.toLowerCase());
+
+      // Filter by facilities
+      const matchesFacilities = (
+        (!filters.wifi || property.facilities.free_wifi === 1) &&
+        (!filters.pool || property.facilities.swimming_pool === 1) &&
+        (!filters.parking || property.facilities.free_parking === 1) &&
+        (!filters.ac || property.facilities.air_conditioning === 1) &&
+        (!filters.spa || property.facilities.spa === 1) &&
+        (!filters.gym || property.facilities.gym === 1)
+      );
+
+      // Filter by price range
+      const basePrice = parseFloat(property.room.base_price);
+      const matchesPriceRange = basePrice >= filters.priceRange[0] && basePrice <= filters.priceRange[1];
+
+      // Filter by free cancellation if selected
+      const matchesFreeCancellation = !filters.freeCancel || property.room.free_cancellation_enabled === 1;
+
+      // Filter by breakfast if selected
+      const matchesBreakfast = !filters.breakfast || property.facilities.restaurant === 1;
+
+      // Filter by beachfront if selected
+      const matchesBeachfront = !filters.beachfront || 
+        parseFloat(property.property_details.nearest_beach_distance) <= 0.5;
+
+      return matchesDestination && 
+             matchesRoomRequirements && 
+             matchesPropertyType && 
+             matchesFacilities && 
+             matchesPriceRange &&
+             matchesFreeCancellation &&
+             matchesBreakfast &&
+             matchesBeachfront;
+    });
+
+    setFilteredProperties(filtered);
+  }, [properties, searchParams, filters]);
+
   const priceRanges = [
     { id: 'price1', label: '₹0 - ₹2,000', count: 134 },
     { id: 'price2', label: '₹2,000 - ₹4,500', count: 171 },
@@ -244,9 +271,9 @@ export default function UserRoomList() {
         <div className="flex items-center text-sm">
           <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">Home</a>
           <span className="mx-2 text-gray-400">&gt;</span>
-          <span className="text-gray-600">Hotels and more in Pondicherry</span>
+          <span className="text-gray-600">Hotels and more in {searchParams.get('destination') || 'Pondicherry'}</span>
         </div>
-        <h2 className="text-2xl font-bold mt-4 text-gray-800">{properties.length} Properties in Pondicherry</h2>
+        <h2 className="text-2xl font-bold mt-4 text-gray-800">{filteredProperties.length} Properties in {searchParams.get('destination') || 'Pondicherry'}</h2>
       </div>
 
       {/* Main Content - Three Column Layout */}
@@ -348,11 +375,11 @@ export default function UserRoomList() {
           </div>
 
           {/* Property Listings - Middle */}
-          <PropertyList properties={properties} loading={loading} error={error} />
+          <PropertyList properties={filteredProperties} loading={loading} error={error} />
 
           {/* Map Column - Right */}
           <div className="w-full lg:w-1/3 bg-white rounded-2xl shadow-lg overflow-hidden">
-            <PriceMapPage properties={properties}/>
+            <PriceMapPage properties={filteredProperties}/>
           </div>
         </div>
       </div>
