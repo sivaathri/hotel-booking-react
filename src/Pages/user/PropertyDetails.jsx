@@ -101,7 +101,7 @@ export default function PropertyDetails() {
 
             {/* Amenities */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-4">Amenities</h2>
+            
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {property.facilities?.swimming_pool === 1 && (
                   <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
