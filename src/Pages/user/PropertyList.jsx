@@ -117,15 +117,21 @@ export default function PropertyList({ properties, loading, error }) {
             </div>
 
             {/* Price Section */}
-            <div className="flex flex-col items-end justify-between min-w-[160px]">
+            <div className="flex  flex-col min-w-[160px]">
               <div className="text-right">
-                <p className="text-3xl font-extrabold text-gray-900">
+                <div className="flex items-center justify-end gap-1 ">
+                  <span className="text-yellow-400 text-lg"></span>
+                  <span className="text-sm font-medium bg-orange-500 px-2 py-1 rounded-full text-white">4.8</span>
+                 
+                </div>
+                <span className="text-sm text-gray-400">(2,345 ratings)</span>
+                <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
                   ₹ {basePrice.toLocaleString('en-IN')}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm mb-0 text-gray-500 ">
                   + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
                 </p>
-                <p className="text-sm text-gray-400 mt-1">Per Night</p>
+                <p className="text-sm text-gray-400">Per Night</p>
               </div>
             </div>
           </div>
