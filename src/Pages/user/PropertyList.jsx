@@ -75,7 +75,7 @@ export default function PropertyList({ properties, loading, error }) {
                   <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
                   <span className="text-yellow-400 text-lg">★★★★★</span>
                 </div>
-                <p className="text-blue-600 hover:underline text-sm">
+                <p className="text-blue-600 text-sm">
                   {property.location.city}  | {property.property_details.nearest_beach_distance} Km drive to Beach
                 </p>
                 <div className="flex gap-2 mt-2">
