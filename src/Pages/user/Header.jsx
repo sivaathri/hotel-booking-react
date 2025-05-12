@@ -144,7 +144,7 @@ const Header = () => {
                         to="/"
                         className={`nav-item nav-link ${currentPath === "/" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
                       >
-                        Rooms
+                       Home
                       </Link>
                       <Link
                         to="/about"

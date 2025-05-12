@@ -7,13 +7,8 @@ import HomeSearchBar  from './HomeSearchBar';
 import carouselImg1 from "../../assets/Images/About Images/carousel-1.jpg";
 import carouselImg2 from "../../assets/Images/About Images/carousel-2.jpg";
 
-import room1 from "../../assets/Images/About Images/room-1.jpg";
-import room2 from "../../assets/Images/About Images/room-2.jpg";
-import room3 from "../../assets/Images/About Images/room-3.jpg";
 export default function UserRoomList() {
-  const [destination, setDestination] = useState('Pondicherry');
-  const [checkInDate, setCheckInDate] = useState('2025-05-21');
-  const [checkOutDate, setCheckOutDate] = useState('2025-05-28');
+ 
   const [guests, setGuests] = useState('1 adult, 1 room');
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [adults, setAdults] = useState(1);
@@ -199,7 +194,7 @@ export default function UserRoomList() {
       {/* Carousel End */}
       <HomeSearchBar />
       {/* Breadcrumb */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto  px-4 py-6">
         <div className="flex items-center text-sm">
           <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">Home</a>
           <span className="mx-2 text-gray-400">&gt;</span>
