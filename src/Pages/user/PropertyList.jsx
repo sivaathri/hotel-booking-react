@@ -7,6 +7,9 @@ export default function PropertyList({ properties, loading, error }) {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
 
+  // Debug log to check properties data
+  console.log('Properties data:', properties);
+
   // Helper function to calculate GST
   const calculateGST = (price) => {
     // Convert price to number and handle invalid values
@@ -75,14 +78,27 @@ export default function PropertyList({ properties, loading, error }) {
           >
             {/* Image Gallery */}
             <div className="relative w-full md:w-1/3">
+              {console.log('Room data:', property.room)}
               <img
-                src={property.room.image_paths ? JSON.parse(property.room.image_paths)[0] : '/api/placeholder/400/320'}
+                src={property.room?.image_urls?.[0] ? `http://localhost:3000${property.room.image_urls[0]}` : 'https://placehold.co/400x320?text=No+Image'}
                 alt={property.property_name}
                 className="w-full h-40 object-cover rounded-xl"
+                onError={(e) => {
+                  console.error('Image failed to load:', e.target.src);
+                  e.target.src = 'https://placehold.co/400x320?text=No+Image';
+                }}
               />
               <div className="absolute bottom-2 left-2 flex gap-2">
-                {property.room.image_paths && JSON.parse(property.room.image_paths).slice(1, 4).map((img, index) => (
-                  <img key={index} src={img} className="w-12 h-8 object-cover rounded" />
+                {property.room?.image_urls?.slice(1, 4).map((img, index) => (
+                  <img 
+                    key={index} 
+                    src={`http://localhost:3000${img}`}
+                    className="w-12 h-8 object-cover rounded"
+                    onError={(e) => {
+                      console.error('Thumbnail failed to load:', e.target.src);
+                      e.target.src = 'https://placehold.co/400x320?text=No+Image';
+                    }}
+                  />
                 ))}
                 <div className="w-12 h-8 bg-black/60 text-white flex items-center justify-center rounded text-xs font-bold cursor-pointer">View All</div>
               </div>

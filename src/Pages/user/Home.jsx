@@ -225,7 +225,7 @@ const Home = () => {
                         diam stet diam sed stet lorem.
                       </p>
 
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <a
                           href="#"
                           className="text-white bg-[#FEA116] px-3 py-1.5 text-xs rounded hover:bg-[#e1920e]"
@@ -238,7 +238,7 @@ const Home = () => {
                         >
                           Book Now
                         </a>
-                      </div>
+                      </div> */}
 
                     </div>
 
