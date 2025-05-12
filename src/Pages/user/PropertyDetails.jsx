@@ -229,7 +229,7 @@ export default function PropertyDetails() {
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <h1 className="text-3xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300">{property.property_name}</h1>
+          <h1 className="text-3xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 font-sans">{property.property_name}</h1>
           <div className="flex items-center gap-2 mt-2">
             <motion.div 
               whileHover={{ scale: 1.05 }}
@@ -437,7 +437,7 @@ export default function PropertyDetails() {
             className="col-span-1"
           >
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4 hover:shadow-md transition-all duration-300">
-              <h2 className="text-xl font-semibold mb-4">Book Now</h2>
+              <h2 className="text-xl font-semibold mb-4 font-sans">Book Now</h2>
               <div className="space-y-4">
                 <motion.div whileHover={{ scale: 1.02 }}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
@@ -475,8 +475,8 @@ export default function PropertyDetails() {
           transition={{ delay: 0.6 }}
           className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
         >
-          <h2 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300">About this property</h2>
-          <div className="text-gray-600 mb-4 whitespace-pre-line">
+          <h2 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300 font-sans">About this property</h2>
+          <div className="text-gray-600 mb-4 whitespace-pre-line font-sans">
             {property?.property_details?.description || 'No description available'}
           </div>
         </motion.div>
@@ -488,7 +488,7 @@ export default function PropertyDetails() {
           transition={{ delay: 0.7 }}
           className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
         >
-          <h3 className="text-lg font-bold mb-4 hover:text-blue-600 transition-colors duration-300">Most popular facilities</h3>
+          <h3 className="text-lg font-bold mb-4 hover:text-blue-600 transition-colors duration-300 font-sans">Most popular facilities</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-green-700">
             {FACILITY_MAP.filter(fac => property.facilities?.[fac.key] === 1).map(fac => (
               <motion.div 
@@ -509,7 +509,7 @@ export default function PropertyDetails() {
           transition={{ delay: 0.8 }}
           className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
         >
-          <h3 className="text-lg font-bold mb-2 hover:text-blue-600 transition-colors duration-300">Property Rules</h3>
+          <h3 className="text-lg font-bold mb-2 hover:text-blue-600 transition-colors duration-300 font-sans">Property Rules</h3>
           <div className="flex items-center gap-8 mb-2 text-sm">
             <motion.span whileHover={{ scale: 1.05 }}>
               <span className="font-semibold text-gray-700">Check-in:</span> {property.rules?.check_in_time ? property.rules.check_in_time : "N/A"}
@@ -595,13 +595,13 @@ export default function PropertyDetails() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] relative flex flex-col"
+              className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] relative flex flex-col"
             >
               {/* Fixed Header */}
               <div className="sticky top-0 bg-white z-20 border-b">
                 <div className="p-6 pb-2">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">House Rules & Information</h2>
+                    <h2 className="text-2xl font-bold font-sans">House Rules & Information</h2>
                     <button
                       className="text-gray-500 hover:text-gray-700 text-2xl"
                       onClick={() => setShowRulesModal(false)}
@@ -615,10 +615,10 @@ export default function PropertyDetails() {
                     {Object.keys(rulesSections).map((section, idx) => (
                       <button
                         key={section}
-                        className={`px-4 py-2 font-semibold text-sm focus:outline-none transition-colors ${
+                        className={`px-4 py-2 font-semibold text-sm focus:outline-none transition-colors relative ${
                           activeRulesTab === section
-                            ? "border-b-2 border-blue-600 text-blue-600"
-                            : "border-b-2 border-transparent text-gray-700 hover:text-blue-600"
+                            ? "text-blue-600"
+                            : "text-gray-700 hover:text-blue-600"
                         }`}
                         onClick={() => {
                           setActiveRulesTab(section);
@@ -629,6 +629,9 @@ export default function PropertyDetails() {
                         }}
                       >
                         {section}
+                        {activeRulesTab === section && (
+                          <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400 rounded-t"></div>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -639,8 +642,16 @@ export default function PropertyDetails() {
                 <div>
                   {Object.entries(rulesSections).map(([section, rules]) =>
                     rules.length > 0 ? (
-                      <div key={section} data-section={section} className="mb-8">
-                        <h3 className="font-bold mb-1 text-lg">{section}</h3>
+                      <div 
+                        key={section} 
+                        data-section={section} 
+                        className={`mb-8 transition-all duration-300 ${
+                          activeRulesTab === section 
+                            ? 'bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400' 
+                            : ''
+                        }`}
+                      >
+                        <h3 className="font-bold mb-1 text-lg font-sans">{section}</h3>
                         <ul className="list-disc list-inside space-y-1">
                           {rules.map((rule, idx) => (
                             <li key={idx}>{rule}</li>
