@@ -49,7 +49,7 @@ const PriceMap = ({ properties }) => {
               icon={createCustomIcon(price)}
             >
               <Popup>
-                <div className="font-medium">
+                <div className="font-medium ">
                   <p className="text-lg">{name}</p>
                   <p className="text-sm">{price}</p>
                 </div>

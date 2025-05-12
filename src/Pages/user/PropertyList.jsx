@@ -46,7 +46,7 @@ export default function PropertyList({ properties, loading, error }) {
       {properties.map((property) => {
         const basePrice = Number(property.room.base_price) || 0;
         const gst = calculateGST(basePrice);
-        
+
         return (
           <div
             key={property.property_id}
@@ -55,10 +55,10 @@ export default function PropertyList({ properties, loading, error }) {
           >
             {/* Image Gallery */}
             <div className="relative w-full md:w-1/3">
-              <img 
-                src={property.room.image_paths ? JSON.parse(property.room.image_paths)[0] : '/api/placeholder/400/320'} 
-                alt={property.property_name} 
-                className="w-full h-40 object-cover rounded-xl" 
+              <img
+                src={property.room.image_paths ? JSON.parse(property.room.image_paths)[0] : '/api/placeholder/400/320'}
+                alt={property.property_name}
+                className="w-full h-40 object-cover rounded-xl"
               />
               <div className="absolute bottom-2 left-2 flex gap-2">
                 {property.room.image_paths && JSON.parse(property.room.image_paths).slice(1, 4).map((img, index) => (
@@ -73,19 +73,20 @@ export default function PropertyList({ properties, loading, error }) {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
-                  <span className="text-yellow-400 text-lg">★★★★★</span>
+                  <span className="text-yellow-400 mb-2 text-lg">★★★★★</span>
                 </div>
-                <p className="text-blue-600 text-sm">
-                  {property.location.city}  | {property.property_details.nearest_beach_distance} Km drive to Beach
+                <p className="text-orange-500 text-sm">
+                  <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{property.property_details.nearest_beach_distance} Km drive to Beach</span> 
                 </p>
-                <div className="flex gap-2 mt-2">
+
+                {/* <div className="flex gap-2 mt-2">
                   {property.rules.unmarried_couples_allowed && (
                     <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-xs font-medium">Couple Friendly</span>
                   )}
                   {property.facilities.swimming_pool && (
                     <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-xs font-medium">Swimming Pool</span>
                   )}
-                </div>
+                </div> */}
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   {[
                     property.room.free_cancellation_enabled && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Cancellation" },
@@ -122,7 +123,7 @@ export default function PropertyList({ properties, loading, error }) {
                 <div className="flex items-center justify-end gap-1 ">
                   <span className="text-yellow-400 text-lg"></span>
                   <span className="text-sm font-medium bg-orange-500 px-2 py-1 rounded-full text-white">4.8</span>
-                 
+
                 </div>
                 <span className="text-sm text-gray-400">(2,345 ratings)</span>
                 <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
