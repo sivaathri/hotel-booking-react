@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, MapPin, Calendar, Users, Star, Coffee, CheckCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import Header from './Header';
 import PriceMapPage from '../PriceMapPage';
@@ -8,7 +9,7 @@ import carouselImg1 from "../../assets/Images/About Images/carousel-1.jpg";
 import carouselImg2 from "../../assets/Images/About Images/carousel-2.jpg";
 
 export default function UserRoomList() {
- 
+  const [searchParams] = useSearchParams();
   const [guests, setGuests] = useState('1 adult, 1 room');
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [adults, setAdults] = useState(1);
@@ -35,7 +36,22 @@ export default function UserRoomList() {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/getall/all');
+        // Get search parameters from URL
+        const destination = searchParams.get('destination');
+        const checkIn = searchParams.get('checkIn');
+        const checkOut = searchParams.get('checkOut');
+        const adults = searchParams.get('adults');
+        const children = searchParams.get('children');
+
+        // Construct API URL with search parameters
+        const apiUrl = new URL('http://localhost:3000/api/getall/all');
+        if (destination) apiUrl.searchParams.append('destination', destination);
+        if (checkIn) apiUrl.searchParams.append('checkIn', checkIn);
+        if (checkOut) apiUrl.searchParams.append('checkOut', checkOut);
+        if (adults) apiUrl.searchParams.append('adults', adults);
+        if (children) apiUrl.searchParams.append('children', children);
+
+        const response = await fetch(apiUrl);
         const result = await response.json();
         
         if (result.success) {
@@ -51,7 +67,7 @@ export default function UserRoomList() {
     };
 
     fetchProperties();
-  }, []);
+  }, [searchParams]); // Re-fetch when search parameters change
 
   
   const priceRanges = [
