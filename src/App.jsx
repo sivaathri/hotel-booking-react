@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from './context/UserContext';
 import AdminDashboard from "./Pages/admin/AdminDashboard";
 import CustomersList from "./Pages/admin/CustomersList";
-import StaffList from "./Pages/admin/StaffList";
-import InvoiceList from "./Pages/admin/InvoiceList";
-import ServiceList from "./Pages/admin/ServiceList";
+
+
 import BookRoom from "./Pages/customer/BookRoom";
 import AdminLayout from "./components/AdminLayout";
 import Dashboard from "./Pages/admin/Dashboard";
@@ -106,21 +105,34 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/calender" element=
-          {<ProtectedRoute>
+            {<ProtectedRoute>
               <Calender />
             </ProtectedRoute>
-          } 
+            }
           />
 
 
-<Route path="/property/:propertyId" element={<PropertyDetails />} />
+          <Route path="/property/:propertyId" element=
+
+            {<ProtectedRoute>
+              <PropertyDetails />
+            </ProtectedRoute>
+            }
+          />
 
           <Route path="/admin/customers" element={<CustomersList />} />
-          <Route path="/admin/invoices" element={<InvoiceList />} />
-          <Route path="/admin/staff" element={<StaffList />} />
-          <Route path="/admin/services" element={<ServiceList />} />
+
+
+
           <Route path="/book" element={<BookRoom />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/dashboard" element=
+
+            {
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+
+            } />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="bookings" element={<BookingList />} />

@@ -21,7 +21,7 @@ const dummyServices = [
   },
 ];
 
-const ServiceList = () => {
+const erviceList = () => {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
