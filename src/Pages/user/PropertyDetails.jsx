@@ -315,18 +315,51 @@ export default function PropertyDetails() {
         >
           <div className="relative h-[400px] rounded-lg overflow-hidden mb-2 group">
             <motion.img
-              initial={{ scale: 1 }}
-              whileHover={{ scale: 1.05 }}
+              key={selectedImage}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
               src={images[selectedImage] ? `http://localhost:3000${images[selectedImage]}` : 'https://placehold.co/600x400?text=No+Image'}
-              alt={property.property_name}
-              className="w-full h-full object-cover transition-transform duration-300"
+              alt={`${property.property_name} - Image ${selectedImage + 1}`}
+              className="w-full h-full object-cover"
               onError={(e) => {
                 console.error('Image failed to load:', e.target.src);
                 e.target.src = 'https://placehold.co/600x400?text=No+Image';
               }}
             />
-            <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+            {/* Left Arrow Button */}
+            <button
+              onClick={() => {
+                setSelectedImage((prev) => {
+                  const newIndex = prev === 0 ? images.length - 1 : prev - 1;
+                  console.log('Previous image:', newIndex);
+                  return newIndex;
+                });
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
+              aria-label="Previous image"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            {/* Right Arrow Button */}
+            <button
+              onClick={() => {
+                setSelectedImage((prev) => {
+                  const newIndex = prev === images.length - 1 ? 0 : prev + 1;
+                  console.log('Next image:', newIndex);
+                  return newIndex;
+                });
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
+              aria-label="Next image"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-black/10" />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
             {images.map((img, idx) => (
@@ -335,9 +368,12 @@ export default function PropertyDetails() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 src={`http://localhost:3000${img}`}
-                alt={`${property.property_name} ${idx + 1}`}
+                alt={`${property.property_name} thumbnail ${idx + 1}`}
                 className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'}`}
-                onClick={() => setSelectedImage(idx)}
+                onClick={() => {
+                  console.log('Selected thumbnail:', idx);
+                  setSelectedImage(idx);
+                }}
                 onError={(e) => {
                   console.error('Thumbnail failed to load:', e.target.src);
                   e.target.src = 'https://placehold.co/200x150?text=No+Image';
