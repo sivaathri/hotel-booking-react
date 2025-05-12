@@ -37,7 +37,7 @@ export default function SearchBar() {
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                   placeholder="Enter Destination or Hotel Name"
-                  className="w-full p-3 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                  className="w-full p-2 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                 />
                 <MapPin className="absolute right-4 top-3.5 h-5 w-5 text-gray-400" />
               </div>
@@ -51,7 +51,7 @@ export default function SearchBar() {
                   type="date"
                   value={checkInDate}
                   onChange={(e) => setCheckInDate(e.target.value)}
-                  className="w-full p-3 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                  className="w-full p-2 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                 />
                 <Calendar className="absolute right-4 top-3.5 h-5 w-5 text-gray-400" />
               </div>
@@ -65,7 +65,7 @@ export default function SearchBar() {
                   type="date"
                   value={checkOutDate}
                   onChange={(e) => setCheckOutDate(e.target.value)}
-                  className="w-full p-3 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                  className="w-full p-2 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                 />
                 <Calendar className="absolute right-4 top-3.5 h-5 w-5 text-gray-400" />
               </div>
@@ -75,7 +75,7 @@ export default function SearchBar() {
             <div className="relative group md:col-span-3">
               <label className="block mb-2 text-sm font-medium text-gray-200">Guests and rooms</label>
               <div
-                className="relative w-full p-3 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl flex justify-between items-center cursor-pointer hover:border-blue-500 transition-all duration-300"
+                className="relative w-full p-2 text-gray-900 bg-white/90 border-2 border-transparent rounded-xl flex justify-between items-center cursor-pointer hover:border-blue-500 transition-all duration-300"
                 onClick={() => setShowGuestDropdown(!showGuestDropdown)}
               >
                 <span className="font-medium">{guests}</span>
@@ -135,7 +135,7 @@ export default function SearchBar() {
 
             {/* Search Button */}
             <div className="flex items-end md:col-span-2">
-              <button className="w-full mb-2 h-[46px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
+              <button className="w-full h-[46px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-medium flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
                 <Search className="h-5 w-5 mr-2" />
                 Search
               </button>
