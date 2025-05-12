@@ -1,8 +1,10 @@
 import { CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 export default function PropertyList({ properties, loading, error }) {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const { id } = useParams();
 
   // Helper function to calculate GST
   const calculateGST = (price) => {
@@ -51,7 +53,7 @@ export default function PropertyList({ properties, loading, error }) {
           <div
             key={property.property_id}
             className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6 cursor-pointer"
-            onClick={() => navigate(`/property/${property.property_id}`)}
+            onClick={() => navigate(`/property/${property.property_id}`, { state: { property } })}
           >
             {/* Image Gallery */}
             <div className="relative w-full md:w-1/3">
@@ -73,10 +75,10 @@ export default function PropertyList({ properties, loading, error }) {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
-                  <span className="text-yellow-400 mb-2 text-lg">★★★★★</span>
+                  <span className="text-orange-500 mb-2 text-lg">★★★★★</span>
                 </div>
                 <p className="text-orange-500 text-sm">
-                  <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{property.property_details.nearest_beach_distance} Km drive to Beach</span> 
+                  <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{property.property_details.nearest_beach_distance} Km drive to Beach</span>
                 </p>
 
                 {/* <div className="flex gap-2 mt-2">
@@ -118,23 +120,27 @@ export default function PropertyList({ properties, loading, error }) {
             </div>
 
             {/* Price Section */}
-            <div className="flex  flex-col min-w-[160px]">
-              <div className="text-right">
-                <div className="flex items-center justify-end gap-1 ">
-                  <span className="text-yellow-400 text-lg"></span>
-                  <span className="text-sm font-medium bg-orange-500 px-2 py-1 rounded-full text-white">4.8</span>
-
+            {/* Divider and Price Section */}
+            <div className="flex flex-col md:flex-row items-stretch">
+              <div className="w-px bg-gray-200 mx-6 hidden md:block" />
+              <div className="flex flex-col min-w-[160px]">
+                <div className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <span className="text-yellow-400 text-lg"></span>
+                    <span className="text-sm font-medium bg-orange-500 px-2 py-1 rounded-full text-white">4.8</span>
+                  </div>
+                  <span className="text-sm text-gray-400">(2,345 ratings)</span>
+                  <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
+                    ₹ {basePrice.toLocaleString('en-IN')}
+                  </p>
+                  <p className="text-sm mb-0 text-gray-500 ">
+                    + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
+                  </p>
+                  <p className="text-sm text-gray-400">Per Night</p>
                 </div>
-                <span className="text-sm text-gray-400">(2,345 ratings)</span>
-                <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
-                  ₹ {basePrice.toLocaleString('en-IN')}
-                </p>
-                <p className="text-sm mb-0 text-gray-500 ">
-                  + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
-                </p>
-                <p className="text-sm text-gray-400">Per Night</p>
               </div>
             </div>
+
           </div>
         );
       })}

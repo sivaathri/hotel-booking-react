@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { FaStar, FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake } from 'react-icons/fa';
 import Header from './Header';
@@ -6,12 +6,16 @@ import SearchBar from './SearchBar';
 
 export default function PropertyDetails() {
   const { propertyId } = useParams();
-  const [property, setProperty] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const [property, setProperty] = useState(location.state?.property || null);
+  const [loading, setLoading] = useState(!property);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
+    if (property) return;
+
+    setLoading(true);
     fetch(`http://localhost:3000/api/getall/property/${propertyId}`)
       .then(res => res.json())
       .then(data => {
@@ -26,7 +30,7 @@ export default function PropertyDetails() {
         setError('Failed to load property details');
         setLoading(false);
       });
-  }, [propertyId]);
+  }, [propertyId, property]);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -84,16 +88,7 @@ export default function PropertyDetails() {
         <div className="grid grid-cols-3 gap-8">
           {/* Left Column - Property Details */}
           <div className="col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">About this property</h2>
-              <p className="text-gray-600 mb-4">{property.description}</p>
-              <div className="border-t pt-4">
-                <h3 className="font-semibold mb-2">Location</h3>
-                <p className="text-gray-600">
-                  {property.location?.address_line1}, {property.location?.city}
-                </p>
-              </div>
-            </div>
+           
 
             {/* Amenities */}
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -151,6 +146,16 @@ export default function PropertyDetails() {
               </div>
             </div>
           </div>
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">About this property</h2>
+              <p className="text-gray-600 mb-4">{property.description}</p>
+              <div className="border-t pt-4">
+                <h3 className="font-semibold mb-2">Location</h3>
+                <p className="text-gray-600">
+                  {property.location?.address_line1}, {property.location?.city}
+                </p>
+              </div>
+            </div>
         </div>
       </div>
     </>
