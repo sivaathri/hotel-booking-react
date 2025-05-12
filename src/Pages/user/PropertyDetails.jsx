@@ -12,6 +12,7 @@ import { GiVacuumCleaner } from 'react-icons/gi';
 import { BiRestaurant } from 'react-icons/bi';
 import Header from './Header';
 import SearchBar from './SearchBar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const FACILITY_MAP = [
   { key: 'room_service_24hr', label: 'Room service', icon: <FaConciergeBell /> },
@@ -196,7 +197,11 @@ export default function PropertyDetails() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <motion.div 
+        className="rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      />
     </div>
   );
   if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
@@ -209,219 +214,333 @@ export default function PropertyDetails() {
 
   return (
     <>
-      {/* Header Section */}
       <Header/>
-        {/* Search Bar Section */}
-        <SearchBar/>
-      <div className="max-w-7xl mx-auto p-4">
+      <SearchBar/>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto p-4"
+      >
         {/* Header Section */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">{property.property_name}</h1>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mb-6"
+        >
+          <h1 className="text-3xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300">{property.property_name}</h1>
           <div className="flex items-center gap-2 mt-2">
-            <div className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded"
+            >
               <FaStar className="mr-1" />
               <span>4.5</span>
-            </div>
+            </motion.div>
             <span className="text-gray-600">|</span>
             <span className="text-gray-600">{property.location?.city}</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Image Gallery */}
-        <div className="mb-8">
-          <div className="relative h-[400px] rounded-lg overflow-hidden mb-2">
-            <img 
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mb-8"
+        >
+          <div className="relative h-[400px] rounded-lg overflow-hidden mb-2 group">
+            <motion.img 
+              initial={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
               src={`http://localhost:3000/${images[selectedImage]}`} 
               alt="Property" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300"
             />
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
             {images.map((img, idx) => (
-              <img 
-                key={idx} 
+              <motion.img 
+                key={idx}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 src={`http://localhost:3000/${img}`} 
                 alt={`Property ${idx}`} 
-                className={`w-24 h-20 object-cover rounded cursor-pointer ${selectedImage === idx ? 'ring-2 ring-blue-500' : ''}`}
+                className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${
+                  selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
+                }`}
                 onClick={() => setSelectedImage(idx)}
               />
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Main Content */}
         <div className="grid grid-cols-3 gap-8">
           {/* Left Column - Property Details */}
-          <div className="col-span-2">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="col-span-2"
+          >
             {/* Amenities */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {property.facilities?.swimming_pool === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaSwimmingPool className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaSwimmingPool className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Swimming Pool</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.restaurant === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaUtensils className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaUtensils className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Restaurant</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.room_service_24hr === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaConciergeBell className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaConciergeBell className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">24/7 Room Service</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.free_parking === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaParking className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaParking className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Free Parking</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.free_wifi === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaWifi className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaWifi className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Free WiFi</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.air_conditioning === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaSnowflake className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaSnowflake className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Air Conditioning</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.housekeeping === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <GiVacuumCleaner className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <GiVacuumCleaner className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Housekeeping</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.elevator === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaArrowUp className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaArrowUp className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Elevator</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.tv === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <MdTv className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <MdTv className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">TV</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.cctv === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaVideo className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaVideo className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">CCTV Security</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.first_aid === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaFirstAid className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaFirstAid className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">First Aid</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.wake_up_call === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaBell className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaBell className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Wake-up Call</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.luggage_storage === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaSuitcaseRolling className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaSuitcaseRolling className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Luggage Storage</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.massage === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <FaHandHoldingHeart className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <FaHandHoldingHeart className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Massage</span>
-                  </div>
+                  </motion.div>
                 )}
                 {property.facilities?.conference_room === 1 && (
-                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
-                    <MdMeetingRoom className="text-2xl text-gray-600" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
+                  >
+                    <MdMeetingRoom className="text-2xl text-gray-600 group-hover:text-blue-500" />
                     <span className="text-sm text-center">Conference Room</span>
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column - Booking Card */}
-          <div className="col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            className="col-span-1"
+          >
+            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4 hover:shadow-md transition-all duration-300">
               <h2 className="text-xl font-semibold mb-4">Book Now</h2>
               <div className="space-y-4">
-                <div>
+                <motion.div whileHover={{ scale: 1.02 }}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
-                  <input type="date" className="w-full p-2 border rounded" />
-                </div>
-                <div>
+                  <input type="date" className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" />
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
-                  <input type="date" className="w-full p-2 border rounded" />
-                </div>
-                <div>
+                  <input type="date" className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" />
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Guests</label>
-                  <select className="w-full p-2 border rounded">
+                  <select className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
                     <option>1 Guest</option>
                     <option>2 Guests</option>
                     <option>3 Guests</option>
                     <option>4 Guests</option>
                   </select>
-                </div>
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                </motion.div>
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                >
                   Check Availability
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
         
-        {/* Property Description - Full Width */}
-        <div className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-bold mb-3">About this property</h2>
+        {/* Property Description */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
+        >
+          <h2 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300">About this property</h2>
           <div className="text-gray-600 mb-4 whitespace-pre-line">
             {property?.property_details?.description || 'No description available'}
           </div>
-        </div>
+        </motion.div>
 
         {/* Most Popular Facilities Section */}
-        <div className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-bold mb-4">Most popular facilities</h3>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
+        >
+          <h3 className="text-lg font-bold mb-4 hover:text-blue-600 transition-colors duration-300">Most popular facilities</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-green-700">
             {FACILITY_MAP.filter(fac => property.facilities?.[fac.key] === 1).map(fac => (
-              <div key={fac.key} className="flex items-center gap-2">
+              <motion.div 
+                key={fac.key}
+                whileHover={{ scale: 1.05, x: 5 }}
+                className="flex items-center gap-2 hover:text-green-800 transition-colors duration-300"
+              >
                 {fac.icon} {fac.label}
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Property Rules Section */}
-        <div className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-bold mb-2">Property Rules</h3>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
+        >
+          <h3 className="text-lg font-bold mb-2 hover:text-blue-600 transition-colors duration-300">Property Rules</h3>
           <div className="flex items-center gap-8 mb-2 text-sm">
-            <span>
+            <motion.span whileHover={{ scale: 1.05 }}>
               <span className="font-semibold text-gray-700">Check-in:</span> {property.rules?.check_in_time ? property.rules.check_in_time : "N/A"}
-            </span>
-            <span>
+            </motion.span>
+            <motion.span whileHover={{ scale: 1.05 }}>
               <span className="font-semibold text-gray-700">Check-out:</span> {property.rules?.check_out_time ? property.rules.check_out_time : "N/A"}
-            </span>
+            </motion.span>
           </div>
           <div className="grid grid-cols-2 gap-4 text-gray-700 text-sm mb-4">
             {property.rules ? (
               <>
                 <ul className="list-disc list-inside space-y-1">
                   {getReadableRules(property.rules).slice(0, 3).map((rule, idx) => (
-                    <li key={idx}>{rule}</li>
+                    <motion.li 
+                      key={idx}
+                      whileHover={{ x: 5 }}
+                      className="hover:text-blue-600 transition-colors duration-300"
+                    >
+                      {rule}
+                    </motion.li>
                   ))}
                 </ul>
                 <ul className="list-disc list-inside space-y-1">
                   {getReadableRules(property.rules).slice(3, 6).map((rule, idx) => (
-                    <li key={idx}>{rule}</li>
+                    <motion.li 
+                      key={idx}
+                      whileHover={{ x: 5 }}
+                      className="hover:text-blue-600 transition-colors duration-300"
+                    >
+                      {rule}
+                    </motion.li>
                   ))}
                 </ul>
               </>
@@ -430,80 +549,112 @@ export default function PropertyDetails() {
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <button className="border px-3 py-1 rounded text-sm hover:bg-gray-100">Must Read Rules</button>
-            <button className="border px-3 py-1 rounded text-sm hover:bg-gray-100">Guest Profile</button>
-            <button className="border px-3 py-1 rounded text-sm hover:bg-gray-100">ID Proof Related</button>
-            <a
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="border px-3 py-1 rounded text-sm hover:bg-blue-50 hover:border-blue-500 transition-all duration-300"
+            >
+              Must Read Rules
+            </motion.button>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="border px-3 py-1 rounded text-sm hover:bg-blue-50 hover:border-blue-500 transition-all duration-300"
+            >
+              Guest Profile
+            </motion.button>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="border px-3 py-1 rounded text-sm hover:bg-blue-50 hover:border-blue-500 transition-all duration-300"
+            >
+              ID Proof Related
+            </motion.button>
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               href="#"
               className="text-blue-600 text-sm font-semibold hover:underline ml-2"
               onClick={e => { e.preventDefault(); setShowRulesModal(true); }}
             >
               Read All Property Rules
-            </a>
+            </motion.a>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {showRulesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] relative flex flex-col">
-            {/* Fixed Header */}
-            <div className="sticky top-0 bg-white z-20 border-b">
-              <div className="p-6 pb-2">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold">House Rules & Information</h2>
-                  <button
-                    className="text-gray-500 hover:text-gray-700 text-2xl"
-                    onClick={() => setShowRulesModal(false)}
-                    aria-label="Close"
-                  >
-                    &times;
-                  </button>
-                </div>
-                {/* Tab Navigation */}
-                <div className="flex border-b">
-                  {Object.keys(rulesSections).map((section, idx) => (
+      <AnimatePresence>
+        {showRulesModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] relative flex flex-col"
+            >
+              {/* Fixed Header */}
+              <div className="sticky top-0 bg-white z-20 border-b">
+                <div className="p-6 pb-2">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold">House Rules & Information</h2>
                     <button
-                      key={section}
-                      className={`px-4 py-2 font-semibold text-sm focus:outline-none transition-colors ${
-                        activeRulesTab === section
-                          ? "border-b-2 border-blue-600 text-blue-600"
-                          : "border-b-2 border-transparent text-gray-700 hover:text-blue-600"
-                      }`}
-                      onClick={() => {
-                        setActiveRulesTab(section);
-                        const sectionElement = modalContentRef.current?.querySelector(`[data-section="${section}"]`);
-                        if (sectionElement) {
-                          sectionElement.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }}
+                      className="text-gray-500 hover:text-gray-700 text-2xl"
+                      onClick={() => setShowRulesModal(false)}
+                      aria-label="Close"
                     >
-                      {section}
+                      &times;
                     </button>
-                  ))}
+                  </div>
+                  {/* Tab Navigation */}
+                  <div className="flex border-b">
+                    {Object.keys(rulesSections).map((section, idx) => (
+                      <button
+                        key={section}
+                        className={`px-4 py-2 font-semibold text-sm focus:outline-none transition-colors ${
+                          activeRulesTab === section
+                            ? "border-b-2 border-blue-600 text-blue-600"
+                            : "border-b-2 border-transparent text-gray-700 hover:text-blue-600"
+                        }`}
+                        onClick={() => {
+                          setActiveRulesTab(section);
+                          const sectionElement = modalContentRef.current?.querySelector(`[data-section="${section}"]`);
+                          if (sectionElement) {
+                            sectionElement.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                      >
+                        {section}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-            {/* Scrollable Content */}
-            <div className="overflow-y-auto flex-1 p-6" ref={modalContentRef}>
-              <div>
-                {Object.entries(rulesSections).map(([section, rules]) =>
-                  rules.length > 0 ? (
-                    <div key={section} data-section={section} className="mb-8">
-                      <h3 className="font-bold mb-1 text-lg">{section}</h3>
-                      <ul className="list-disc list-inside space-y-1">
-                        {rules.map((rule, idx) => (
-                          <li key={idx}>{rule}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null
-                )}
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto flex-1 p-6" ref={modalContentRef}>
+                <div>
+                  {Object.entries(rulesSections).map(([section, rules]) =>
+                    rules.length > 0 ? (
+                      <div key={section} data-section={section} className="mb-8">
+                        <h3 className="font-bold mb-1 text-lg">{section}</h3>
+                        <ul className="list-disc list-inside space-y-1">
+                          {rules.map((rule, idx) => (
+                            <li key={idx}>{rule}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
