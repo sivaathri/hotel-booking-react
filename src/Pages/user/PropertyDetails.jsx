@@ -1,10 +1,10 @@
 import { useParams, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { FaStar } from 'react-icons/fa';
-import { 
-  FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake, 
-  FaConciergeBell, FaBed, FaArrowUp, FaUmbrellaBeach, 
-   FaVideo, FaFirstAid, FaBell, FaSuitcaseRolling,
+import {
+  FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake,
+  FaConciergeBell, FaBed, FaArrowUp, FaUmbrellaBeach,
+  FaVideo, FaFirstAid, FaBell, FaSuitcaseRolling,
   FaHandHoldingHeart
 } from 'react-icons/fa';
 import { MdMeetingRoom, MdLocalLaundryService, MdPower, MdSecurity, MdTv, MdRoom } from 'react-icons/md';
@@ -127,6 +127,21 @@ function getRulesSections(rules) {
   };
 }
 
+const mockReviews = {
+  overall: 7.4,
+  label: "Good",
+  count: 143,
+  categories: [
+    { name: "Staff", score: 8.1 },
+    { name: "Facilities", score: 7.7 },
+    { name: "Cleanliness", score: 8.0 },
+    { name: "Comfort", score: 8.0 },
+    { name: "Value for money", score: 7.6 },
+    { name: "Location", score: 7.9 },
+    { name: "Free WiFi", score: 8.5 },
+  ],
+};
+
 export default function PropertyDetails() {
   const { propertyId } = useParams();
   const location = useLocation();
@@ -137,6 +152,7 @@ export default function PropertyDetails() {
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [activeRulesTab, setActiveRulesTab] = useState("");
   const modalContentRef = useRef(null);
+  const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
 
   // Add scroll handler for rules modal
   const handleRulesModalScroll = useCallback(() => {
@@ -197,7 +213,7 @@ export default function PropertyDetails() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
-      <motion.div 
+      <motion.div
         className="rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
         animate={{ rotate: 360 }}
         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -214,16 +230,16 @@ export default function PropertyDetails() {
 
   return (
     <>
-      <Header/>
-      <SearchBar/>
-      <motion.div 
+      <Header />
+      <SearchBar />
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-7xl mx-auto p-4"
       >
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -231,7 +247,7 @@ export default function PropertyDetails() {
         >
           <h1 className="text-3xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 font-sans">{property.property_name}</h1>
           <div className="flex items-center gap-2 mt-2">
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded"
             >
@@ -244,44 +260,44 @@ export default function PropertyDetails() {
         </motion.div>
 
         {/* Image Gallery */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
           <div className="relative h-[400px] rounded-lg overflow-hidden mb-2 group">
-            <motion.img 
+            <motion.img
               initial={{ scale: 1 }}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
-              src={`http://localhost:3000/${images[selectedImage]}`} 
-              alt="Property" 
+              src={`http://localhost:3000/${images[selectedImage]}`}
+              alt="Property"
               className="w-full h-full object-cover transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
             {images.map((img, idx) => (
-              <motion.img 
+              <motion.img
                 key={idx}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                src={`http://localhost:3000/${img}`} 
-                alt={`Property ${idx}`} 
-                className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${
-                  selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
-                }`}
+                src={`http://localhost:3000/${img}`}
+                alt={`Property ${idx}`}
+                className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
+                  }`}
                 onClick={() => setSelectedImage(idx)}
               />
             ))}
           </div>
         </motion.div>
 
+
         {/* Main Content */}
         <div className="grid grid-cols-3 gap-8">
           {/* Left Column - Property Details */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
@@ -291,7 +307,7 @@ export default function PropertyDetails() {
             <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {property.facilities?.swimming_pool === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -300,7 +316,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.restaurant === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -309,7 +325,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.room_service_24hr === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -318,7 +334,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.free_parking === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -327,7 +343,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.free_wifi === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -336,7 +352,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.air_conditioning === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -345,7 +361,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.housekeeping === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -354,7 +370,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.elevator === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -363,7 +379,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.tv === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -372,7 +388,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.cctv === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -381,7 +397,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.first_aid === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -390,7 +406,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.wake_up_call === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -399,7 +415,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.luggage_storage === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -408,7 +424,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.massage === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -417,7 +433,7 @@ export default function PropertyDetails() {
                   </motion.div>
                 )}
                 {property.facilities?.conference_room === 1 && (
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -5 }}
                     className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:border-blue-500 transition-colors duration-300"
                   >
@@ -430,7 +446,7 @@ export default function PropertyDetails() {
           </motion.div>
 
           {/* Right Column - Booking Card */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
@@ -456,7 +472,7 @@ export default function PropertyDetails() {
                     <option>4 Guests</option>
                   </select>
                 </motion.div>
-                <motion.button 
+                <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
@@ -467,9 +483,9 @@ export default function PropertyDetails() {
             </div>
           </motion.div>
         </div>
-        
+
         {/* Property Description */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
@@ -482,7 +498,7 @@ export default function PropertyDetails() {
         </motion.div>
 
         {/* Most Popular Facilities Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
@@ -491,7 +507,7 @@ export default function PropertyDetails() {
           <h3 className="text-lg font-bold mb-4 hover:text-blue-600 transition-colors duration-300 font-sans">Most popular facilities</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-green-700">
             {FACILITY_MAP.filter(fac => property.facilities?.[fac.key] === 1).map(fac => (
-              <motion.div 
+              <motion.div
                 key={fac.key}
                 whileHover={{ scale: 1.05, x: 5 }}
                 className="flex items-center gap-2 hover:text-green-800 transition-colors duration-300"
@@ -503,7 +519,7 @@ export default function PropertyDetails() {
         </motion.div>
 
         {/* Property Rules Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
@@ -523,7 +539,7 @@ export default function PropertyDetails() {
               <>
                 <ul className="list-disc list-inside space-y-1">
                   {getReadableRules(property.rules).slice(0, 3).map((rule, idx) => (
-                    <motion.li 
+                    <motion.li
                       key={idx}
                       whileHover={{ x: 5 }}
                       className="hover:text-blue-600 transition-colors duration-300"
@@ -534,7 +550,7 @@ export default function PropertyDetails() {
                 </ul>
                 <ul className="list-disc list-inside space-y-1">
                   {getReadableRules(property.rules).slice(3, 6).map((rule, idx) => (
-                    <motion.li 
+                    <motion.li
                       key={idx}
                       whileHover={{ x: 5 }}
                       className="hover:text-blue-600 transition-colors duration-300"
@@ -549,21 +565,21 @@ export default function PropertyDetails() {
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="border px-3 py-1 rounded text-sm hover:bg-blue-50 hover:border-blue-500 transition-all duration-300"
             >
               Must Read Rules
             </motion.button>
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="border px-3 py-1 rounded text-sm hover:bg-blue-50 hover:border-blue-500 transition-all duration-300"
             >
               Guest Profile
             </motion.button>
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="border px-3 py-1 rounded text-sm hover:bg-blue-50 hover:border-blue-500 transition-all duration-300"
@@ -582,16 +598,77 @@ export default function PropertyDetails() {
           </div>
         </motion.div>
       </motion.div>
+      {/* Reviews Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="w-2/3 mx-auto mb-8 bg-white rounded-lg shadow-sm p-8 hover:shadow-md transition-all duration-300"
+      >
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-2xl font-bold mb-2 font-sans">Guest reviews</h2>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="bg-blue-700 text-white px-3 py-1 rounded-lg text-xl font-bold">{mockReviews.overall}</span>
+                <div>
+                  <div className="font-semibold text-gray-800">{mockReviews.label}</div>
+                  <div className="text-gray-500 text-sm">{mockReviews.count} verified reviews</div>
+                </div>
+              </div>
+              <div className="h-8 w-px bg-gray-300"></div>
+              <div className="flex items-center gap-2">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar key={i} className={`text-lg ${i < Math.floor(mockReviews.overall) ? 'text-yellow-400' : 'text-gray-300'}`} />
+                  ))}
+                </div>
+                <span className="text-gray-600 text-sm">Based on {mockReviews.count} reviews</span>
+              </div>
+            </div>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="px-6 mt-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
+          >
+            Write a Review
+          </motion.button>
+        </div>
+
+   
+
+        <div className="border-t pt-6">
+          <div className="flex justify-between items-center">
+            <h3 className="font-semibold text-lg">Recent Reviews</h3>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2"
+              onClick={() => setShowAllReviewsModal(true)}
+            >
+              View All Reviews
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </motion.button>
+          </div>
+          <div className=" space-y-6">
+            {/* Sample Review Card */}
+            
+          </div>
+        </div>
+      </motion.div>
 
       <AnimatePresence>
         {showRulesModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -615,11 +692,10 @@ export default function PropertyDetails() {
                     {Object.keys(rulesSections).map((section, idx) => (
                       <button
                         key={section}
-                        className={`px-4 py-2 font-semibold text-sm focus:outline-none transition-colors relative ${
-                          activeRulesTab === section
+                        className={`px-4 py-2 font-semibold text-sm focus:outline-none transition-colors relative ${activeRulesTab === section
                             ? "text-blue-600"
                             : "text-gray-700 hover:text-blue-600"
-                        }`}
+                          }`}
                         onClick={() => {
                           setActiveRulesTab(section);
                           const sectionElement = modalContentRef.current?.querySelector(`[data-section="${section}"]`);
@@ -642,14 +718,13 @@ export default function PropertyDetails() {
                 <div>
                   {Object.entries(rulesSections).map(([section, rules]) =>
                     rules.length > 0 ? (
-                      <div 
-                        key={section} 
-                        data-section={section} 
-                        className={`mb-8 transition-all duration-300 ${
-                          activeRulesTab === section 
-                            ? 'bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400' 
+                      <div
+                        key={section}
+                        data-section={section}
+                        className={`mb-8 transition-all duration-300 ${activeRulesTab === section
+                            ? 'bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400'
                             : ''
-                        }`}
+                          }`}
                       >
                         <h3 className="font-bold mb-1 text-lg font-sans">{section}</h3>
                         <ul className="list-disc list-inside space-y-1">
@@ -661,6 +736,127 @@ export default function PropertyDetails() {
                     ) : null
                   )}
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+        {showAllReviewsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-lg shadow-lg max-w-5xl w-full max-h-[90vh] relative flex flex-col"
+            >
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-white z-20 border-b p-6 flex justify-between items-start">
+                <div>
+                  <h2 className="text-xl font-bold mb-1">Guest reviews for {property.property_name}</h2>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-blue-700 text-white px-2 py-1 rounded text-lg font-bold">{mockReviews.overall}</span>
+                    <span className="font-semibold text-gray-700">{mockReviews.label}</span>
+                    <span className="text-gray-500">{mockReviews.count} real reviews</span>
+                  </div>
+                  <span className="text-green-700 text-xs font-medium">We aim for 100% real reviews <span className="ml-1">✔️</span></span>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                  >
+                    Write a review
+                  </motion.button>
+                  <button
+                    className="text-gray-500 hover:text-gray-700 text-2xl mt-2"
+                    onClick={() => setShowAllReviewsModal(false)}
+                    aria-label="Close"
+                  >
+                    &times;
+                  </button>
+                </div>
+              </div>
+              {/* Categories */}
+              <div className="px-6 pt-4 pb-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  {mockReviews.categories.map(cat => (
+                    <div key={cat.name}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{cat.name}</span>
+                        <span className="font-semibold">{cat.score}</span>
+                      </div>
+                      <div className="w-full h-2 bg-gray-200 rounded">
+                        <div
+                          className="h-2 bg-blue-700 rounded"
+                          style={{ width: `${(cat.score / 10) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Filters */}
+              <div className="px-6 py-2 border-b flex flex-wrap gap-4 items-center">
+                <div className="flex gap-2 items-center">
+                  <span className="font-semibold text-sm">Filters:</span>
+                  <select className="border rounded px-2 py-1 text-sm">
+                    <option>All ({mockReviews.count})</option>
+                  </select>
+                  <select className="border rounded px-2 py-1 text-sm">
+                    <option>All scores</option>
+                  </select>
+                  <select className="border rounded px-2 py-1 text-sm">
+                    <option>All languages</option>
+                  </select>
+                  <select className="border rounded px-2 py-1 text-sm">
+                    <option>All times</option>
+                  </select>
+                </div>
+                <div className="flex gap-2 flex-wrap ml-auto">
+                  <span className="font-semibold text-sm">Select topics to read reviews:</span>
+                  <button className="px-3 py-1 bg-gray-100 rounded-full text-sm">+ Breakfast</button>
+                  <button className="px-3 py-1 bg-gray-100 rounded-full text-sm">+ Clean</button>
+                  <button className="px-3 py-1 bg-gray-100 rounded-full text-sm">+ Room</button>
+                  <button className="px-3 py-1 bg-gray-100 rounded-full text-sm">+ Location</button>
+                  <button className="px-3 py-1 bg-gray-100 rounded-full text-sm">+ Dinner</button>
+                  <button className="px-3 py-1 bg-gray-100 rounded-full text-sm">Show more</button>
+                </div>
+              </div>
+              {/* Reviews List */}
+              <div className="overflow-y-auto flex-1 px-6 py-4 space-y-6">
+                {/* Sample Review Card */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                      JD
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-semibold">John Doe</h4>
+                          <div className="flex items-center gap-1 text-sm text-gray-500">
+                            <span>United States</span>
+                            <span>•</span>
+                            <span>2 days ago</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaStar className="text-yellow-400" />
+                          <span className="font-semibold">8.5</span>
+                        </div>
+                      </div>
+                      <p className="mt-2 text-gray-700">
+                        Excellent stay! The staff was very friendly and the facilities were top-notch. Would definitely recommend this property to others.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {/* Add more review cards as needed */}
               </div>
             </motion.div>
           </motion.div>
