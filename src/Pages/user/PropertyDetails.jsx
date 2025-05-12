@@ -161,6 +161,8 @@ export default function PropertyDetails() {
   const [activeRulesTab, setActiveRulesTab] = useState("");
   const modalContentRef = useRef(null);
   const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
 
   // Calculate guest capacity from search params
   const capacity = Number(searchParams.get('adults') || 1) + Number(searchParams.get('children') || 0);
@@ -263,7 +265,12 @@ export default function PropertyDetails() {
   if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
   if (!property) return <div className="text-center p-4">No property found</div>;
 
-  const images = property.room?.image_paths ? JSON.parse(property.room.image_paths) : [];
+  console.log('Property data:', property);
+  console.log('Room data:', property.room);
+  console.log('Image URLs:', property.room?.image_urls);
+
+  const images = property.room?.image_urls || [];
+  console.log('Images array:', images);
 
   const rulesSections = getRulesSections(property.rules);
   const sectionKeys = Object.keys(rulesSections);
@@ -311,15 +318,15 @@ export default function PropertyDetails() {
               initial={{ scale: 1 }}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
-              src={`http://localhost:5000/assets/${images[selectedImage]}`}
-              alt="Property"
+              src={images[selectedImage] ? `http://localhost:3000${images[selectedImage]}` : 'https://placehold.co/600x400?text=No+Image'}
+              alt={property.property_name}
               className="w-full h-full object-cover transition-transform duration-300"
               onError={(e) => {
                 console.error('Image failed to load:', e.target.src);
-                e.target.src = 'https://placehold.co/600x400?text=Image+Not+Found';
+                e.target.src = 'https://placehold.co/600x400?text=No+Image';
               }}
             />
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+            <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
             {images.map((img, idx) => (
@@ -327,14 +334,13 @@ export default function PropertyDetails() {
                 key={idx}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                src={`http://localhost:5000/assets/${img}`}
-                alt={`Property ${idx}`}
-                className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
-                  }`}
+                src={`http://localhost:3000${img}`}
+                alt={`${property.property_name} ${idx + 1}`}
+                className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'}`}
                 onClick={() => setSelectedImage(idx)}
                 onError={(e) => {
                   console.error('Thumbnail failed to load:', e.target.src);
-                  e.target.src = 'https://placehold.co/200x150?text=Image+Not+Found';
+                  e.target.src = 'https://placehold.co/200x150?text=No+Image';
                 }}
               />
             ))}
