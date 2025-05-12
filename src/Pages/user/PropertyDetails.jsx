@@ -29,6 +29,7 @@ export default function PropertyDetails() {
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) {
+          console.log('Property data:', data.data[0]);
           setProperty(data.data[0]);
         } else {
           setError('Property not found');
@@ -97,11 +98,8 @@ export default function PropertyDetails() {
         <div className="grid grid-cols-3 gap-8">
           {/* Left Column - Property Details */}
           <div className="col-span-2">
-           
-
             {/* Amenities */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-            
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {property.facilities?.swimming_pool === 1 && (
                   <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
@@ -225,16 +223,20 @@ export default function PropertyDetails() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">About this property</h2>
-              <p className="text-gray-600 mb-4">{property.description}</p>
-              <div className="border-t pt-4">
-                <h3 className="font-semibold mb-2">Location</h3>
-                <p className="text-gray-600">
-                  {property.location?.address_line1}, {property.location?.city}
-                </p>
-              </div>
-            </div>
+        </div>
+        
+        {/* Property Description - Full Width */}
+        <div className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold mb-3">About this property</h2>
+          <div className="text-gray-600 mb-4 whitespace-pre-line">
+            {property?.property_details?.description || 'No description available'}
+          </div>
+          {/* <div className="border-t pt-4">
+            <h3 className="font-semibold mb-2">Location</h3>
+            <p className="text-gray-600">
+              {property.location?.address_line1}, {property.location?.city}
+            </p>
+          </div> */}
         </div>
       </div>
     </>
