@@ -1,6 +1,15 @@
 import { useParams, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { FaStar, FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa';
+import { 
+  FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake, 
+  FaConciergeBell, FaBed, FaArrowUp, FaUmbrellaBeach, 
+   FaVideo, FaFirstAid, FaBell, FaSuitcaseRolling,
+  FaHandHoldingHeart
+} from 'react-icons/fa';
+import { MdMeetingRoom, MdLocalLaundryService, MdPower, MdSecurity, MdTv, MdRoom } from 'react-icons/md';
+import { GiVacuumCleaner } from 'react-icons/gi';
+import { BiRestaurant } from 'react-icons/bi';
 import Header from './Header';
 import SearchBar from './SearchBar';
 
@@ -93,27 +102,97 @@ export default function PropertyDetails() {
             {/* Amenities */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold mb-4">Amenities</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2">
-                  <FaWifi className="text-blue-500" />
-                  <span>Free WiFi</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FaParking className="text-blue-500" />
-                  <span>Free Parking</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FaSwimmingPool className="text-blue-500" />
-                  <span>Swimming Pool</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FaUtensils className="text-blue-500" />
-                  <span>Restaurant</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FaSnowflake className="text-blue-500" />
-                  <span>Air Conditioning</span>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {property.facilities?.swimming_pool === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaSwimmingPool className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Swimming Pool</span>
+                  </div>
+                )}
+                {property.facilities?.restaurant === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaUtensils className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Restaurant</span>
+                  </div>
+                )}
+                {property.facilities?.room_service_24hr === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaConciergeBell className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">24/7 Room Service</span>
+                  </div>
+                )}
+                {property.facilities?.free_parking === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaParking className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Free Parking</span>
+                  </div>
+                )}
+                {property.facilities?.free_wifi === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaWifi className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Free WiFi</span>
+                  </div>
+                )}
+                {property.facilities?.air_conditioning === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaSnowflake className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Air Conditioning</span>
+                  </div>
+                )}
+                {property.facilities?.housekeeping === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <GiVacuumCleaner className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Housekeeping</span>
+                  </div>
+                )}
+                {property.facilities?.elevator === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaArrowUp className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Elevator</span>
+                  </div>
+                )}
+                {property.facilities?.tv === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <MdTv className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">TV</span>
+                  </div>
+                )}
+                {property.facilities?.cctv === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaVideo className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">CCTV Security</span>
+                  </div>
+                )}
+                {property.facilities?.first_aid === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaFirstAid className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">First Aid</span>
+                  </div>
+                )}
+                {property.facilities?.wake_up_call === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaBell className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Wake-up Call</span>
+                  </div>
+                )}
+                {property.facilities?.luggage_storage === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaSuitcaseRolling className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Luggage Storage</span>
+                  </div>
+                )}
+                {property.facilities?.massage === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <FaHandHoldingHeart className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Massage</span>
+                  </div>
+                )}
+                {property.facilities?.conference_room === 1 && (
+                  <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                    <MdMeetingRoom className="text-2xl text-gray-600" />
+                    <span className="text-sm text-center">Conference Room</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
