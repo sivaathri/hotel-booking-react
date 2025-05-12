@@ -19,19 +19,21 @@ export default function UserRoomList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
+    earlyBird: false,
     freeCancel: false,
     breakfast: false,
+    mealPlan: false,
     beachfront: false,
-    earlyBird: false,
-    priceRange: [0, 15000],
-    starRating: [],
-    propertyType: [],
+    unmarriedCouples: false,
     wifi: false,
     pool: false,
     parking: false,
     ac: false,
     spa: false,
-    gym: false
+    gym: false,
+    starRating: [],
+    propertyType: [],
+    priceRange: [0, 30000]
   });
 
   useEffect(() => {
@@ -90,6 +92,10 @@ export default function UserRoomList() {
       const matchesPropertyType = filters.propertyType.length === 0 || 
         filters.propertyType.includes(property.property_type.toLowerCase());
 
+      // Filter by star rating
+      const matchesStarRating = filters.starRating.length === 0 || 
+        filters.starRating.includes(`${property.star_rating}-star`);
+
       // Filter by facilities
       const matchesFacilities = (
         (!filters.wifi || property.facilities.free_wifi === 1) &&
@@ -110,18 +116,33 @@ export default function UserRoomList() {
       // Filter by breakfast if selected
       const matchesBreakfast = !filters.breakfast || property.facilities.restaurant === 1;
 
+      // Filter by meal plan if selected
+      const matchesMealPlan = !filters.mealPlan || property.facilities.restaurant === 1;
+
       // Filter by beachfront if selected
       const matchesBeachfront = !filters.beachfront || 
         parseFloat(property.property_details.nearest_beach_distance) <= 0.5;
 
+      // Filter by unmarried couples if selected
+      const matchesUnmarriedCouples = !filters.unmarriedCouples || 
+        property.property_details.allows_unmarried_couples === 1;
+
+      // Filter by early bird deals if selected
+      const matchesEarlyBird = !filters.earlyBird || 
+        property.room.early_bird_discount > 0;
+
       return matchesDestination && 
              matchesRoomRequirements && 
              matchesPropertyType && 
+             matchesStarRating &&
              matchesFacilities && 
              matchesPriceRange &&
              matchesFreeCancellation &&
              matchesBreakfast &&
-             matchesBeachfront;
+             matchesMealPlan &&
+             matchesBeachfront &&
+             matchesUnmarriedCouples &&
+             matchesEarlyBird;
     });
 
     setFilteredProperties(filtered);
@@ -178,6 +199,22 @@ export default function UserRoomList() {
   const applyGuestSelection = () => {
     setGuests(`${adults} adult${adults > 1 ? 's' : ''}, ${rooms} room${rooms > 1 ? 's' : ''}`);
     setShowGuestDropdown(false);
+  };
+
+  const handlePriceRangeChange = (rangeId) => {
+    const priceRanges = {
+      'price1': [0, 2000],
+      'price2': [2000, 4500],
+      'price3': [4500, 8000],
+      'price4': [8000, 11500],
+      'price5': [11500, 15000],
+      'price6': [15000, 30000]
+    };
+    
+    setFilters(prev => ({
+      ...prev,
+      priceRange: priceRanges[rangeId] || [0, 30000]
+    }));
   };
 
   return (
@@ -366,6 +403,7 @@ export default function UserRoomList() {
                     type="checkbox"
                     id={range.id}
                     className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    onChange={() => handlePriceRangeChange(range.id)}
                   />
                   <label htmlFor={range.id} className="ml-3 flex-grow text-gray-700">{range.label}</label>
                   <span className="text-gray-500 text-sm">({range.count})</span>
