@@ -79,7 +79,7 @@ const Listings = () => {
             className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition duration-200"
           >
             <FiPlus className="text-xl" />
-            <span>Add New Listing</span>
+            <span>Add New Property</span>
           </button>
         </div>
 
