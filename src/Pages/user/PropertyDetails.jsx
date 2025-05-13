@@ -172,10 +172,34 @@ export default function PropertyDetails() {
   let totalPrice = 0;
   const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
   const numberOfChildren = parseInt(searchParams.get('children')) || 0;
-  const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
+  
+  // Add more detailed logging for children ages parsing
+  console.log('Raw childrenAges from URL:', searchParams.get('childrenAges'));
+  let childrenAges = [];
+  try {
+    const rawChildrenAges = searchParams.get('childrenAges');
+    if (rawChildrenAges) {
+      childrenAges = JSON.parse(rawChildrenAges);
+      console.log('Parsed childrenAges:', childrenAges);
+    } else {
+      console.log('No childrenAges parameter found in URL');
+      // If no ages provided but children count > 0, create default ages
+      if (numberOfChildren > 0) {
+        childrenAges = Array(numberOfChildren).fill(6); // Default age of 6
+        console.log('Created default ages for children:', childrenAges);
+      }
+    }
+  } catch (error) {
+    console.error('Error parsing childrenAges:', error);
+    if (numberOfChildren > 0) {
+      childrenAges = Array(numberOfChildren).fill(6); // Default age of 6
+      console.log('Created default ages after error:', childrenAges);
+    }
+  }
 
   // Start with base price
   totalPrice = Number(property?.room?.base_price || 0);
+  console.log('Initial base price:', totalPrice);
 
   // Apply occupancy-based pricing adjustments
   if (property?.room?.occupancy_price_adjustments) {
@@ -186,6 +210,7 @@ export default function PropertyDetails() {
         if (typeof occupancyPricing === 'string') {
           occupancyPricing = JSON.parse(occupancyPricing);
         }
+        console.log('Parsed occupancy pricing rules:', occupancyPricing);
       } catch (e) {
         console.error('Error parsing occupancy pricing:', e);
         occupancyPricing = [];
@@ -195,9 +220,11 @@ export default function PropertyDetails() {
       const applicablePricing = occupancyPricing.find(p => 
         numberOfAdults >= p.minGuests && numberOfAdults <= p.maxGuests
       );
+      console.log('Applicable occupancy pricing:', applicablePricing);
 
       if (applicablePricing) {
         totalPrice = Number(applicablePricing.adjustment);
+        console.log('Price after occupancy adjustment:', totalPrice);
       }
     } catch (error) {
       console.error('Error calculating occupancy pricing:', error);
@@ -208,9 +235,13 @@ export default function PropertyDetails() {
   if (numberOfChildren > 0 && property?.room?.child_pricing) {
     try {
       let childPrice = 0;
+      console.log('Starting child price calculation...');
+      console.log('Number of children:', numberOfChildren);
+      console.log('Children ages:', childrenAges);
+      console.log('Base room price:', property.room.base_price);
 
       // Calculate price for each child based on their actual age
-      childrenAges.forEach(age => {
+      childrenAges.forEach((age, index) => {
         let childPricing;
         try {
           // First try to parse the child pricing data
@@ -219,6 +250,7 @@ export default function PropertyDetails() {
           if (typeof childPricing === 'string') {
             childPricing = JSON.parse(childPricing);
           }
+          console.log(`Child pricing rules for child ${index + 1}:`, childPricing);
         } catch (e) {
           console.error('Error parsing child pricing:', e);
           childPricing = [];
@@ -227,17 +259,28 @@ export default function PropertyDetails() {
         const applicablePricing = childPricing.find(p => 
           age >= p.ageFrom && age <= p.ageTo
         );
+        console.log(`Applicable pricing rule for child ${index + 1} (age ${age}):`, applicablePricing);
+
         if (applicablePricing) {
+          let currentChildPrice = 0;
           // If the price type is percentage, calculate based on base price
           if (applicablePricing.type === 'percentage') {
-            childPrice += (Number(property.room.base_price) * Number(applicablePricing.price)) / 100;
+            currentChildPrice = (Number(property.room.base_price) * Number(applicablePricing.price)) / 100;
+            console.log(`Child ${index + 1} price (${applicablePricing.price}% of ${property.room.base_price}):`, currentChildPrice);
           } else {
-            childPrice += Number(applicablePricing.price);
+            currentChildPrice = Number(applicablePricing.price);
+            console.log(`Child ${index + 1} fixed price:`, currentChildPrice);
           }
+          childPrice += currentChildPrice;
+          console.log(`Running total child price after child ${index + 1}:`, childPrice);
+        } else {
+          console.log(`No applicable pricing rule found for child ${index + 1} (age ${age})`);
         }
       });
+      
       totalPrice += childPrice;
-      console.log('Child price:', childPrice);
+      console.log('Final total child price:', childPrice);
+      console.log('New total price after adding child price:', totalPrice);
     } catch (error) {
       console.error('Error calculating child pricing:', error);
     }
