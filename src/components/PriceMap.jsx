@@ -26,7 +26,7 @@ const PriceMap = ({ properties }) => {
   };
 
   return (
-    <div className="w-full h-[600px] rounded-lg overflow-hidden shadow-lg">
+    <div className="w-full h-[600px] rounded-lg  shadow-lg">
       <MapContainer 
         center={[11.9404, 79.8083]} 
         zoom={13} 

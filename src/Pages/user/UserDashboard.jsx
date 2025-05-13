@@ -985,7 +985,7 @@ export default function UserDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
                       { label: 'Email', value: profileData.email, icon: Mail },
-                      { label: 'Phone', value: profileData.mobile, icon: Phone }
+                      { label: 'Phone', value: profileData.mobile, icon: Phone, isVerified: true }
                     ].map((item) => (
                       <div key={item.label} className="flex items-center p-4 bg-gray-50 rounded-lg">
                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
@@ -993,7 +993,15 @@ export default function UserDashboard() {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">{item.label}</p>
-                          <p className="text-sm font-medium text-gray-900">{item.value || 'Not set'}</p>
+                          <div className="flex items-center">
+                            <p className="text-sm font-medium text-gray-900">{item.value || 'Not set'}</p>
+                            {item.isVerified && item.value && (
+                              <span className="ml-2 mb-3 px-2 py-0.5 bg-green-100 text-green-600 text-xs font-medium rounded-full flex items-center">
+                                <Check className="w-3 h-3 mr-1" />
+                                Verified
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
