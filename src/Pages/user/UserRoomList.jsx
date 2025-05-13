@@ -223,7 +223,7 @@ export default function UserRoomList() {
       <Header />
       {/* Header End */}
       {/* Carousel Start */}
-      <div className="container-fluid p-0 mb-5">
+      <div className="container-fluid p-0 ">
         <div
           id="header-carousel"
           className="carousel slide"
@@ -416,7 +416,7 @@ export default function UserRoomList() {
           <PropertyList properties={filteredProperties} loading={loading} error={error} />
 
           {/* Map Column - Right */}
-          <div className="w-full lg:w-1/3 bg-white shadow-lg overflow-hidden h-[600px]">
+          <div className="w-full lg:w-1/3  shadow-lg overflow-hidden h-[600px]">
             <PriceMapPage properties={filteredProperties}/>
           </div>
         </div>
