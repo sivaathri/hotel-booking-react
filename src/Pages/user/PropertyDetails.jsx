@@ -1,4 +1,4 @@
-import { useParams, useLocation, useSearchParams } from 'react-router-dom';
+import { useParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { FaStar } from 'react-icons/fa';
 import {
@@ -145,6 +145,7 @@ const mockReviews = {
 export default function PropertyDetails() {
   const { propertyId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [property, setProperty] = useState(location.state?.property || null);
   const [searchParamsState, setSearchParamsState] = useState({
@@ -287,20 +288,32 @@ export default function PropertyDetails() {
   return (
     <>
       <Header />
-      {/* <SearchBar initialSearchParams={searchParamsState} /> */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-7xl mx-auto p-4"
       >
-        {/* Header Section */}
+        {/* Header Section with Back Button */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
+          <div className="flex items-center gap-4 mb-2">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-300"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </motion.button>
+          </div>
           <h1 className="text-3xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 font-sans">{property.property_name}</h1>
           <div className="flex items-center gap-2 mt-2">
             <motion.div
