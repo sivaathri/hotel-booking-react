@@ -21,18 +21,57 @@ export default function PropertyList({ properties, loading, error }) {
 
   // Helper function to calculate price based on occupancy
   const calculatePrice = (property) => {
-    const basePrice = Number(property.room.base_price) || 0;
+    const basePrice = Number(property.room?.base_price) || 0;
     const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
     const numberOfChildren = parseInt(searchParams.get('children')) || 0;
     const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
+    const totalGuests = numberOfAdults + numberOfChildren;
 
-    // Start with base price for adults
+    // Start with base price
     let totalPrice = basePrice;
 
-    // Add child pricing if there are children
-    if (numberOfChildren > 0 && property.room.child_pricing) {
+    // Apply occupancy-based pricing adjustments
+    if (property.room?.occupancy_price_adjustments) {
       try {
-        const childPricing = JSON.parse(JSON.parse(property.room.child_pricing));
+        let occupancyPricing;
+        try {
+          occupancyPricing = JSON.parse(property.room.occupancy_price_adjustments);
+          if (typeof occupancyPricing === 'string') {
+            occupancyPricing = JSON.parse(occupancyPricing);
+          }
+        } catch (e) {
+          console.error('Error parsing occupancy pricing:', e);
+          occupancyPricing = [];
+        }
+
+        // Find the applicable pricing based on number of adults
+        const applicablePricing = occupancyPricing.find(p => 
+          numberOfAdults >= p.minGuests && numberOfAdults <= p.maxGuests
+        );
+
+        if (applicablePricing) {
+          totalPrice = Number(applicablePricing.adjustment);
+        }
+      } catch (error) {
+        console.error('Error calculating occupancy pricing:', error);
+      }
+    }
+
+    // Add child pricing if there are children
+    if (numberOfChildren > 0 && property.room?.child_pricing) {
+      try {
+        // Parse the child pricing data
+        let childPricing;
+        try {
+          childPricing = JSON.parse(property.room.child_pricing);
+          if (typeof childPricing === 'string') {
+            childPricing = JSON.parse(childPricing);
+          }
+        } catch (e) {
+          console.error('Error parsing child pricing:', e);
+          childPricing = [];
+        }
+
         let childPrice = 0;
 
         // Calculate price for each child based on their actual age
@@ -44,9 +83,12 @@ export default function PropertyList({ properties, loading, error }) {
             childPrice += Number(applicablePricing.price);
           }
         });
+
+        // Add child price to total
         totalPrice += childPrice;
+        console.log('Child price:', childPrice);
       } catch (error) {
-        console.error('Error parsing child pricing:', error);
+        console.error('Error calculating child pricing:', error);
       }
     }
 
@@ -262,7 +304,7 @@ export default function PropertyList({ properties, loading, error }) {
                   <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
                     ₹ {price.toLocaleString('en-IN')}
                   </p>
-                  <p className="text-sm mb-0 text-gray-500 ">
+                  <p className="text-sm mb-0 text-gray-500">
                     + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
                   </p>
                   <p className="text-sm text-gray-400">Per Night</p>
@@ -274,6 +316,8 @@ export default function PropertyList({ properties, loading, error }) {
                       )}
                     </p>
                   )}
+                  {/* Price Breakdown */}
+                
                 </div>
               </div>
             </div>
