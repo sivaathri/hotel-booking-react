@@ -22,7 +22,7 @@ export default function PropertyList({ properties, loading, error }) {
   // Helper function to calculate price based on occupancy
   const calculatePrice = (property) => {
     const basePrice = Number(property.room.base_price) || 0;
-    
+
     // If no adults specified or no occupancy adjustments, return base price
     if (!numberOfAdults || !property.room.occupancy_price_adjustments) {
       return basePrice;
@@ -31,7 +31,7 @@ export default function PropertyList({ properties, loading, error }) {
     try {
       // Parse the double-escaped JSON string
       const adjustments = JSON.parse(JSON.parse(property.room.occupancy_price_adjustments));
-      
+
       // Find the matching adjustment based on number of guests
       const adjustment = adjustments.find(
         adj => numberOfAdults >= adj.minGuests && numberOfAdults <= adj.maxGuests
@@ -75,9 +75,35 @@ export default function PropertyList({ properties, loading, error }) {
 
   if (properties.length === 0) {
     return (
-      <div className="bg-gray-50 p-6 rounded-2xl text-gray-600 text-center">
-        No properties found
+      <div className="flex flex-col items-center w-[800px] h-[400px] p-10 bg-white rounded-2xl shadow-lg border border-gray-100">
+      <div className="w-52 h-36 mb-4">
+        <svg className="w-full h-full text-gray-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" stroke="currentColor" strokeWidth="2"/>
+          <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
       </div>
+      <h3 className="text-xl font-bold text-gray-800 mb-2">No Properties Found</h3>
+      <p className="text-gray-600 text-center mb-4 max-w-md text-sm">
+        We couldn't find any properties matching your search criteria. Try adjusting your filters or search parameters.
+      </p>
+      <div className="flex gap-4">
+        <button 
+          onClick={() => navigate('/')}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+        >
+          Modify Search
+        </button>
+        <button 
+          onClick={() => navigate('/rooms')}
+          className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+        >
+          View All Properties
+        </button>
+      </div>
+    </div>
+    
+    
+
     );
   }
 
@@ -195,7 +221,7 @@ export default function PropertyList({ properties, loading, error }) {
                     ))}
                 </div>
               </div>
-              <p 
+              <p
                 className='text-gray-500 text-sm cursor-pointer hover:text-blue-500 flex items-center gap-1'
                 onClick={(e) => {
                   e.stopPropagation();
