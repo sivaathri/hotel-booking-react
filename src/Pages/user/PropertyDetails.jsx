@@ -689,7 +689,7 @@ export default function PropertyDetails() {
                   Total: ₹ {Number(finalPrice).toLocaleString('en-IN')}
                 </div>
                 {/* Price Breakdown */}
-                <div className="mt-2 text-sm text-gray-600">
+                {/* <div className="mt-2 text-sm text-gray-600">
                   <div>Base Price: ₹ {Number(property.room?.base_price || 0).toLocaleString('en-IN')}</div>
                   {numberOfChildren > 0 && property.room?.child_pricing && (
                     <div className="mt-1">
@@ -734,7 +734,7 @@ export default function PropertyDetails() {
                       })}
                     </div>
                   )}
-                </div>
+                </div> */}
               </div>
               {/* Book Button & More Options */}
               <div className="flex flex-col gap-2 mt-4">
