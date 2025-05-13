@@ -416,7 +416,7 @@ export default function UserRoomList() {
           <PropertyList properties={filteredProperties} loading={loading} error={error} />
 
           {/* Map Column - Right */}
-          <div className="w-full lg:w-1/3 bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="w-full lg:w-1/3 bg-white shadow-lg overflow-hidden h-[600px]">
             <PriceMapPage properties={filteredProperties}/>
           </div>
         </div>

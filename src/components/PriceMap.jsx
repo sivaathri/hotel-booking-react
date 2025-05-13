@@ -15,16 +15,18 @@ const PriceMap = ({ properties }) => {
   const createCustomIcon = (price) => {
     return L.divIcon({
       className: 'custom-div-icon',
-      html: `<div class="bg-white px-2 py-1 rounded-lg shadow-md border border-gray-200">
-               <span class="text-[#FF5A5F] font-medium">${price}</span>
-             </div>`,
+      html: `<div class="bg-white border border-gray-300 px-2 py-1 rounded-full inline-flex items-center shadow-sm">
+  <span class="text-black text-[15px] font-bold leading-none">${price}</span>
+</div>
+
+`,
       iconSize: [60, 20],
       iconAnchor: [30, 10],
     });
   };
 
   return (
-    <div className="w-full h-[500px] rounded-lg overflow-hidden shadow-lg">
+    <div className="w-full h-[600px] rounded-lg overflow-hidden shadow-lg">
       <MapContainer 
         center={[11.9404, 79.8083]} 
         zoom={13} 
@@ -39,7 +41,8 @@ const PriceMap = ({ properties }) => {
         {properties.map((property, index) => {
           const lat = parseFloat(property.location.latitude);
           const lng = parseFloat(property.location.longitude);
-          const price = `₹${property.room?.base_price || '0'}`;
+          const priceValue = parseInt(property.room?.base_price || '0', 10).toLocaleString();
+          const price = `₹${priceValue}`;
           const name = property.property_name;
 
           return (
@@ -51,7 +54,9 @@ const PriceMap = ({ properties }) => {
               <Popup>
                 <div className="font-medium ">
                   <p className="text-lg">{name}</p>
-                  <p className="text-sm">{price}</p>
+                  <span className="bg-white rounded-full px-4 py-2 shadow text-black font-medium text-lg inline-block">
+                    {price}
+                  </span>
                 </div>
               </Popup>
             </Marker>
