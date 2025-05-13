@@ -13,12 +13,40 @@ export default function PropertyList({ properties, loading, error }) {
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
+  // Get number of adults from search params
+  const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
+
   // Debug log to check properties data
   console.log('Properties data:', properties);
 
+  // Helper function to calculate price based on occupancy
+  const calculatePrice = (property) => {
+    const basePrice = Number(property.room.base_price) || 0;
+    
+    // If no adults specified or no occupancy adjustments, return base price
+    if (!numberOfAdults || !property.room.occupancy_price_adjustments) {
+      return basePrice;
+    }
+
+    try {
+      // Parse the double-escaped JSON string
+      const adjustments = JSON.parse(JSON.parse(property.room.occupancy_price_adjustments));
+      
+      // Find the matching adjustment based on number of guests
+      const adjustment = adjustments.find(
+        adj => numberOfAdults >= adj.minGuests && numberOfAdults <= adj.maxGuests
+      );
+
+      // Return adjusted price if found, otherwise base price
+      return adjustment ? Number(adjustment.adjustment) : basePrice;
+    } catch (error) {
+      console.error('Error parsing occupancy adjustments:', error);
+      return basePrice;
+    }
+  };
+
   // Helper function to calculate GST
   const calculateGST = (price) => {
-    // Convert price to number and handle invalid values
     const numericPrice = Number(price) || 0;
     const gstRate = numericPrice <= 7500 ? 0.12 : 0.18;
     const gstAmount = numericPrice * gstRate;
@@ -56,8 +84,8 @@ export default function PropertyList({ properties, loading, error }) {
   return (
     <div className="w-full h-40px lg:w-4/5">
       {properties.map((property) => {
-        const basePrice = Number(property.room.base_price) || 0;
-        const gst = calculateGST(basePrice);
+        const price = calculatePrice(property);
+        const gst = calculateGST(price);
 
         return (
           <div
@@ -188,7 +216,6 @@ export default function PropertyList({ properties, loading, error }) {
             </div>
 
             {/* Price Section */}
-            {/* Divider and Price Section */}
             <div className="flex flex-col md:flex-row items-stretch">
               <div className="w-px bg-gray-200 mx-6 hidden md:block" />
               <div className="flex flex-col min-w-[160px]">
@@ -199,12 +226,17 @@ export default function PropertyList({ properties, loading, error }) {
                   </div>
                   <span className="text-sm text-gray-400">(2,345 ratings)</span>
                   <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
-                    ₹ {basePrice.toLocaleString('en-IN')}
+                    ₹ {price.toLocaleString('en-IN')}
                   </p>
                   <p className="text-sm mb-0 text-gray-500 ">
                     + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
                   </p>
                   <p className="text-sm text-gray-400">Per Night</p>
+                  {numberOfAdults > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Price for {numberOfAdults} {numberOfAdults === 1 ? 'adult' : 'adults'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
