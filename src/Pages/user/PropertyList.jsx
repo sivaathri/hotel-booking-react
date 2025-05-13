@@ -122,7 +122,7 @@ export default function PropertyList({ properties, loading, error }) {
                   e.target.src = 'https://placehold.co/400x320?text=No+Image';
                 }}
               />
-              <div className="absolute bottom-2 left-2 flex gap-2">
+              <div className="absolute mt-2  border-white rounded-lg left-2 flex gap-1">
                 {property.room?.image_urls?.slice(1, 4).map((img, index) => (
                   <img
                     key={index}
