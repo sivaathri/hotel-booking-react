@@ -106,7 +106,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
     }));
   };
 
-  const handleRoomCapacityChange = (index, roomNumber, value) => {
+  const handleRoomCapacityChange = (index, roomNumber, type, value) => {
     if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
@@ -115,10 +115,48 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
           ...room,
           individualRoomCapacities: {
             ...(room.individualRoomCapacities || {}),
-            [roomNumber]: parseInt(value)
+            [roomNumber]: {
+              ...(room.individualRoomCapacities?.[roomNumber] || { adults: 0, children: 0 }),
+              [type]: parseInt(value)
+            }
           }
         } : room
       )
+    }));
+  };
+
+  const handleChildPricingChange = (index, field, value) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      childPricing: prev.childPricing.map((pricing, i) =>
+        i === index ? { ...pricing, [field]: value } : pricing
+      )
+    }));
+  };
+
+  const addChildPricing = () => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      childPricing: [
+        ...(prev.childPricing || []),
+        {
+          ageFrom: 0,
+          ageTo: 0,
+          price: 0,
+          type: 'INR',
+          id: Date.now()
+        }
+      ]
+    }));
+  };
+
+  const removeChildPricing = (index) => {
+    if (!isEditing) return;
+    setFormData(prev => ({
+      ...prev,
+      childPricing: prev.childPricing.filter((_, i) => i !== index)
     }));
   };
 
@@ -152,27 +190,47 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                     <div className="space-y-3">
                       {Array.from({ length: room.numberOfRooms }, (_, i) => {
                         const roomNumber = i + 1;
-                        const currentCapacity = room.individualRoomCapacities?.[roomNumber] || room.capacity;
+                        const currentCapacity = room.individualRoomCapacities?.[roomNumber] || { adults: 0, children: 0 };
+                        const totalCapacity = (currentCapacity.adults || 0) + (currentCapacity.children || 0);
                         return (
-                          <div key={roomNumber} className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-gray-900 w-20">Room {roomNumber}</span>
-                            <input
-                              type="number"
-                              value={currentCapacity}
-                              onChange={(e) => handleRoomCapacityChange(index, roomNumber, e.target.value)}
-                              disabled={!isEditing}
-                              className={`w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
-                              min="1"
-                              max={room.capacity}
-                            />
-                            <span className="text-sm text-gray-500">guests</span>
+                          <div key={roomNumber} className="flex flex-col gap-3 p-3 bg-gray-50 rounded-lg">
+                            <span className="text-sm font-medium text-gray-900">Room {roomNumber}</span>
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">Adults:</span>
+                                <input
+                                  type="number"
+                                  value={currentCapacity.adults || 0}
+                                  onChange={(e) => handleRoomCapacityChange(index, roomNumber, 'adults', e.target.value)}
+                                  disabled={!isEditing}
+                                  className={`w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                                  min="1"
+                                  max={room.capacity}
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">Children:</span>
+                                <input
+                                  type="number"
+                                  value={currentCapacity.children || 0}
+                                  onChange={(e) => handleRoomCapacityChange(index, roomNumber, 'children', e.target.value)}
+                                  disabled={!isEditing}
+                                  className={`w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                                  min="0"
+                                  max={room.capacity - (currentCapacity.adults || 0)}
+                                />
+                              </div>
+                              <span className="text-sm text-gray-500">Total: {totalCapacity} guests</span>
+                            </div>
                           </div>
                         );
                       })}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => sum + capacity, 0) || (room.capacity * room.numberOfRooms) || 0} guests
+                    {Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => {
+                      return sum + ((capacity?.adults || 0) + (capacity?.children || 0));
+                    }, 0)} guests
                   </td>
                   <td className="px-6 py-4">
                     <input
@@ -251,6 +309,106 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Child Pricing Section */}
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-medium">Child Pricing</h3>
+          {isEditing && (
+            <button
+              onClick={addChildPricing}
+              className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+            >
+              <FiPlus className="mr-2" />
+              Add Age Range
+            </button>
+          )}
+        </div>
+        <div className="space-y-4">
+          {(formData.childPricing || []).map((pricing, index) => (
+            <div key={pricing.id} className="p-4 border border-gray-200 rounded-lg bg-white">
+              <div className="flex justify-between items-start mb-4">
+                <h4 className="text-sm font-medium text-gray-700">Age Range {index + 1}</h4>
+                {isEditing && (
+                  <button
+                    onClick={() => removeChildPricing(index)}
+                    className="text-red-500 hover:text-red-700 transition-colors"
+                  >
+                    <FiTrash2 />
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Age From</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      value={pricing.ageFrom}
+                      onChange={(e) => handleChildPricingChange(index, 'ageFrom', parseInt(e.target.value))}
+                      disabled={!isEditing}
+                      min="0"
+                      max={pricing.ageTo}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                    />
+                    <span className="text-sm text-gray-500">years</span>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Age To</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      value={pricing.ageTo}
+                      onChange={(e) => handleChildPricingChange(index, 'ageTo', parseInt(e.target.value))}
+                      disabled={!isEditing}
+                      min={pricing.ageFrom}
+                      max="17"
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                    />
+                    <span className="text-sm text-gray-500">years</span>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Price</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      value={pricing.price}
+                      onChange={(e) => handleChildPricingChange(index, 'price', e.target.value)}
+                      disabled={!isEditing}
+                      min="0"
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Price Type</label>
+                  <select
+                    value={pricing.type}
+                    onChange={(e) => handleChildPricingChange(index, 'type', e.target.value)}
+                    disabled={!isEditing}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                  >
+                    <option value="INR">Fixed Amount (₹)</option>
+                    <option value="percentage">Percentage of Room Rate (%)</option>
+                  </select>
+                </div>
+              </div>
+              <p className="mt-2 text-sm text-gray-500">
+                {pricing.type === 'INR' 
+                  ? `Children aged ${pricing.ageFrom}-${pricing.ageTo} years will be charged ₹${pricing.price} per night`
+                  : `Children aged ${pricing.ageFrom}-${pricing.ageTo} years will be charged ${pricing.price}% of the room rate per night`}
+              </p>
+            </div>
+          ))}
+          {(formData.childPricing || []).length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              No child pricing rules added yet. Click "Add Age Range" to create one.
+            </div>
+          )}
         </div>
       </div>
 

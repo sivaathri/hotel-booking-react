@@ -49,7 +49,11 @@ function App() {
           {/* HOme Screen Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/About" element={<About />} />
-          <Route path="/rooms" element={<UserRoomList />} />
+          <Route path="/rooms" element={
+             <ProtectedRoute>
+            <UserRoomList />
+            </ProtectedRoute>
+            } />
           <Route path="/rooms/:id" element={<RoomDetails />} />
           <Route path="/book/:id" element={<UserBookRoom />} />
           <Route path="/register" element={<Register />} />
