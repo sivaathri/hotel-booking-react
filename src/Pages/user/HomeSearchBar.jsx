@@ -6,8 +6,19 @@ export default function HomeSearchBar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [destination, setDestination] = useState('');
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
+  
+  // Get today's date and day after tomorrow's date
+  const today = new Date();
+  const dayAfterTomorrow = new Date(today);
+  dayAfterTomorrow.setDate(today.getDate() + 2);
+  
+  // Format dates to YYYY-MM-DD
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const [checkIn, setCheckIn] = useState(formatDate(today));
+  const [checkOut, setCheckOut] = useState(formatDate(dayAfterTomorrow));
   const [guests, setGuests] = useState({
     adults: 1,
     children: 0

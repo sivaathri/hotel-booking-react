@@ -93,11 +93,11 @@ export default function PropertyList({ properties, loading, error }) {
             className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6 cursor-pointer"
             onClick={() => {
               const searchParamsObj = {
-                destination: searchParams.get('destination'),
-                checkIn: searchParams.get('checkIn'),
-                checkOut: searchParams.get('checkOut'),
-                adults: searchParams.get('adults'),
-                children: searchParams.get('children')
+                destination: searchParams.get('destination') || '',
+                checkIn: searchParams.get('checkIn') || '',
+                checkOut: searchParams.get('checkOut') || '',
+                adults: searchParams.get('adults') || '1',
+                children: searchParams.get('children') || '0'
               };
 
               // Create URL with search parameters
