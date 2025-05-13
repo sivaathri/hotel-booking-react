@@ -213,7 +213,10 @@ export default function UserRoomList() {
     
     setFilters(prev => ({
       ...prev,
-      priceRange: priceRanges[rangeId] || [0, 30000]
+      priceRange: prev.priceRange[0] === priceRanges[rangeId][0] && 
+                 prev.priceRange[1] === priceRanges[rangeId][1] 
+                 ? [0, 30000] // Reset to default if same range is clicked again
+                 : priceRanges[rangeId]
     }));
   };
 
@@ -417,7 +420,7 @@ export default function UserRoomList() {
 
           {/* Map Column - Right */}
           <div className="w-full lg:w-1/3  shadow-lg overflow-hidden h-[600px]">
-            <PriceMapPage properties={filteredProperties}/>
+            <PriceMapPage properties={properties}/>
           </div>
         </div>
       </div>

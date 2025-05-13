@@ -51,14 +51,7 @@ const PriceMap = ({ properties }) => {
               position={[lat, lng]}
               icon={createCustomIcon(price)}
             >
-              <Popup>
-                <div className="font-medium ">
-                  <p className="text-lg">{name}</p>
-                  <span className="bg-white rounded-full px-4 py-2 shadow text-black font-medium text-lg inline-block">
-                    {price}
-                  </span>
-                </div>
-              </Popup>
+             
             </Marker>
           );
         })}
