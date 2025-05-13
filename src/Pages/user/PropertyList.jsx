@@ -22,27 +22,35 @@ export default function PropertyList({ properties, loading, error }) {
   // Helper function to calculate price based on occupancy
   const calculatePrice = (property) => {
     const basePrice = Number(property.room.base_price) || 0;
+    const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
+    const numberOfChildren = parseInt(searchParams.get('children')) || 0;
+    const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
 
-    // If no adults specified or no occupancy adjustments, return base price
-    if (!numberOfAdults || !property.room.occupancy_price_adjustments) {
-      return basePrice;
+    // Start with base price for adults
+    let totalPrice = basePrice;
+
+    // Add child pricing if there are children
+    if (numberOfChildren > 0 && property.room.child_pricing) {
+      try {
+        const childPricing = JSON.parse(JSON.parse(property.room.child_pricing));
+        let childPrice = 0;
+
+        // Calculate price for each child based on their actual age
+        childrenAges.forEach(age => {
+          const applicablePricing = childPricing.find(p => 
+            age >= p.ageFrom && age <= p.ageTo
+          );
+          if (applicablePricing) {
+            childPrice += Number(applicablePricing.price);
+          }
+        });
+        totalPrice += childPrice;
+      } catch (error) {
+        console.error('Error parsing child pricing:', error);
+      }
     }
 
-    try {
-      // Parse the double-escaped JSON string
-      const adjustments = JSON.parse(JSON.parse(property.room.occupancy_price_adjustments));
-
-      // Find the matching adjustment based on number of guests
-      const adjustment = adjustments.find(
-        adj => numberOfAdults >= adj.minGuests && numberOfAdults <= adj.maxGuests
-      );
-
-      // Return adjusted price if found, otherwise base price
-      return adjustment ? Number(adjustment.adjustment) : basePrice;
-    } catch (error) {
-      console.error('Error parsing occupancy adjustments:', error);
-      return basePrice;
-    }
+    return totalPrice;
   };
 
   // Helper function to calculate GST
@@ -261,6 +269,9 @@ export default function PropertyList({ properties, loading, error }) {
                   {numberOfAdults > 0 && (
                     <p className="text-xs text-gray-500 mt-1">
                       Price for {numberOfAdults} {numberOfAdults === 1 ? 'adult' : 'adults'}
+                      {parseInt(searchParams.get('children')) > 0 && (
+                        <> and {searchParams.get('children')} {parseInt(searchParams.get('children')) === 1 ? 'child' : 'children'}</>
+                      )}
                     </p>
                   )}
                 </div>

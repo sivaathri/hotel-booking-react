@@ -6,6 +6,7 @@ export default function HomeSearchBar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [destination, setDestination] = useState('');
+  const [childrenAges, setChildrenAges] = useState([]);
   
   // Get today's date and day after tomorrow's date
   const today = new Date();
@@ -32,6 +33,7 @@ export default function HomeSearchBar() {
     const urlCheckOut = searchParams.get('checkOut');
     const urlAdults = searchParams.get('adults');
     const urlChildren = searchParams.get('children');
+    const urlChildrenAges = searchParams.get('childrenAges');
 
     if (urlDestination) setDestination(urlDestination);
     if (urlCheckIn) setCheckIn(urlCheckIn);
@@ -42,13 +44,39 @@ export default function HomeSearchBar() {
         children: parseInt(urlChildren) || 0
       });
     }
+    if (urlChildrenAges) {
+      setChildrenAges(JSON.parse(decodeURIComponent(urlChildrenAges)));
+    }
   }, [searchParams]);
 
   const handleChange = (type, value) => {
-    setGuests(prev => ({
-      ...prev,
-      [type]: Math.max(0, prev[type] + value)
-    }));
+    if (type === 'children') {
+      const newChildrenCount = Math.max(0, guests.children + value);
+      setGuests(prev => ({
+        ...prev,
+        children: newChildrenCount
+      }));
+      
+      // Update children ages array
+      if (value > 0) {
+        setChildrenAges(prev => [...prev, 0]);
+      } else {
+        setChildrenAges(prev => prev.slice(0, -1));
+      }
+    } else {
+      setGuests(prev => ({
+        ...prev,
+        [type]: Math.max(0, prev[type] + value)
+      }));
+    }
+  };
+
+  const handleAgeChange = (index, value) => {
+    setChildrenAges(prev => {
+      const newAges = [...prev];
+      newAges[index] = value;
+      return newAges;
+    });
   };
 
   const getSummary = () => {
@@ -69,14 +97,13 @@ export default function HomeSearchBar() {
       checkIn,
       checkOut,
       guests,
+      childrenAges
     };
 
     console.log("Search Data:", searchData);
 
     // Navigate to rooms page with query parameters
-    navigate(`/rooms?destination=${encodeURIComponent(destination)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&adults=${guests.adults}&children=${guests.children}`);
-
-    // Remove other commented options since we're using navigation
+    navigate(`/rooms?destination=${encodeURIComponent(destination)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&adults=${guests.adults}&children=${guests.children}&childrenAges=${encodeURIComponent(JSON.stringify(childrenAges))}`);
   };
 
   return (
@@ -144,6 +171,27 @@ export default function HomeSearchBar() {
                   </div>
                 </div>
               ))}
+              {guests.children > 0 && (
+                <div className="mt-4 border-t pt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Children's Ages</h3>
+                  {childrenAges.map((age, index) => (
+                    <div key={index} className="flex items-center gap-2 mb-2">
+                      <span className="text-sm text-gray-600">Child {index + 1}</span>
+                      <select
+                        value={age}
+                        onChange={(e) => handleAgeChange(index, parseInt(e.target.value))}
+                        className="border rounded px-2 py-1 text-sm"
+                      >
+                        {[...Array(18)].map((_, i) => (
+                          <option key={i} value={i}>
+                            {i} years
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
