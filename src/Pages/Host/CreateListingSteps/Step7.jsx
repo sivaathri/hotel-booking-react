@@ -1,13 +1,57 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FiDollarSign, FiPlus, FiTrash2 } from 'react-icons/fi';
 
 const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
+  // Initialize room capacities when component mounts
+  useEffect(() => {
+    if (formData.rooms) {
+      setFormData(prev => ({
+        ...prev,
+        rooms: prev.rooms.map(room => {
+          // Initialize individualRoomCapacities if it doesn't exist
+          const individualRoomCapacities = room.individualRoomCapacities || {};
+          
+          // Initialize capacities for each room number
+          for (let i = 1; i <= (room.numberOfRooms || 1); i++) {
+            if (!individualRoomCapacities[i]) {
+              individualRoomCapacities[i] = { adults: 1, children: 0 };
+            }
+          }
+
+          // Calculate total capacity
+          const totalCapacity = Object.values(individualRoomCapacities).reduce((sum, capacity) => {
+            return sum + ((capacity?.adults || 0) + (capacity?.children || 0));
+          }, 0);
+
+          // Add room capacity data for API
+          const roomCapacityAdults = Object.values(individualRoomCapacities).reduce((sum, capacity) => 
+            sum + (capacity?.adults || 0), 0);
+          const roomCapacityChildren = Object.values(individualRoomCapacities).reduce((sum, capacity) => 
+            sum + (capacity?.children || 0), 0);
+
+          return {
+            ...room,
+            individualRoomCapacities,
+            capacity: totalCapacity,
+            room_capacity_adults: roomCapacityAdults,
+            room_capacity_children: roomCapacityChildren
+          };
+        })
+      }));
+    }
+  }, []);
+
   const handleRoomChange = (index, field, value) => {
     if (!isEditing) return;
     setFormData(prev => ({
       ...prev,
       rooms: prev.rooms.map((room, i) =>
-        i === index ? { ...room, [field]: value } : room
+        i === index ? { 
+          ...room, 
+          [field]: value,
+          // Ensure individualRoomCapacities exists
+          individualRoomCapacities: room.individualRoomCapacities || {}
+        } : room
       )
     }));
   };
@@ -108,20 +152,44 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
 
   const handleRoomCapacityChange = (index, roomNumber, type, value) => {
     if (!isEditing) return;
+    const parsedValue = parseInt(value) || 0;
+    
     setFormData(prev => ({
       ...prev,
-      rooms: prev.rooms.map((room, i) =>
-        i === index ? {
-          ...room,
-          individualRoomCapacities: {
-            ...(room.individualRoomCapacities || {}),
-            [roomNumber]: {
-              ...(room.individualRoomCapacities?.[roomNumber] || { adults: 0, children: 0 }),
-              [type]: parseInt(value)
-            }
+      rooms: prev.rooms.map((room, i) => {
+        if (i !== index) return room;
+        
+        // Initialize individualRoomCapacities if it doesn't exist
+        const individualRoomCapacities = room.individualRoomCapacities || {};
+        const currentRoomCapacity = individualRoomCapacities[roomNumber] || { adults: 1, children: 0 };
+        
+        // Update the specific room capacity
+        const updatedRoomCapacities = {
+          ...individualRoomCapacities,
+          [roomNumber]: {
+            ...currentRoomCapacity,
+            [type]: parsedValue
           }
-        } : room
-      )
+        };
+
+        // Calculate total capacity and room capacities
+        const totalCapacity = Object.values(updatedRoomCapacities).reduce((sum, capacity) => {
+          return sum + ((capacity?.adults || 0) + (capacity?.children || 0));
+        }, 0);
+
+        const roomCapacityAdults = Object.values(updatedRoomCapacities).reduce((sum, capacity) => 
+          sum + (capacity?.adults || 0), 0);
+        const roomCapacityChildren = Object.values(updatedRoomCapacities).reduce((sum, capacity) => 
+          sum + (capacity?.children || 0), 0);
+
+        return {
+          ...room,
+          individualRoomCapacities: updatedRoomCapacities,
+          capacity: totalCapacity,
+          room_capacity_adults: roomCapacityAdults,
+          room_capacity_children: roomCapacityChildren
+        };
+      })
     }));
   };
 

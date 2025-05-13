@@ -883,8 +883,14 @@ const CreateNewListing = () => {
 
       // Process each room's pricing data
       const roomPricingPromises = formData.rooms.map(async (room) => {
-        // Calculate total capacity from individual room capacities
-        const totalCapacity = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => sum + capacity, 0) || (room.capacity * room.numberOfRooms);
+        // Calculate room capacities
+        const roomCapacityAdults = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => 
+          sum + (capacity?.adults || 0), 0);
+        const roomCapacityChildren = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => 
+          sum + (capacity?.children || 0), 0);
+
+        // Calculate total capacity
+        const totalCapacity = roomCapacityAdults + roomCapacityChildren;
 
         // Format occupancy price adjustments
         const occupancyPriceAdjustments = (room.occupancyRanges || []).map(range => ({
@@ -894,14 +900,25 @@ const CreateNewListing = () => {
           type: range.type
         }));
 
+        // Format child pricing data
+        const childPricingData = (formData.childPricing || []).map(pricing => ({
+          ageFrom: pricing.ageFrom,
+          ageTo: pricing.ageTo,
+          price: pricing.price,
+          type: pricing.type
+        }));
+
         const pricingData = {
           property_id: formData.property_id,
           floor: room.floor,
           room_type: room.bhk,
           number_of_rooms: room.numberOfRooms,
+          room_capacity_adults: roomCapacityAdults,
+          room_capacity_children: roomCapacityChildren,
           total_capacity: totalCapacity,
           base_price: parseFloat(room.pricePerNight),
           occupancy_price_adjustments: JSON.stringify(occupancyPriceAdjustments),
+          child_pricing: JSON.stringify(childPricingData),
           instant_payment_enabled: formData.instantPayment || false,
           free_cancellation_enabled: formData.freeCancellation || false,
           // Refund Policy 1 - Fully Refundable
