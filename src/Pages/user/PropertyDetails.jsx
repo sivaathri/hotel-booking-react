@@ -174,35 +174,66 @@ export default function PropertyDetails() {
   const numberOfChildren = parseInt(searchParams.get('children')) || 0;
   const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
 
-  // Start with base price for adults
-  totalPrice = Number(property.room?.base_price || 0);
+  // Start with base price
+  totalPrice = Number(property?.room?.base_price || 0);
 
-  // Add child pricing if there are children
-  if (numberOfChildren > 0 && property.room?.child_pricing) {
+  // Apply occupancy-based pricing adjustments
+  if (property?.room?.occupancy_price_adjustments) {
     try {
-      // Parse the child pricing data
-      let childPricing;
+      let occupancyPricing;
       try {
-        // Try parsing once
-        childPricing = JSON.parse(property.room.child_pricing);
-        // If it's still a string, parse again
-        if (typeof childPricing === 'string') {
-          childPricing = JSON.parse(childPricing);
+        occupancyPricing = JSON.parse(property.room.occupancy_price_adjustments);
+        if (typeof occupancyPricing === 'string') {
+          occupancyPricing = JSON.parse(occupancyPricing);
         }
       } catch (e) {
-        console.error('Error parsing child pricing:', e);
-        childPricing = [];
+        console.error('Error parsing occupancy pricing:', e);
+        occupancyPricing = [];
       }
 
+      // Find the applicable pricing based on number of adults
+      const applicablePricing = occupancyPricing.find(p => 
+        numberOfAdults >= p.minGuests && numberOfAdults <= p.maxGuests
+      );
+
+      if (applicablePricing) {
+        totalPrice = Number(applicablePricing.adjustment);
+      }
+    } catch (error) {
+      console.error('Error calculating occupancy pricing:', error);
+    }
+  }
+
+  // Add child pricing if there are children
+  if (numberOfChildren > 0 && property?.room?.child_pricing) {
+    try {
       let childPrice = 0;
 
       // Calculate price for each child based on their actual age
       childrenAges.forEach(age => {
+        let childPricing;
+        try {
+          // First try to parse the child pricing data
+          childPricing = JSON.parse(property.room.child_pricing);
+          // If it's still a string, parse it again
+          if (typeof childPricing === 'string') {
+            childPricing = JSON.parse(childPricing);
+          }
+        } catch (e) {
+          console.error('Error parsing child pricing:', e);
+          childPricing = [];
+        }
+
         const applicablePricing = childPricing.find(p => 
           age >= p.ageFrom && age <= p.ageTo
         );
         if (applicablePricing) {
-          childPrice += Number(applicablePricing.price);
+          // If the price type is percentage, calculate based on base price
+          if (applicablePricing.type === 'percentage') {
+            childPrice += (Number(property.room.base_price) * Number(applicablePricing.price)) / 100;
+          } else {
+            childPrice += Number(applicablePricing.price);
+          }
         }
       });
       totalPrice += childPrice;
@@ -214,8 +245,8 @@ export default function PropertyDetails() {
 
   // Calculate GST based on price range
   const gstRate = totalPrice <= 7500 ? 0.12 : 0.18;
-  const gstAmount = totalPrice * gstRate;
-  const finalPrice = totalPrice + gstAmount;
+  const gstAmount = Math.round(totalPrice * gstRate);
+  const finalPrice = Math.round(totalPrice + gstAmount);
 
   // Add scroll handler for rules modal
   const handleRulesModalScroll = useCallback(() => {
@@ -617,19 +648,40 @@ export default function PropertyDetails() {
                 {/* Price Breakdown */}
                 <div className="mt-2 text-sm text-gray-600">
                   <div>Base Price: ₹ {Number(property.room?.base_price || 0).toLocaleString('en-IN')}</div>
-                  {numberOfChildren > 0 && (
+                  {numberOfChildren > 0 && property.room?.child_pricing && (
                     <div className="mt-1">
                       <div className="font-medium">Child Pricing:</div>
                       {childrenAges.map((age, index) => {
                         let childPrice = 0;
                         try {
-                          const childPricing = JSON.parse(JSON.parse(property.room?.child_pricing || '[]'));
-                          const applicablePricing = childPricing.find(p => age >= p.ageFrom && age <= p.ageTo);
+                          let childPricing;
+                          try {
+                            // First try to parse the child pricing data
+                            childPricing = JSON.parse(property.room.child_pricing);
+                            // If it's still a string, parse it again
+                            if (typeof childPricing === 'string') {
+                              childPricing = JSON.parse(childPricing);
+                            }
+                          } catch (e) {
+                            console.error('Error parsing child pricing:', e);
+                            childPricing = [];
+                          }
+
+                          // Find applicable pricing for this child's age
+                          const applicablePricing = childPricing.find(p => 
+                            age >= p.ageFrom && age <= p.ageTo
+                          );
+
                           if (applicablePricing) {
-                            childPrice = Number(applicablePricing.price);
+                            // If the price type is percentage, calculate based on base price
+                            if (applicablePricing.type === 'percentage') {
+                              childPrice = (Number(property.room.base_price) * Number(applicablePricing.price)) / 100;
+                            } else {
+                              childPrice = Number(applicablePricing.price);
+                            }
                           }
                         } catch (error) {
-                          console.error('Error parsing child pricing:', error);
+                          console.error('Error calculating child pricing:', error);
                         }
                         return (
                           <div key={index} className="ml-2 text-gray-500">
