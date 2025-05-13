@@ -21,7 +21,7 @@ export default function PropertyList({ properties, loading, error }) {
 
   // Helper function to calculate price based on occupancy
   const calculatePrice = (property) => {
-    const basePrice = Number(property.room.base_price) || 0;
+    const basePrice = Number(property.room?.base_price) || 0;
     const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
     const numberOfChildren = parseInt(searchParams.get('children')) || 0;
     const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
@@ -30,9 +30,22 @@ export default function PropertyList({ properties, loading, error }) {
     let totalPrice = basePrice;
 
     // Add child pricing if there are children
-    if (numberOfChildren > 0 && property.room.child_pricing) {
+    if (numberOfChildren > 0 && property.room?.child_pricing) {
       try {
-        const childPricing = JSON.parse(JSON.parse(property.room.child_pricing));
+        // Parse the child pricing data
+        let childPricing;
+        try {
+          // Try parsing once
+          childPricing = JSON.parse(property.room.child_pricing);
+          // If it's still a string, parse again
+          if (typeof childPricing === 'string') {
+            childPricing = JSON.parse(childPricing);
+          }
+        } catch (e) {
+          console.error('Error parsing child pricing:', e);
+          childPricing = [];
+        }
+
         let childPrice = 0;
 
         // Calculate price for each child based on their actual age
@@ -45,8 +58,9 @@ export default function PropertyList({ properties, loading, error }) {
           }
         });
         totalPrice += childPrice;
+        console.log('Child price:', childPrice);
       } catch (error) {
-        console.error('Error parsing child pricing:', error);
+        console.error('Error calculating child pricing:', error);
       }
     }
 
@@ -262,7 +276,7 @@ export default function PropertyList({ properties, loading, error }) {
                   <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
                     ₹ {price.toLocaleString('en-IN')}
                   </p>
-                  <p className="text-sm mb-0 text-gray-500 ">
+                  <p className="text-sm mb-0 text-gray-500">
                     + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
                   </p>
                   <p className="text-sm text-gray-400">Per Night</p>
@@ -274,6 +288,32 @@ export default function PropertyList({ properties, loading, error }) {
                       )}
                     </p>
                   )}
+                  {/* Price Breakdown */}
+                  <div className="mt-2 text-sm text-gray-600">
+                    <div>Base Price: ₹ {Number(property.room?.base_price || 0).toLocaleString('en-IN')}</div>
+                    {parseInt(searchParams.get('children')) > 0 && (
+                      <div className="mt-1">
+                        <div className="font-medium">Child Pricing:</div>
+                        {JSON.parse(searchParams.get('childrenAges') || '[]').map((age, index) => {
+                          let childPrice = 0;
+                          try {
+                            const childPricing = JSON.parse(JSON.parse(property.room?.child_pricing || '[]'));
+                            const applicablePricing = childPricing.find(p => age >= p.ageFrom && age <= p.ageTo);
+                            if (applicablePricing) {
+                              childPrice = Number(applicablePricing.price);
+                            }
+                          } catch (error) {
+                            console.error('Error parsing child pricing:', error);
+                          }
+                          return (
+                            <div key={index} className="ml-2 text-gray-500">
+                              Child {index + 1} ({age} years): ₹ {childPrice.toLocaleString('en-IN')}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -170,35 +170,46 @@ export default function PropertyDetails() {
 
   // Calculate price based on occupancy adjustments or base price
   let totalPrice = 0;
-  let occupancyAdjustments = [];
-  
-  // Parse occupancy price adjustments if they exist
-  if (property.room?.occupancy_price_adjustments) {
+  const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
+  const numberOfChildren = parseInt(searchParams.get('children')) || 0;
+  const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
+
+  // Start with base price for adults
+  totalPrice = Number(property.room?.base_price || 0);
+
+  // Add child pricing if there are children
+  if (numberOfChildren > 0 && property.room?.child_pricing) {
     try {
-      let opa = property.room.occupancy_price_adjustments;
-      if (typeof opa === 'string') {
-        opa = JSON.parse(opa);
-        if (typeof opa === 'string') {
-          opa = JSON.parse(opa);
+      // Parse the child pricing data
+      let childPricing;
+      try {
+        // Try parsing once
+        childPricing = JSON.parse(property.room.child_pricing);
+        // If it's still a string, parse again
+        if (typeof childPricing === 'string') {
+          childPricing = JSON.parse(childPricing);
         }
+      } catch (e) {
+        console.error('Error parsing child pricing:', e);
+        childPricing = [];
       }
-      occupancyAdjustments = Array.isArray(opa) ? opa : [];
-    } catch (e) {
-      console.error('Error parsing occupancy price adjustments:', e);
+
+      let childPrice = 0;
+
+      // Calculate price for each child based on their actual age
+      childrenAges.forEach(age => {
+        const applicablePricing = childPricing.find(p => 
+          age >= p.ageFrom && age <= p.ageTo
+        );
+        if (applicablePricing) {
+          childPrice += Number(applicablePricing.price);
+        }
+      });
+      totalPrice += childPrice;
+      console.log('Child price:', childPrice);
+    } catch (error) {
+      console.error('Error calculating child pricing:', error);
     }
-  }
-
-  // Find matching occupancy adjustment for current capacity
-  const matchingAdjustment = occupancyAdjustments.find(adj => 
-    capacity >= Number(adj.minGuests) && capacity <= Number(adj.maxGuests)
-  );
-
-  if (matchingAdjustment && matchingAdjustment.adjustment) {
-    // Use the specific price adjustment for this occupancy
-    totalPrice = Number(matchingAdjustment.adjustment);
-  } else {
-    // Fallback to base price calculation
-    totalPrice = Number(property.room?.base_price || 0) * capacity;
   }
 
   // Calculate GST based on price range
@@ -602,6 +613,32 @@ export default function PropertyDetails() {
                 </div>
                 <div className="text-sm text-gray-600 mt-1">
                   Total: ₹ {Number(finalPrice).toLocaleString('en-IN')}
+                </div>
+                {/* Price Breakdown */}
+                <div className="mt-2 text-sm text-gray-600">
+                  <div>Base Price: ₹ {Number(property.room?.base_price || 0).toLocaleString('en-IN')}</div>
+                  {numberOfChildren > 0 && (
+                    <div className="mt-1">
+                      <div className="font-medium">Child Pricing:</div>
+                      {childrenAges.map((age, index) => {
+                        let childPrice = 0;
+                        try {
+                          const childPricing = JSON.parse(JSON.parse(property.room?.child_pricing || '[]'));
+                          const applicablePricing = childPricing.find(p => age >= p.ageFrom && age <= p.ageTo);
+                          if (applicablePricing) {
+                            childPrice = Number(applicablePricing.price);
+                          }
+                        } catch (error) {
+                          console.error('Error parsing child pricing:', error);
+                        }
+                        return (
+                          <div key={index} className="ml-2 text-gray-500">
+                            Child {index + 1} ({age} years): ₹ {childPrice.toLocaleString('en-IN')}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
               {/* Book Button & More Options */}
