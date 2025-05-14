@@ -143,7 +143,7 @@ export default function HomeSearchBar() {
   };
 
   return (
-    <div className={`w-full transition-all duration-300 z-50 mb-5 ${isSticky ? 'fixed top-0 left-0 right-0 bg-white shadow-lg' : ''}`}>
+    <div className={`w-full transition-all duration-300 z-50 mb-5 `}>
       <div className="w-full mt-3 max-w-6xl mx-auto px-4">
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
