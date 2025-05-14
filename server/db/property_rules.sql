@@ -1,253 +1,310 @@
+CREATE TABLE property_details (
+  property_id INT PRIMARY KEY,
+  description TEXT,
+  nearest_beach_distance DECIMAL(10, 2) DEFAULT NULL,
+  nearest_railway_station_distance DECIMAL(10, 2) DEFAULT NULL,
+  nearest_airport_distance DECIMAL(10, 2) DEFAULT NULL,
+  nearest_bus_stand_distance DECIMAL(10, 2) DEFAULT NULL,
+  can_book_married_couples BOOLEAN DEFAULT FALSE,
+  can_book_families BOOLEAN DEFAULT FALSE,
+  can_book_solo_travelers BOOLEAN DEFAULT FALSE,
+  can_book_friends BOOLEAN DEFAULT FALSE,
+  instant_booking BOOLEAN DEFAULT FALSE,
+  manual_approval BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+);
+ 
 
--- Table structure for table `basic_info`
---
-CREATE TABLE `basic_info` (
-  `property_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `property_name` VARCHAR(255) NOT NULL,
-  `property_type` ENUM('Hotel','Apartment','Hut House','Resort','Beach House','Villa') NOT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`property_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE room_pricing_availability (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  property_id INT NOT NULL,
+  floor INT NOT NULL,
+  room_type VARCHAR(255) NOT NULL,
+  number_of_rooms INT NOT NULL,
+  total_capacity INT NOT NULL,
+  base_price DECIMAL(10, 2) NOT NULL,
+  occupancy_price_adjustments JSON DEFAULT NULL,
+  instant_payment_enabled BOOLEAN DEFAULT FALSE,
+  free_cancellation_enabled BOOLEAN DEFAULT FALSE,
+  refundable1 BOOLEAN DEFAULT FALSE,
+  days_before1 INT DEFAULT NULL,
+  refund_percent1 DECIMAL(5, 2) DEFAULT NULL,
+  refundable2 BOOLEAN DEFAULT FALSE,
+  days_before2 INT DEFAULT NULL,
+  refund_percent2 DECIMAL(5, 2) DEFAULT NULL,
+  refundable3 BOOLEAN DEFAULT FALSE,
+  days_before3 INT DEFAULT NULL,
+  refund_percent3 DECIMAL(5, 2) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+);
+ 
 
-
---
--- Table structure for table `facilities_amenities`
---
-
-CREATE TABLE `facilities_amenities` (
-  `property_id` int(11) NOT NULL  ,
-  `gym` tinyint(1) DEFAULT 0,
-  `swimming_pool` tinyint(1) DEFAULT 0,
-  `spa` tinyint(1) DEFAULT 0,
-  `restaurant` tinyint(1) DEFAULT 0,
-  `room_service_24hr` tinyint(1) DEFAULT 0,
-  `lounge` tinyint(1) DEFAULT 0,
-  `steam_sauna` tinyint(1) DEFAULT 0,
-  `bar` tinyint(1) DEFAULT 0,
-  `free_parking` tinyint(1) DEFAULT 0,
-  `free_wifi` tinyint(1) DEFAULT 0,
-  `refrigerator` tinyint(1) DEFAULT 0,
-  `laundry_service` tinyint(1) DEFAULT 0,
-  `housekeeping` tinyint(1) DEFAULT 0,
-  `air_conditioning` tinyint(1) DEFAULT 0,
-  `power_backup` tinyint(1) DEFAULT 0,
-  `ev_charging` tinyint(1) DEFAULT 0,
-  `smoke_detector` tinyint(1) DEFAULT 0,
-  `umbrellas` tinyint(1) DEFAULT 0,
-  `elevator` tinyint(1) DEFAULT 0,
-  `paid_lan` tinyint(1) DEFAULT 0,
-  `dining_area` tinyint(1) DEFAULT 0,
-  `cafe_24hr` tinyint(1) DEFAULT 0,
-  `barbeque` tinyint(1) DEFAULT 0,
-  `bakery` tinyint(1) DEFAULT 0,
-  `coffee_shop_24hr` tinyint(1) DEFAULT 0,
-  `fire_extinguishers` tinyint(1) DEFAULT 0,
-  `cctv` tinyint(1) DEFAULT 0,
-  `security_alarms` tinyint(1) DEFAULT 0,
-  `reflexology` tinyint(1) DEFAULT 0,
-  `first_aid` tinyint(1) DEFAULT 0,
-  `tv` tinyint(1) DEFAULT 0,
-  `luggage_storage` tinyint(1) DEFAULT 0,
-  `wake_up_call` tinyint(1) DEFAULT 0,
-  `concierge` tinyint(1) DEFAULT 0,
-  `doctor_on_call` tinyint(1) DEFAULT 0,
-  `wheelchair` tinyint(1) DEFAULT 0,
-  `luggage_assistance` tinyint(1) DEFAULT 0,
-  `bellboy_service` tinyint(1) DEFAULT 0,
-  `accessible_facilities` tinyint(1) DEFAULT 0,
-  `pool_beach_towels` tinyint(1) DEFAULT 0,
-  `multilingual_staff` tinyint(1) DEFAULT 0,
-  `massage` tinyint(1) DEFAULT 0,
-  `printer` tinyint(1) DEFAULT 0,
-  `photocopying` tinyint(1) DEFAULT 0,
-  `conference_room` tinyint(1) DEFAULT 0,
-  `banquet` tinyint(1) DEFAULT 0,
-   PRIMARY KEY (`property_id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Table structure for table `location_details`
---
-
-CREATE TABLE `location_details` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `property_id` int(5) NOT NULL ,
-  `user_id` int(11) NOT NULL,
-  `address_line1` varchar(255) NOT NULL,
-  `address_line2` varchar(255) DEFAULT NULL,
-  `city` varchar(100) NOT NULL,
-  `state_province` varchar(100) NOT NULL,
-  `country` varchar(100) NOT NULL,
-  `postal_code` varchar(20) NOT NULL,
-  `latitude` decimal(10,8) DEFAULT NULL,
-  `longitude` decimal(11,8) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
---
--- Table structure for table `property_details`
---
-CREATE TABLE `property_details` (
-  `property_id` INT(11) NOT NULL,
-  `user_id` INT(11) NOT NULL,
-  `description` TEXT,
-  `nearest_beach_distance` DECIMAL(5,2) DEFAULT 0.00,
-  `nearest_railway_station_distance` DECIMAL(5,2) DEFAULT 0.00,
-  `nearest_airport_distance` DECIMAL(5,2) DEFAULT 0.00,
-  `nearest_bus_stand_distance` DECIMAL(5,2) DEFAULT 0.00,
-  `can_book_married_couples` TINYINT(1) DEFAULT 0,
-  `can_book_families` TINYINT(1) DEFAULT 0,
-  `can_book_solo_travelers` TINYINT(1) DEFAULT 0,
-  `can_book_friends` TINYINT(1) DEFAULT 0,
-  `instant_booking` TINYINT(1) DEFAULT 0,
-  `manual_approval` TINYINT(1) DEFAULT 0,
-  PRIMARY KEY (`property_id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Table structure for table `property_rules`
---
-
-CREATE TABLE `property_rules` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `property_id` int(5) NOT NULL  ,
-  `user_id` int(11) NOT NULL,
-  `check_in_time` time DEFAULT NULL,
-  `check_out_time` time DEFAULT NULL,
-  `min_guest_age` int(11) DEFAULT NULL,
-  `proof_type` enum('Passport','Aadhar','Govt ID','Driving License') DEFAULT NULL,
-  `unmarried_couples_allowed` tinyint(1) DEFAULT NULL,
-  `male_only_groups_allowed` tinyint(1) DEFAULT NULL,
-  `scanty_baggage_allowed` tinyint(1) DEFAULT NULL,
-  `smoking_allowed` tinyint(1) DEFAULT NULL,
-  `alcohol_allowed` tinyint(1) DEFAULT NULL,
-  `non_veg_allowed` tinyint(1) DEFAULT NULL,
-  `outside_food_allowed` tinyint(1) DEFAULT NULL,
-  `food_delivery_service` enum('Zomato','Swiggy','Local','UberEats') DEFAULT NULL,
-  `wheelchair_accessible` tinyint(1) DEFAULT NULL,
-  `wheelchair_provided` tinyint(1) DEFAULT NULL,
-  `pets_allowed` tinyint(1) DEFAULT NULL,
-  `pets_on_property` tinyint(1) DEFAULT NULL,
-  `mattress_cost_child` decimal(10,2) DEFAULT NULL,
-  `mattress_cost_adult` decimal(10,2) DEFAULT NULL,
-  `cot_cost` decimal(10,2) DEFAULT NULL,
-  `rule_description` text DEFAULT NULL,
-   PRIMARY KEY (`id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE,
-    FOREIGN KEY (`room_id`) REFERENCES `room_setup`(`room_id`) ON DELETE CASCADE
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Table structure for table `room_images`
---
-
-CREATE TABLE `room_images` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `property_id` int(5) NOT NULL  ,
-  `room_id` int(11) NOT NULL,
-  `image_paths` varchar(555) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-   PRIMARY KEY (`id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Table structure for table `room_pricing_availability`
---
-
-CREATE TABLE `room_pricing_availability` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `property_id` int(11) NOT NULL  ,
-  `floor` varchar(50) DEFAULT NULL,
-  `room_type` varchar(50) DEFAULT NULL,
-  `number_of_rooms` int(11) DEFAULT NULL,
-  `total_capacity` int(11) DEFAULT NULL,
-  `base_price` decimal(10,2) DEFAULT NULL,
-  `occupancy_price_adjustments` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`occupancy_price_adjustments`)),
-  `instant_payment_enabled` tinyint(1) DEFAULT 0,
-  `free_cancellation_enabled` tinyint(1) DEFAULT 0,
-  `refundable1` tinyint(1) DEFAULT 0,
-  `days_before1` int(11) DEFAULT NULL,
-  `refund_percent1` int(11) DEFAULT NULL,
-  `refundable2` tinyint(1) DEFAULT 0,
-  `days_before2` int(11) DEFAULT NULL,
-  `refund_percent2` int(11) DEFAULT NULL,
-  `refundable3` tinyint(1) DEFAULT 0,
-  `days_before3` int(11) DEFAULT NULL,
-  `refund_percent3` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
- PRIMARY KEY (`id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE,
-  CHECK (JSON_VALID(`occupancy_price_adjustments`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE facilities_amenities (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  property_id INT NOT NULL,
+  gym BOOLEAN DEFAULT FALSE,
+  swimming_pool BOOLEAN DEFAULT FALSE,
+  spa BOOLEAN DEFAULT FALSE,
+  restaurant BOOLEAN DEFAULT FALSE,
+  room_service_24hr BOOLEAN DEFAULT FALSE,
+  lounge BOOLEAN DEFAULT FALSE,
+  steam_sauna BOOLEAN DEFAULT FALSE,
+  bar BOOLEAN DEFAULT FALSE,
+  free_parking BOOLEAN DEFAULT FALSE,
+  free_wifi BOOLEAN DEFAULT FALSE,
+  refrigerator BOOLEAN DEFAULT FALSE,
+  laundry_service BOOLEAN DEFAULT FALSE,
+  housekeeping BOOLEAN DEFAULT FALSE,
+  air_conditioning BOOLEAN DEFAULT FALSE,
+  power_backup BOOLEAN DEFAULT FALSE,
+ ev_charging BOOLEAN DEFAULT FALSE,
+  smoke_detector BOOLEAN DEFAULT FALSE,
+  umbrellas BOOLEAN DEFAULT FALSE,
+ elevator BOOLEAN DEFAULT FALSE,
+  paid_lan BOOLEAN DEFAULT FALSE,
+  dining_area BOOLEAN DEFAULT FALSE,
+  cafe_24hr BOOLEAN DEFAULT FALSE,
+  barbeque BOOLEAN DEFAULT FALSE,
+  bakery BOOLEAN DEFAULT FALSE,
+  coffee_shop_24hr BOOLEAN DEFAULT FALSE,
+  fire_extinguishers BOOLEAN DEFAULT FALSE,
+  cctv BOOLEAN DEFAULT FALSE,
+  security_alarms BOOLEAN DEFAULT FALSE,
+  reflexology BOOLEAN DEFAULT FALSE,
+ first_aid BOOLEAN DEFAULT FALSE,
+  tv BOOLEAN DEFAULT FALSE,
+  luggage_storage BOOLEAN DEFAULT FALSE,
+  wake_up_call BOOLEAN DEFAULT FALSE,
+  concierge BOOLEAN DEFAULT FALSE,
+  doctor_on_call BOOLEAN DEFAULT FALSE,
+  wheelchair BOOLEAN DEFAULT FALSE,
+  luggage_assistance BOOLEAN DEFAULT FALSE,
+  bellboy_service BOOLEAN DEFAULT FALSE,
+  pool_beach_towels BOOLEAN DEFAULT FALSE,
+  multilingual_staff BOOLEAN DEFAULT FALSE,
+accessible_facilities BOOLEAN DEFAULT FALSE,
+  massage BOOLEAN DEFAULT FALSE,
+  printer BOOLEAN DEFAULT FALSE,
+  photocopying BOOLEAN DEFAULT FALSE,
+  conference_room BOOLEAN DEFAULT FALSE,
+  banquet BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+);
 
 
---
--- Table structure for table `room_setup`
---
 
-CREATE TABLE `room_setup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `property_id` int(5) NOT NULL ,
-  `user_id` int(11) NOT NULL,
-  `floor` varchar(50) NOT NULL,
-  `room_type` varchar(100) NOT NULL,
-  `number_of_rooms` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-CREATE TABLE `room_setup` (
-  `room_id` int(11) NOT NULL AUTO_INCREMENT,
-  `property_id` int(5) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `floor` varchar(50) NOT NULL,
-  `room_type` varchar(100) NOT NULL,
-  `number_of_rooms` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`room_id`),
-  FOREIGN KEY (`property_id`) REFERENCES `basic_info`(`property_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- Table structure for table `users`
---
 
-CREATE TABLE `users` (
-  `user_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `mobile` varchar(15) DEFAULT NULL,
-  `role` enum('user','admin') DEFAULT 'user',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `date_of_birth` date DEFAULT NULL,
-  `gender` varchar(15) DEFAULT NULL,
-  `marital_status` varchar(15) DEFAULT NULL,
-  `address` text DEFAULT NULL,
-  `pincode` varchar(10) DEFAULT NULL,
-  `state` varchar(50) DEFAULT NULL,
-   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE property_rules (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  property_id INT NOT NULL,
+  user_id INT NOT NULL,
+  check_in_time TIME NOT NULL,
+  check_out_time TIME NOT NULL,
+  min_guest_age INT NOT NULL,
+  proof_type VARCHAR(255) DEFAULT NULL,
+  unmarried_couples_allowed BOOLEAN DEFAULT FALSE,
+  male_only_groups_allowed BOOLEAN DEFAULT FALSE,
+  scanty_baggage_allowed BOOLEAN DEFAULT FALSE,
+  smoking_allowed BOOLEAN DEFAULT FALSE,
+  alcohol_allowed BOOLEAN DEFAULT FALSE,
+  non_veg_allowed BOOLEAN DEFAULT FALSE,
+  outside_food_allowed BOOLEAN DEFAULT FALSE,
+  food_delivery_service BOOLEAN DEFAULT FALSE,
+  wheelchair_accessible BOOLEAN DEFAULT FALSE,
+  wheelchair_provided BOOLEAN DEFAULT FALSE,
+  pets_allowed BOOLEAN DEFAULT FALSE,
+  pets_on_property BOOLEAN DEFAULT FALSE,
+  mattress_cost_child DECIMAL(10, 2) DEFAULT NULL,
+  mattress_cost_adult DECIMAL(10, 2) DEFAULT NULL,
+  cot_cost DECIMAL(10, 2) DEFAULT NULL,
+  rule_description TEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
--- Indexes for dumped tables
---
+
+
+
+CREATE TABLE room_images (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  room_id INT NOT NULL,
+  property_id INT NOT NULL,
+  image_paths JSON NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (room_id) REFERENCES room_setup(room_id) ON DELETE CASCADE,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE room_setup (
+  room_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  property_id INT NOT NULL,
+  floor INT NOT NULL,
+  room_type VARCHAR(255) NOT NULL,
+  number_of_rooms INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE location_details (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  property_id INT NOT NULL,
+  address_line1 VARCHAR(255) NOT NULL,
+  address_line2 VARCHAR(255),
+  city VARCHAR(255) NOT NULL,
+  state_province VARCHAR(255) NOT NULL,
+  country VARCHAR(255) NOT NULL,
+  postal_code VARCHAR(20) NOT NULL,
+  latitude DECIMAL(9, 6) NOT NULL,
+  longitude DECIMAL(9, 6) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE,
+  UNIQUE (address_line1, city, state_province, country, postal_code, address_line2, latitude, longitude)
+);
+
+
+CREATE TABLE basic_info (
+  property_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  property_name VARCHAR(255) NOT NULL,
+  property_type ENUM('Hotel', 'Apartment', 'Hut House', 'Resort', 'Beach House', 'Villa') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+ 
+
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('user', 'admin') DEFAULT 'user',
+  mobile VARCHAR(15),
+  date_of_birth DATE,
+  gender ENUM('male', 'female', 'other') DEFAULT 'other',
+  marital_status ENUM('single', 'married', 'divorced', 'widowed') DEFAULT 'single',
+  address TEXT,
+  pincode VARCHAR(10),
+  state VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
+
+
+
+
+===============================
+
+
+
+CREATE TABLE facilities_amenities (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  property_id INT NOT NULL,
+  gym BOOLEAN DEFAULT FALSE,
+  swimming_pool BOOLEAN DEFAULT FALSE,
+  spa BOOLEAN DEFAULT FALSE,
+  restaurant BOOLEAN DEFAULT FALSE,
+  room_service_24hr BOOLEAN DEFAULT FALSE,
+  lounge BOOLEAN DEFAULT FALSE,
+  steam_sauna BOOLEAN DEFAULT FALSE,
+  bar BOOLEAN DEFAULT FALSE,
+  free_parking BOOLEAN DEFAULT FALSE,
+  free_wifi BOOLEAN DEFAULT FALSE,
+  refrigerator BOOLEAN DEFAULT FALSE,
+  laundry_service BOOLEAN DEFAULT FALSE,
+  housekeeping BOOLEAN DEFAULT FALSE,
+  air_conditioning BOOLEAN DEFAULT FALSE,
+  power_backup BOOLEAN DEFAULT FALSE,
+ ev_charging BOOLEAN DEFAULT FALSE,
+  smoke_detector BOOLEAN DEFAULT FALSE,
+  umbrellas BOOLEAN DEFAULT FALSE,
+ elevator BOOLEAN DEFAULT FALSE,
+  paid_lan BOOLEAN DEFAULT FALSE,
+  dining_area BOOLEAN DEFAULT FALSE,
+  cafe_24hr BOOLEAN DEFAULT FALSE,
+  barbeque BOOLEAN DEFAULT FALSE,
+  bakery BOOLEAN DEFAULT FALSE,
+  coffee_shop_24hr BOOLEAN DEFAULT FALSE,
+  fire_extinguishers BOOLEAN DEFAULT FALSE,
+  cctv BOOLEAN DEFAULT FALSE,
+  security_alarms BOOLEAN DEFAULT FALSE,
+  reflexology BOOLEAN DEFAULT FALSE,
+ first_aid BOOLEAN DEFAULT FALSE,
+  tv BOOLEAN DEFAULT FALSE,
+  luggage_storage BOOLEAN DEFAULT FALSE,
+  wake_up_call BOOLEAN DEFAULT FALSE,
+  concierge BOOLEAN DEFAULT FALSE,
+  doctor_on_call BOOLEAN DEFAULT FALSE,
+  wheelchair BOOLEAN DEFAULT FALSE,
+  luggage_assistance BOOLEAN DEFAULT FALSE,
+  bellboy_service BOOLEAN DEFAULT FALSE,
+  pool_beach_towels BOOLEAN DEFAULT FALSE,
+  multilingual_staff BOOLEAN DEFAULT FALSE,
+accessible_facilities BOOLEAN DEFAULT FALSE,
+  massage BOOLEAN DEFAULT FALSE,
+  printer BOOLEAN DEFAULT FALSE,
+  photocopying BOOLEAN DEFAULT FALSE,
+  conference_room BOOLEAN DEFAULT FALSE,
+  banquet BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+);
+
+
+
+
+CREATE TABLE room_pricing_availability (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  property_id INT NOT NULL,
+  floor INT NOT NULL,
+  room_type VARCHAR(255) NOT NULL,
+  number_of_rooms INT NOT NULL,
+ room_capacity_adults INT NOT NULL,
+    room_capacity_children INT NOT NULL,
+  total_capacity INT NOT NULL,
+  base_price DECIMAL(10, 2) NOT NULL,
+  occupancy_price_adjustments JSON DEFAULT NULL,
+child_pricing JSON DEFAULT NULL,
+  instant_payment_enabled BOOLEAN DEFAULT FALSE,
+  free_cancellation_enabled BOOLEAN DEFAULT FALSE,
+  refundable1 BOOLEAN DEFAULT FALSE,
+  days_before1 INT DEFAULT NULL,
+  refund_percent1 DECIMAL(5, 2) DEFAULT NULL,
+  refundable2 BOOLEAN DEFAULT FALSE,
+  days_before2 INT DEFAULT NULL,
+  refund_percent2 DECIMAL(5, 2) DEFAULT NULL,
+  refundable3 BOOLEAN DEFAULT FALSE,
+  days_before3 INT DEFAULT NULL,
+  refund_percent3 DECIMAL(5, 2) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+);
+
+
+
+
 
