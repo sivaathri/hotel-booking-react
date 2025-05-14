@@ -26,24 +26,13 @@ class BasicInfo {
   }
 
   // Check if property name exists
-  static async checkPropertyNameExists(property_name) {
-    const [rows] = await db.query(
-      'SELECT property_id FROM basic_info WHERE property_name = ?',
-      [property_name]
-    );
-    return rows.length > 0;
-  }
-
+  
   static async createBasicInfo(
     user_id,
     property_name,
     property_type
   ){
-    // Check if property name already exists
-    const propertyExists = await this.checkPropertyNameExists(property_name);
-    if (propertyExists) {
-      throw new Error('Property name already exists');
-    }
+    
 
     const [result] = await db.query(
       `INSERT INTO basic_info (user_id, property_name, property_type) VALUES (?, ?, ?)`,
