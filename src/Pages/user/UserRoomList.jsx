@@ -232,7 +232,7 @@ export default function UserRoomList() {
       {/* Carousel End */}
       <HomeSearchBar />
       {/* Breadcrumb */}
-      <div className="container mx-auto  px-4 py-6">
+      <div className="container mx-auto">
         <div className="flex items-center text-sm">
           <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">Home</a>
           <span className="mx-2 text-gray-400">&gt;</span>

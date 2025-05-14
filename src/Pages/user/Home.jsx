@@ -88,7 +88,7 @@ const Home = () => {
           <div className="carousel-inner">
             <div className="carousel-item active relative" style={{ height: "500px" }}>
               <img
-                className="w-100 h-100 object-cover"
+                className="w-100 h-50 object-cover"
                 src={carouselImg1}
                 alt="Luxury Hotel 1"
               />
@@ -111,7 +111,7 @@ const Home = () => {
 
             <div className="carousel-item active relative" style={{ height: "500px" }}>
               <img
-                className="w-100 h-100 object-cover"
+                className="w-100 h-50 object-cover"
                 src={carouselImg2}
                 alt="Luxury Hotel 1"
               />
