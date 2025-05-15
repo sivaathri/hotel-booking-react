@@ -144,7 +144,7 @@ export default function HomeSearchBar() {
 
   return (
     <div className={`w-full transition-all duration-300 z-50 mb-5 `}>
-      <div className="w-full mt-3 max-w-6xl mx-auto px-4">
+      <div className="w-full max-w-6xl mx-auto px-4">
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
