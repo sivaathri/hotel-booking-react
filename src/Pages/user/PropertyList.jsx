@@ -246,9 +246,56 @@ export default function PropertyList({ properties, loading, error }) {
                   <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
                   <span className="text-orange-500 mb-2 text-lg">★★★★★</span>
                 </div>
-                <p className="text-orange-500 text-sm">
-                  <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{Number(property.property_details.nearest_beach_distance).toString()} Km drive to Beach</span>
+                <p className="text-orange-500 text-sm mb-2">
+                  <span className="font-bold">{property.location.city}</span>
                 </p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                  {(() => {
+                    const distances = [
+                      {
+                        type: 'beach',
+                        distance: Number(property.property_details.nearest_beach_distance),
+                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16.5L7 21l-2.5-1.5L2 21l-1-4.5M16 4c0-1.1.9-2 2-2s2 .9 2 2M3 11c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8M3 15c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8" />,
+                        text: 'Beach'
+                      },
+                      {
+                        type: 'airport',
+                        distance: Number(property.property_details.nearest_airport_distance),
+                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />,
+                        text: 'Airport'
+                      },
+                      {
+                        type: 'railway',
+                        distance: Number(property.property_details.nearest_railway_station_distance),
+                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />,
+                        text: 'Railway'
+                      },
+                      {
+                        type: 'bus',
+                        distance: Number(property.property_details.nearest_bus_stand_distance),
+                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />,
+                        text: 'Bus Stand'
+                      }
+                    ];
+
+                    // Filter out invalid distances and find the nearest
+                    const validDistances = distances.filter(d => !isNaN(d.distance) && d.distance > 0);
+                    if (validDistances.length === 0) return null;
+
+                    const nearest = validDistances.reduce((prev, curr) => 
+                      prev.distance < curr.distance ? prev : curr
+                    );
+
+                    return (
+                      <span className="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          {nearest.icon}
+                        </svg>
+                        {nearest.distance.toString()} km to {nearest.text}
+                      </span>
+                    );
+                  })()}
+                </div>
 
                 <div className="mt-3 grid gap-2">
                   {[

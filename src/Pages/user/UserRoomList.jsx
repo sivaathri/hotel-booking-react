@@ -230,7 +230,10 @@ export default function UserRoomList() {
       
       </div>
       {/* Carousel End */}
+      <div className='mt-2'>
       <HomeSearchBar />
+      </div>
+   
       {/* Breadcrumb */}
       <div className="container mx-auto">
         <div className="flex items-center text-sm">
