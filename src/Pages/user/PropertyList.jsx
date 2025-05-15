@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 // Add API URL constant
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -174,162 +185,149 @@ export default function PropertyList({ properties, loading, error }) {
         const gst = calculateGST(price);
 
         return (
-          <a
+          <div
             key={property.property_id}
-            href={`/property/${property.property_id}?${new URLSearchParams({
-              destination: searchParams.get('destination') || '',
-              checkIn: searchParams.get('checkIn') || '',
-              checkOut: searchParams.get('checkOut') || '',
-              adults: searchParams.get('adults') || '1',
-              children: searchParams.get('children') || '0'
-            }).toString()}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="no-underline"
+            className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6 cursor-pointer"
+            onClick={() => {
+              const searchParamsObj = {
+                destination: searchParams.get('destination') || '',
+                checkIn: searchParams.get('checkIn') || '',
+                checkOut: searchParams.get('checkOut') || '',
+                adults: searchParams.get('adults') || '1',
+                children: searchParams.get('children') || '0'
+              };
+
+              // Create URL with search parameters
+              const searchParamsString = new URLSearchParams(searchParamsObj).toString();
+              window.open(`/property/${property.property_id}?${searchParamsString}`, '_blank');
+            }}
           >
-            <div
-              className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6"
-              onClick={(e) => {
-                e.preventDefault();
-                const searchParamsObj = {
-                  destination: searchParams.get('destination') || '',
-                  checkIn: searchParams.get('checkIn') || '',
-                  checkOut: searchParams.get('checkOut') || '',
-                  adults: searchParams.get('adults') || '1',
-                  children: searchParams.get('children') || '0'
-                };
-
-                // Create URL with search parameters
-                const searchParamsString = new URLSearchParams(searchParamsObj).toString();
-                window.open(`/property/${property.property_id}?${searchParamsString}`, '_blank');
-              }}
-            >
-              {/* Image Gallery */}
-              <div className="relative w-full md:w-1/3">
-                <img
-                  src={firstRoom.image_urls?.[0] ? getImageUrl(firstRoom.image_urls[0]) : 'https://placehold.co/400x320?text=No+Image'}
-                  alt={property.property_name}
-                  className="w-full h-40 object-cover rounded-xl"
-                  onError={(e) => {
-                    console.error('Image failed to load:', e.target.src);
-                    e.target.src = 'https://placehold.co/400x320?text=No+Image';
-                  }}
-                />
-                <div className="absolute mt-2 border-white rounded-lg left-2 flex gap-1">
-                  {firstRoom.image_urls?.slice(1, 4).map((img, index) => (
-                    <img
-                      key={index}
-                      src={getImageUrl(img)}
-                      className="w-12 h-8 object-cover rounded"
-                      onError={(e) => {
-                        console.error('Thumbnail failed to load:', e.target.src);
-                        e.target.src = 'https://placehold.co/400x320?text=No+Image';
-                      }}
-                    />
-                  ))}
-                  <div
-                    className="w-12 h-8 bg-black/60 text-white flex items-center justify-center rounded text-xs font-bold cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setModalImages(firstRoom.image_urls || []);
-                      setCurrentImageIdx(0);
-                      setModalOpen(true);
+            {/* Image Gallery */}
+            <div className="relative w-full md:w-1/3">
+              <img
+                src={firstRoom.image_urls?.[0] ? getImageUrl(firstRoom.image_urls[0]) : 'https://placehold.co/400x320?text=No+Image'}
+                alt={property.property_name}
+                className="w-full h-40 object-cover rounded-xl"
+                onError={(e) => {
+                  console.error('Image failed to load:', e.target.src);
+                  e.target.src = 'https://placehold.co/400x320?text=No+Image';
+                }}
+              />
+              <div className="absolute mt-2 border-white rounded-lg left-2 flex gap-1">
+                {firstRoom.image_urls?.slice(1, 4).map((img, index) => (
+                  <img
+                    key={index}
+                    src={getImageUrl(img)}
+                    className="w-12 h-8 object-cover rounded"
+                    onError={(e) => {
+                      console.error('Thumbnail failed to load:', e.target.src);
+                      e.target.src = 'https://placehold.co/400x320?text=No+Image';
                     }}
-                  >
-                    View All
-                  </div>
-                </div>
-              </div>
-
-              {/* Property Info */}
-              <div className="flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
-                    <span className="text-orange-500 mb-2 text-lg">★★★★★</span>
-                  </div>
-                  <p className="text-orange-500 text-sm">
-                    <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{Number(property.property_details.nearest_beach_distance).toString()} Km drive to Beach</span>
-                  </p>
-
-                  <div className="mt-3 grid gap-2">
-                    {[
-                      firstRoom.free_cancellation_enabled && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Cancellation" },
-                      property.facilities.free_wifi && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free WiFi" },
-                      property.facilities.air_conditioning && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Air Conditioning" },
-                      property.facilities.free_parking && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Parking" },
-                      property.facilities.gym && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Gym" },
-                      property.facilities.restaurant && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Restaurant" },
-                      property.facilities.bar && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Bar" },
-                      property.facilities.spa && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Spa" },
-                      property.facilities.laundry && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Laundry" },
-                      property.facilities.room_service && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Room Service" },
-                      property.facilities.business_centre && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Business Centre" },
-                      property.facilities.conference_hall && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Conference Hall" },
-                      property.facilities.kids_play_area && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Kids Play Area" },
-                      property.facilities.coffee_shop && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Coffee Shop" },
-                      property.facilities.cafe && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Cafe" },
-                      property.facilities.lounge && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Lounge" }
-                    ]
-                      .filter(Boolean)
-                      .slice(0, 3)
-                      .map((facility, index) => (
-                        <div key={index} className="flex items-center text-green-600 text-sm">
-                          {facility.icon} {facility.text}
-                        </div>
-                      ))}
-                  </div>
-                </div>
-                <p
-                  className='text-gray-500 text-sm cursor-pointer hover:text-blue-500 flex items-center gap-1'
+                  />
+                ))}
+                <div
+                  className="w-12 h-8 bg-black/60 text-white flex items-center justify-center rounded text-xs font-bold cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelectedLocation({
-                      lat: property.location.latitude,
-                      lng: property.location.longitude,
-                      name: property.property_name
-                    });
-                    setMapModalOpen(true);
+                    setModalImages(firstRoom.image_urls || []);
+                    setCurrentImageIdx(0);
+                    setModalOpen(true);
                   }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  View on Map
-                </p>
-              </div>
-
-              {/* Price Section */}
-              <div className="flex flex-col md:flex-row items-stretch">
-                <div className="w-px bg-gray-200 mx-10 hidden md:block" />
-                <div className="flex flex-col min-w-[160px]">
-                  <div className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <span className="text-yellow-400 text-lg"></span>
-                      <span className="text-sm font-medium bg-orange-500 px-2 py-1 rounded-full text-white">4.8</span>
-                    </div>
-                    <span className="text-sm text-gray-400">(2,345 ratings)</span>
-                    <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
-                      ₹ {price.toLocaleString('en-IN')}
-                    </p>
-                    <p className="text-sm mb-0 text-gray-500">
-                      + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
-                    </p>
-                    <p className="text-sm text-gray-400">Per Night</p>
-                    {numberOfAdults > 0 && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Price for {numberOfAdults} {numberOfAdults === 1 ? 'adult' : 'adults'}
-                        {parseInt(searchParams.get('children')) > 0 && (
-                          <> and {searchParams.get('children')} {parseInt(searchParams.get('children')) === 1 ? 'child' : 'children'}</>
-                        )}
-                      </p>
-                    )}
-                  </div>
+                  View All
                 </div>
               </div>
             </div>
-          </a>
+
+            {/* Property Info */}
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
+                  <span className="text-orange-500 mb-2 text-lg">★★★★★</span>
+                </div>
+                <p className="text-orange-500 text-sm">
+                  <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{Number(property.property_details.nearest_beach_distance).toString()} Km drive to Beach</span>
+                </p>
+
+                <div className="mt-3 grid gap-2">
+                  {[
+                    firstRoom.free_cancellation_enabled && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Cancellation" },
+                    property.facilities.free_wifi && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free WiFi" },
+                    property.facilities.air_conditioning && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Air Conditioning" },
+                    property.facilities.free_parking && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Parking" },
+                    property.facilities.gym && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Gym" },
+                    property.facilities.restaurant && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Restaurant" },
+                    property.facilities.bar && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Bar" },
+                    property.facilities.spa && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Spa" },
+                    property.facilities.laundry && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Laundry" },
+                    property.facilities.room_service && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Room Service" },
+                    property.facilities.business_centre && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Business Centre" },
+                    property.facilities.conference_hall && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Conference Hall" },
+                    property.facilities.kids_play_area && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Kids Play Area" },
+                    property.facilities.coffee_shop && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Coffee Shop" },
+                    property.facilities.cafe && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Cafe" },
+                    property.facilities.lounge && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Lounge" }
+                  ]
+                    .filter(Boolean)
+                    .slice(0, 3)
+                    .map((facility, index) => (
+                      <div key={index} className="flex items-center text-green-600 text-sm">
+                        {facility.icon} {facility.text}
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <p
+                className='text-gray-500 text-sm cursor-pointer hover:text-blue-500 flex items-center gap-1'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedLocation({
+                    lat: property.location.latitude,
+                    lng: property.location.longitude,
+                    name: property.property_name,
+                    address: `${property.location.address_line1}${property.location.address_line2 ? ', ' + property.location.address_line2 : ''}, ${property.location.city}, ${property.location.state_province}, ${property.location.country}`
+                  });
+                  setMapModalOpen(true);
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                View on Map
+              </p>
+            </div>
+
+            {/* Price Section */}
+            <div className="flex flex-col md:flex-row items-stretch">
+              <div className="w-px bg-gray-200 mx-10 hidden md:block" />
+              <div className="flex flex-col min-w-[160px]">
+                <div className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <span className="text-yellow-400 text-lg"></span>
+                    <span className="text-sm font-medium bg-orange-500 px-2 py-1 rounded-full text-white">4.8</span>
+                  </div>
+                  <span className="text-sm text-gray-400">(2,345 ratings)</span>
+                  <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
+                    ₹ {price.toLocaleString('en-IN')}
+                  </p>
+                  <p className="text-sm mb-0 text-gray-500">
+                    + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
+                  </p>
+                  <p className="text-sm text-gray-400">Per Night</p>
+                  {numberOfAdults > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Price for {numberOfAdults} {numberOfAdults === 1 ? 'adult' : 'adults'}
+                      {parseInt(searchParams.get('children')) > 0 && (
+                        <> and {searchParams.get('children')} {parseInt(searchParams.get('children')) === 1 ? 'child' : 'children'}</>
+                      )}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         );
       })}
 
@@ -406,14 +404,27 @@ export default function PropertyList({ properties, loading, error }) {
             </button>
 
             <div className="w-full h-full rounded-lg overflow-hidden">
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                style={{ border: 0 }}
-                src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${selectedLocation.lat},${selectedLocation.lng}&zoom=15`}
-                allowFullScreen
-              />
+              <MapContainer
+                center={[selectedLocation.lat, selectedLocation.lng]}
+                zoom={15}
+                style={{ height: '100%', width: '100%' }}
+                className="rounded-lg"
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker position={[selectedLocation.lat, selectedLocation.lng]}>
+                  <Popup>
+                    <div className="text-center p-2">
+                      <h3 className="font-semibold mb-1">{selectedLocation.name}</h3>
+                      <p className="text-sm text-gray-600">
+                        {selectedLocation.address}
+                      </p>
+                    </div>
+                  </Popup>
+                </Marker>
+              </MapContainer>
             </div>
           </div>
         </div>
