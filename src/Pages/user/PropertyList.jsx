@@ -241,10 +241,10 @@ export default function PropertyList({ properties, loading, error }) {
                   <span className="text-orange-500 mb-2 text-lg">★★★★★</span>
                 </div>
                 <p className="text-orange-500 text-sm">
-                  <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{property.property_details.nearest_beach_distance} Km drive to Beach</span>
+                  <span className="font-bold">{property.location.city}</span> <span className=''>|</span> <span className='text-gray-800'>{Number(property.property_details.nearest_beach_distance).toString()} Km drive to Beach</span>
                 </p>
 
-                <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="mt-3 grid gap-2">
                   {[
                     firstRoom.free_cancellation_enabled && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Cancellation" },
                     property.facilities.free_wifi && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free WiFi" },
