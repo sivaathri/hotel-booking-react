@@ -80,7 +80,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
           ...room,
           occupancyRanges: [
             ...(room.occupancyRanges || []),
-            { minGuests: 1, maxGuests: 1, value: 0, type: 'INR' }
+            { minGuests: 1, value: 0, type: 'INR' }
           ]
         } : room
       )
@@ -315,6 +315,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                       {(room.occupancyRanges || []).map((range, rangeIndex) => (
                         <div key={rangeIndex} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">For</span>
                             <input
                               type="number"
                               value={range.minGuests}
@@ -322,43 +323,36 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                               disabled={!isEditing}
                               className={`w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
                               min="1"
-                              max={range.maxGuests}
-                            />
-                            <span className="text-sm text-gray-500">to</span>
-                            <input
-                              type="number"
-                              value={range.maxGuests}
-                              onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'maxGuests', parseInt(e.target.value))}
-                              disabled={!isEditing}
-                              className={`w-16 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
-                              min={range.minGuests}
                               max={room.capacity}
                             />
-                            <span className="text-sm text-gray-500">guests</span>
+                            <span className="text-sm text-gray-500">guest(s)</span>
                           </div>
-                          <input
-                            type="number"
-                            value={range.value}
-                            onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'value', e.target.value)}
-                            disabled={!isEditing}
-                            className={`w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
-                            placeholder="Amount"
-                          />
-                          <select
-                            value={range.type}
-                            onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'type', e.target.value)}
-                            disabled={!isEditing}
-                            className={`w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
-                          >
-                            <option value="INR">INR</option>
-                            <option value="percentage">%</option>
-                          </select>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">Add</span>
+                            <input
+                              type="number"
+                              value={range.value}
+                              onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'value', e.target.value)}
+                              disabled={!isEditing}
+                              className={`w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                              placeholder="Amount"
+                            />
+                            <select
+                              value={range.type}
+                              onChange={(e) => handleOccupancyRangeChange(index, rangeIndex, 'type', e.target.value)}
+                              disabled={!isEditing}
+                              className={`w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
+                            >
+                              <option value="INR">₹ per guest</option>
+                              <option value="percentage">% per guest</option>
+                            </select>
+                          </div>
                           {isEditing && (
                             <button
                               onClick={() => removeOccupancyRange(index, rangeIndex)}
                               className="p-2 text-red-500 hover:text-red-700 transition-colors"
                             >
-                              ×
+                              <FiTrash2 />
                             </button>
                           )}
                         </div>
@@ -366,11 +360,14 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
                       {isEditing && (
                         <button
                           onClick={() => addOccupancyRange(index)}
-                          className="w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+                          className="w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
                         >
-                          + Add Occupancy Range
+                          <FiPlus /> Add Price Adjustment
                         </button>
                       )}
+                      <p className="text-sm text-gray-500 mt-2">
+                        Add price adjustments for additional guests. The adjustment will be applied per guest above the base occupancy.
+                      </p>
                     </div>
                   </td>
                 </tr>
