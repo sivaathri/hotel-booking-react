@@ -35,6 +35,7 @@ export default function PropertyList({ properties, loading, error }) {
       try {
         let occupancyPricing;
         try {
+          // Handle double-stringified JSON
           occupancyPricing = JSON.parse(property.room.occupancy_price_adjustments);
           if (typeof occupancyPricing === 'string') {
             occupancyPricing = JSON.parse(occupancyPricing);
@@ -45,12 +46,13 @@ export default function PropertyList({ properties, loading, error }) {
         }
 
         // Find the applicable pricing based on number of adults
-        const applicablePricing = occupancyPricing.find(p => 
-          numberOfAdults >= p.minGuests && numberOfAdults <= p.maxGuests
-        );
+        // Sort by minGuests in descending order to get the highest applicable tier
+        const sortedPricing = occupancyPricing.sort((a, b) => b.minGuests - a.minGuests);
+        const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
 
         if (applicablePricing) {
           totalPrice = Number(applicablePricing.adjustment);
+          console.log('Applied price adjustment:', totalPrice, 'for', numberOfAdults, 'adults');
         }
       } catch (error) {
         console.error('Error calculating occupancy pricing:', error);

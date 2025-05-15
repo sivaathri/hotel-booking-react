@@ -206,6 +206,7 @@ export default function PropertyDetails() {
     try {
       let occupancyPricing;
       try {
+        // Handle double-stringified JSON
         occupancyPricing = JSON.parse(property.room.occupancy_price_adjustments);
         if (typeof occupancyPricing === 'string') {
           occupancyPricing = JSON.parse(occupancyPricing);
@@ -216,10 +217,9 @@ export default function PropertyDetails() {
         occupancyPricing = [];
       }
 
-      // Find the applicable pricing based on number of adults
-      const applicablePricing = occupancyPricing.find(p => 
-        numberOfAdults >= p.minGuests && numberOfAdults <= p.maxGuests
-      );
+      // Sort by minGuests in descending order and find applicable pricing
+      const sortedPricing = occupancyPricing.sort((a, b) => b.minGuests - a.minGuests);
+      const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
       console.log('Applicable occupancy pricing:', applicablePricing);
 
       if (applicablePricing) {
@@ -238,15 +238,12 @@ export default function PropertyDetails() {
       console.log('Starting child price calculation...');
       console.log('Number of children:', numberOfChildren);
       console.log('Children ages:', childrenAges);
-      console.log('Base room price:', property.room.base_price);
 
       // Calculate price for each child based on their actual age
       childrenAges.forEach((age, index) => {
         let childPricing;
         try {
-          // First try to parse the child pricing data
           childPricing = JSON.parse(property.room.child_pricing);
-          // If it's still a string, parse it again
           if (typeof childPricing === 'string') {
             childPricing = JSON.parse(childPricing);
           }
@@ -263,7 +260,6 @@ export default function PropertyDetails() {
 
         if (applicablePricing) {
           let currentChildPrice = 0;
-          // If the price type is percentage, calculate based on base price
           if (applicablePricing.type === 'percentage') {
             currentChildPrice = (Number(property.room.base_price) * Number(applicablePricing.price)) / 100;
             console.log(`Child ${index + 1} price (${applicablePricing.price}% of ${property.room.base_price}):`, currentChildPrice);
@@ -273,14 +269,11 @@ export default function PropertyDetails() {
           }
           childPrice += currentChildPrice;
           console.log(`Running total child price after child ${index + 1}:`, childPrice);
-        } else {
-          console.log(`No applicable pricing rule found for child ${index + 1} (age ${age})`);
         }
       });
-      
+
       totalPrice += childPrice;
-      console.log('Final total child price:', childPrice);
-      console.log('New total price after adding child price:', totalPrice);
+      console.log('Final total price after adding child price:', totalPrice);
     } catch (error) {
       console.error('Error calculating child pricing:', error);
     }
