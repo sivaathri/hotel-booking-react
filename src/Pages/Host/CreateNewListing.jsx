@@ -1010,16 +1010,16 @@ const CreateNewListing = () => {
       const bookingPreferencesData = {
         property_id: formData.property_id,
         description: formData.description || '',
-        nearest_beach_distance: formData.nearestBeachDistance || 0,
-        nearest_railway_station_distance: formData.nearestRailwayStationDistance || 0,
-        nearest_airport_distance: formData.nearestAirportDistance || 0,
-        nearest_bus_stand_distance: formData.nearestBusStandDistance || 0,
+        nearest_beach_distance: formData.nearest_beach_distance || 0,
+        nearest_railway_station_distance: formData.nearest_railway_station_distance || 0,
+        nearest_airport_distance: formData.nearest_airport_distance || 0,
+        nearest_bus_stand_distance: formData.nearest_bus_stand_distance || 0,
         can_book_married_couples: formData.allowedGuests?.includes('Married Couples') || false,
         can_book_families: formData.allowedGuests?.includes('Families') || false,
         can_book_solo_travelers: formData.allowedGuests?.includes('Solo Travelers') || false,
         can_book_friends: formData.allowedGuests?.includes('Friends') || false,
-        instant_booking: formData.instantBooking || false,
-        manual_approval: formData.manualApproval || false
+        instant_booking: formData.instant_booking || false,
+        manual_approval: formData.manual_approval || false
       };
 
       const response = await axios.post(

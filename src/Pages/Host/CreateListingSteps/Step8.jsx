@@ -28,8 +28,8 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
       <Card title="About this property" className="mb-6">
         <Form.Item>
           <TextArea
-            value={formData.propertyDescription}
-            onChange={(e) => setFormData(prev => ({ ...prev, propertyDescription: e.target.value }))}
+            value={formData.description || ''}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
             placeholder="Write a detailed description of your property (minimum 1000 words). Include information about the location, amenities, nearby attractions, and what makes your property special."
             disabled={!isEditing}
             autoSize={{ minRows: 10, maxRows: 20 }}
@@ -39,12 +39,12 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
         </Form.Item>
       </Card>
 
-      {/* Beach Distance */}
+      {/* Distance Information */}
       <Card title="Distance" className="mb-6">
         <Form.Item label="How many kilometers to the nearest beach?">
           <InputNumber
-            value={formData.beachDistance || 0}
-            onChange={(value) => setFormData(prev => ({ ...prev, beachDistance: value }))}
+            value={formData.nearest_beach_distance || 0}
+            onChange={(value) => setFormData(prev => ({ ...prev, nearest_beach_distance: value }))}
             disabled={!isEditing}
             min={0}
             max={100}
@@ -55,8 +55,8 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
         </Form.Item>
         <Form.Item label="How many kilometers to the nearest railway station?">
           <InputNumber
-            value={formData.railwayDistance || 0}
-            onChange={(value) => setFormData(prev => ({ ...prev, railwayDistance: value }))}
+            value={formData.nearest_railway_station_distance || 0}
+            onChange={(value) => setFormData(prev => ({ ...prev, nearest_railway_station_distance: value }))}
             disabled={!isEditing}
             min={0}
             max={100}
@@ -67,8 +67,8 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
         </Form.Item>
         <Form.Item label="How many kilometers to the nearest airport?">
           <InputNumber
-            value={formData.airportDistance || 0}
-            onChange={(value) => setFormData(prev => ({ ...prev, airportDistance: value }))}
+            value={formData.nearest_airport_distance || 0}
+            onChange={(value) => setFormData(prev => ({ ...prev, nearest_airport_distance: value }))}
             disabled={!isEditing}
             min={0}
             max={100}
@@ -79,8 +79,8 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
         </Form.Item>
         <Form.Item label="How many kilometers to the nearest bus stand?">
           <InputNumber
-            value={formData.busStandDistance || 0}
-            onChange={(value) => setFormData(prev => ({ ...prev, busStandDistance: value }))}
+            value={formData.nearest_bus_stand_distance || 0}
+            onChange={(value) => setFormData(prev => ({ ...prev, nearest_bus_stand_distance: value }))}
             disabled={!isEditing}
             min={0}
             max={100}
@@ -122,8 +122,8 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
           <Col span={12}>
             <Form.Item label="Instant Booking">
               <Radio.Group 
-                value={formData.instantBooking} 
-                onChange={(e) => setFormData(prev => ({ ...prev, instantBooking: e.target.value }))}
+                value={formData.instant_booking} 
+                onChange={(e) => setFormData(prev => ({ ...prev, instant_booking: e.target.value }))}
                 disabled={!isEditing}
               >
                 <Radio value={true}>Yes</Radio>
@@ -134,8 +134,8 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
           <Col span={12}>
             <Form.Item label="Manual Approval">
               <Radio.Group 
-                value={formData.manualApproval} 
-                onChange={(e) => setFormData(prev => ({ ...prev, manualApproval: e.target.value }))}
+                value={formData.manual_approval} 
+                onChange={(e) => setFormData(prev => ({ ...prev, manual_approval: e.target.value }))}
                 disabled={!isEditing}
               >
                 <Radio value={true}>Yes</Radio>
