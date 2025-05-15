@@ -27,11 +27,13 @@ LEFT JOIN
 LEFT JOIN 
     property_rules pr ON bi.property_id = pr.property_id AND bi.user_id = pr.user_id
 LEFT JOIN 
-    room_images ri ON bi.property_id = ri.property_id
+    room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
 LEFT JOIN 
-    room_pricing_availability rpa ON bi.property_id = rpa.property_id
+    room_images ri ON ri.property_id = bi.property_id AND ri.room_id = rs.room_id
 LEFT JOIN 
-    room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id;
+    room_pricing_availability rpa ON rpa.property_id = bi.property_id 
+    AND rpa.floor = rs.floor 
+    AND rpa.room_type = rs.room_type;
             `;
 
             const [results] = await db.query(query, [userId]);
@@ -213,9 +215,11 @@ LEFT JOIN
                 LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
                 LEFT JOIN property_details pd ON bi.property_id = pd.property_id
                 LEFT JOIN property_rules pr ON bi.property_id = pr.property_id AND bi.user_id = pr.user_id
-                LEFT JOIN room_images ri ON bi.property_id = ri.property_id
-                LEFT JOIN room_pricing_availability rpa ON bi.property_id = rpa.property_id
                 LEFT JOIN room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
+                LEFT JOIN room_images ri ON ri.property_id = bi.property_id AND ri.room_id = rs.room_id
+                LEFT JOIN room_pricing_availability rpa ON rpa.property_id = bi.property_id 
+                    AND rpa.floor = rs.floor 
+                    AND rpa.room_type = rs.room_type
                 WHERE bi.user_id = ?
             `;
 
@@ -397,9 +401,11 @@ LEFT JOIN
                 LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
                 LEFT JOIN property_details pd ON bi.property_id = pd.property_id
                 LEFT JOIN property_rules pr ON bi.property_id = pr.property_id AND bi.user_id = pr.user_id
-                LEFT JOIN room_images ri ON bi.property_id = ri.property_id
-                LEFT JOIN room_pricing_availability rpa ON bi.property_id = rpa.property_id
                 LEFT JOIN room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
+                LEFT JOIN room_images ri ON ri.property_id = bi.property_id AND ri.room_id = rs.room_id
+                LEFT JOIN room_pricing_availability rpa ON rpa.property_id = bi.property_id 
+                    AND rpa.floor = rs.floor 
+                    AND rpa.room_type = rs.room_type
                 WHERE bi.property_id = ?
             `;
 
