@@ -1,12 +1,6 @@
 import { useParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { FaStar } from 'react-icons/fa';
-import {
-  FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake,
-  FaConciergeBell, FaBed, FaArrowUp, FaUmbrellaBeach,
-  FaVideo, FaFirstAid, FaBell, FaSuitcaseRolling,
-  FaHandHoldingHeart
-} from 'react-icons/fa';
+import { FaStar, FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake, FaConciergeBell, FaBed, FaArrowUp, FaUmbrellaBeach, FaVideo, FaFirstAid, FaBell, FaSuitcaseRolling, FaHandHoldingHeart, FaRuler, FaUser, FaChild, FaCalendarCheck, FaMoneyBillWave, FaCheck } from 'react-icons/fa';
 import { MdMeetingRoom, MdLocalLaundryService, MdPower, MdSecurity, MdTv, MdRoom } from 'react-icons/md';
 import { GiVacuumCleaner } from 'react-icons/gi';
 import { BiRestaurant } from 'react-icons/bi';
@@ -174,6 +168,8 @@ export default function PropertyDetails() {
   const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
   const [modalImages, setModalImages] = useState([]);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [roomSelections, setRoomSelections] = useState({});
 
   // Calculate guest capacity from search params
   const capacity = Number(searchParams.get('adults') || 1) + Number(searchParams.get('children') || 0);
@@ -695,52 +691,213 @@ export default function PropertyDetails() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="col-span-1"
+            className="col-span-3"
           >
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-4 border border-gray-100">
-              {/* Room Name & Type */}
-              <div className="mb-1">
-                <div className="font-bold text-lg text-gray-900">
-                  {room?.room_type || 'Deluxe room'}
-                  {room?.bed_type ? ` (${room.bed_type})` : ''}
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <h2 className="text-2xl font-bold mb-6">Select your room</h2>
+              
+              {/* Room Comparison Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-600">Room type</th>
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-600">Sleeps</th>
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-600">Today's price</th>
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-600">Your choices</th>
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-600">Select rooms</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {Array.isArray(property.rooms) && property.rooms.map((roomOption, index) => {
+                      // Calculate room price with occupancy adjustments
+                      const roomPrice = calculatePrice(roomOption);
+                      const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                      const roomGstAmount = Math.round(roomPrice * roomGstRate);
+                      const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                      const currentSelection = roomSelections[roomOption.id] || 0;
+
+                      return (
+                        <tr key={index} className={`hover:bg-blue-50 transition-colors ${
+                          selectedRoom?.id === roomOption.id ? 'bg-blue-50' : ''
+                        }`}>
+                          {/* Room Type Column */}
+                          <td className="py-6 px-6">
+                            <div className="flex flex-col gap-2">
+                              <h3 className="font-semibold text-lg text-gray-900">{roomOption.room_type}</h3>
+                              <div className="space-y-2 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                  <FaBed className="text-gray-400" />
+                                  <span>{roomOption.bed_type || 'Double Bed'}</span>
                 </div>
-                <div className="text-gray-700 text-sm font-medium mb-2">
-                  Fits {room?.total_capacity || 2} Adults
+                                <div className="flex items-center gap-2">
+                                  <FaRuler className="text-gray-400" />
+                                  <span>{roomOption.room_size || '26'} m²</span>
                 </div>
+                                {/* Room Features */}
+                                <div className="space-y-1 mt-2">
+                                  {roomOption.features?.map((feature, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 text-green-600">
+                                      <FaCheck className="text-sm" />
+                                      <span>{feature}</span>
               </div>
-              {/* Perks */}
-              <ul className="mb-3 space-y-1 text-sm">
-                <li className="flex items-center text-gray-700">
-                  <span className="mr-2 text-lg">•</span> Book with ₹ 0 Payment
+                                  )) || (
+                                    <>
+                                      <div className="flex items-center gap-2 text-green-600">
+                                        <FaCheck className="text-sm" />
+                                        <span>Air conditioning</span>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-green-600">
+                                        <FaCheck className="text-sm" />
+                                        <span>Private bathroom</span>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Sleeps Column */}
+                          <td className="py-6 px-6">
+                            <div className="flex items-center gap-1">
+                              {[...Array(roomOption.room_capacity_adults)].map((_, i) => (
+                                <FaUser key={i} className="text-gray-400" />
+                              ))}
+                              {roomOption.room_capacity_children > 0 && [...Array(roomOption.room_capacity_children)].map((_, i) => (
+                                <FaChild key={i} className="text-gray-400" />
+                              ))}
+                            </div>
+                            <div className="text-sm text-gray-600 mt-1">
+                              {roomOption.room_capacity_adults} adults
+                              {roomOption.room_capacity_children > 0 && ` + ${roomOption.room_capacity_children} children`}
+                            </div>
+                          </td>
+
+                          {/* Price Column */}
+                          <td className="py-6 px-6">
+                            <div className="flex flex-col">
+                              <div className="text-2xl font-bold text-gray-900">
+                                ₹{roomFinalPrice.toLocaleString('en-IN')}
+                              </div>
+                              <div className="text-sm text-gray-500">includes taxes and fees</div>
+                              {roomOption.free_cancellation_enabled && (
+                                <div className="text-green-600 text-sm mt-2 flex items-center gap-1">
+                                  <FaCheck />
+                                  <span>Free cancellation</span>
+                                </div>
+                              )}
+                              {roomOption.breakfast_included && (
+                                <div className="text-green-600 text-sm flex items-center gap-1">
+                                  <FaUtensils />
+                                  <span>Breakfast included</span>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Benefits Column */}
+                          <td className="py-6 px-6">
+                            <ul className="space-y-2 text-sm">
+                              <li className="flex items-center gap-2 text-gray-600">
+                                <FaWifi className="text-blue-500" />
+                                <span>Free WiFi</span>
                 </li>
-                {property.facilities?.restaurant === 1 && (
-                  <li className="flex items-center text-green-600">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 8h14M7 8V6a5 5 0 0110 0v2" /></svg>
-                    Free Breakfast
+                              {property.facilities?.air_conditioning && (
+                                <li className="flex items-center gap-2 text-gray-600">
+                                  <FaSnowflake className="text-blue-500" />
+                                  <span>Air conditioning</span>
                   </li>
                 )}
-                {room?.free_cancellation_enabled === 1 && (
-                  <li className="flex items-center text-green-600">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
-                    Free Cancellation before <span className="ml-1 font-medium">{property.rules?.free_cancellation_before || '12 May 12:59 PM'}</span>
+                              {roomOption.free_cancellation_enabled && (
+                                <li className="flex items-center gap-2 text-green-600">
+                                  <FaCalendarCheck className="text-green-500" />
+                                  <span>Free cancellation</span>
+                                </li>
+                              )}
+                              {roomOption.pay_at_hotel && (
+                                <li className="flex items-center gap-2 text-green-600">
+                                  <FaMoneyBillWave className="text-green-500" />
+                                  <span>Pay at the hotel</span>
                   </li>
                 )}
               </ul>
-              {/* Price Section */}
-              <div className="mb-2">
-                <div className="text-xs text-gray-500 mb-1">Per Night:</div>
-                <div className="flex items-end gap-1">
-                  <span className="text-2xl font-extrabold text-gray-900">₹ {Number(finalPrice).toLocaleString('en-IN')}</span>
-                  <span className="text-gray-500 font-medium text-sm">(Incl. {gstRate * 100}% GST)</span>
+                          </td>
+
+                          {/* Select Room Column */}
+                          <td className="py-6 px-6">
+                            {roomOption.number_of_rooms > 0 ? (
+                              <div className="space-y-3">
+                                <select
+                                  className="w-full border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  onChange={(e) => {
+                                    const count = parseInt(e.target.value);
+                                    setRoomSelections(prev => ({
+                                      ...prev,
+                                      [roomOption.id]: count
+                                    }));
+                                    if (count > 0) {
+                                      setSelectedRoom({...roomOption, selectedCount: count});
+                                    } else {
+                                      setSelectedRoom(null);
+                                    }
+                                  }}
+                                  value={currentSelection}
+                                >
+                                  <option value="0">0 rooms</option>
+                                  {[...Array(roomOption.number_of_rooms)].map((_, i) => (
+                                    <option key={i + 1} value={i + 1}>
+                                      {i + 1} {i === 0 ? 'room' : 'rooms'}
+                                    </option>
+                                  ))}
+                                </select>
+                                <button
+                                  className={`w-full font-semibold py-2 px-4 rounded-lg transition-colors ${
+                                    currentSelection > 0 
+                                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                  }`}
+                                  disabled={currentSelection === 0}
+                                  onClick={() => {
+                                    navigate(`/book/${propertyId}`, {
+                                      state: {
+                                        room: {...roomOption, selectedCount: currentSelection},
+                                        dates: {
+                                          checkIn: searchParamsState.checkIn,
+                                          checkOut: searchParamsState.checkOut
+                                        },
+                                        guests: {
+                                          adults: searchParamsState.adults,
+                                          children: searchParamsState.children
+                                        },
+                                        price: {
+                                          basePrice: roomPrice,
+                                          gstAmount: roomGstAmount,
+                                          finalPrice: roomFinalPrice
+                                        }
+                                      }
+                                    });
+                                  }}
+                                >
+                                  I'll reserve
+                                </button>
+                                {roomOption.number_of_rooms <= 3 && (
+                                  <div className="text-red-600 text-sm font-medium">
+                                    Only {roomOption.number_of_rooms} rooms left!
                 </div>
-                <div className="text-sm text-gray-500">
-                  Base Price: ₹ {Number(basePrice).toLocaleString('en-IN')} + GST: ₹ {Number(gstAmount).toLocaleString('en-IN')}
+                                )}
                 </div>
+                            ) : (
+                              <div className="text-red-600 text-sm font-medium">
+                                Sold out
               </div>
-              {/* Book Button & More Options */}
-              <div className="flex flex-col gap-2 mt-4">
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-base shadow transition">BOOK THIS NOW</button>
-                <button className="w-full text-blue-600 hover:underline text-sm font-medium bg-transparent">2 More Options</button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           </motion.div>
