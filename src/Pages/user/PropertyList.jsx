@@ -279,7 +279,7 @@ export default function PropertyList({ properties, loading, error }) {
                 </div>
               </div>
               <p
-                className='text-gray-500 text-sm cursor-pointer hover:text-blue-500 flex items-center gap-1'
+                className='text-gray-500 mt-3 mb-0 text-sm cursor-pointer hover:text-blue-500 flex items-center gap-1'
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedLocation({
