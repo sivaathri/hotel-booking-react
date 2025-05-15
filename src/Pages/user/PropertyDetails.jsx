@@ -8,6 +8,7 @@ import Header from './Header';
 import SearchBar from './SearchBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin } from 'lucide-react';
+import HomeSearchBar from './HomeSearchBar';
 
 // Add API URL constant
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -439,6 +440,10 @@ export default function PropertyDetails() {
         className="max-w-7xl mx-auto p-4"
       >
         {/* Header Section with Back Button */}
+    
+        <HomeSearchBar/>
+       
+       
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
