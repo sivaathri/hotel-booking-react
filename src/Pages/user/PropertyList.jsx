@@ -294,7 +294,7 @@ export default function PropertyList({ properties, loading, error }) {
 
             {/* Price Section */}
             <div className="flex flex-col md:flex-row items-stretch">
-              <div className="w-px bg-gray-200 mx-6 hidden md:block" />
+              <div className="w-px bg-gray-200 mx-10 hidden md:block" />
               <div className="flex flex-col min-w-[160px]">
                 <div className="text-right">
                   <div className="flex items-center justify-end gap-1">
