@@ -15,18 +15,16 @@ const PriceMap = ({ properties }) => {
   const createCustomIcon = (price) => {
     return L.divIcon({
       className: 'custom-div-icon',
-      html: `<div class="bg-white border border-gray-300 px-2 py-1 rounded-full inline-flex items-center shadow-sm">
-  <span class="text-black text-[15px] font-bold leading-none">${price}</span>
-</div>
-
-`,
+      html: `<div class="bg-white border border-gray-300 px-2 py-1 rounded-full inline-flex items-center shadow-sm hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer">
+        <span class="text-black text-[15px] font-bold leading-none">${price}</span>
+      </div>`,
       iconSize: [60, 20],
       iconAnchor: [30, 10],
     });
   };
 
   return (
-    <div className="w-full h-[600px] rounded-lg  shadow-lg">
+    <div className="w-full h-[600px] rounded-lg shadow-lg">
       <MapContainer 
         center={[11.9404, 79.8083]} 
         zoom={13} 
@@ -56,8 +54,25 @@ const PriceMap = ({ properties }) => {
               key={index} 
               position={[lat, lng]}
               icon={createCustomIcon(price)}
+              eventHandlers={{
+                click: () => {
+                  // Open property details in new tab
+                  window.open(`/property/${property.property_id}`, '_blank');
+                }
+              }}
             >
-             
+              <Popup>
+                <div className="text-center">
+                  <h3 className="font-semibold mb-1">{name}</h3>
+                  <p className="text-blue-600 font-bold">{price}</p>
+                  <button 
+                    onClick={() => window.open(`/property/${property.property_id}`, '_blank')}
+                    className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </Popup>
             </Marker>
           );
         })}
