@@ -86,7 +86,7 @@ export default function UserRoomList() {
         property.location.state_province.toLowerCase().includes(destination);
 
       // Filter by room capacity and number of rooms
-      const matchesRoomRequirements = property.room.total_capacity >= totalGuests;
+      const hasEnoughCapacity = property.rooms?.some(room => room.total_capacity >= totalGuests);
 
       // Filter by property type if specified
       const matchesPropertyType = filters.propertyType.length === 0 || 
@@ -106,12 +106,15 @@ export default function UserRoomList() {
         (!filters.gym || property.facilities.gym === 1)
       );
 
+      // Get the first room for price filtering
+      const firstRoom = property.rooms?.[0];
+
       // Filter by price range
-      const basePrice = parseFloat(property.room.base_price);
+      const basePrice = parseFloat(firstRoom?.base_price) || 0;
       const matchesPriceRange = basePrice >= filters.priceRange[0] && basePrice <= filters.priceRange[1];
 
       // Filter by free cancellation if selected
-      const matchesFreeCancellation = !filters.freeCancel || property.room.free_cancellation_enabled === 1;
+      const matchesFreeCancellation = !filters.freeCancel || firstRoom?.free_cancellation_enabled === 1;
 
       // Filter by breakfast if selected
       const matchesBreakfast = !filters.breakfast || property.facilities.restaurant === 1;
@@ -125,28 +128,25 @@ export default function UserRoomList() {
 
       // Filter by unmarried couples if selected
       const matchesUnmarriedCouples = !filters.unmarriedCouples || 
-        property.property_details.allows_unmarried_couples === 1;
+        property.rules.unmarried_couples_allowed === 1;
 
-      // Filter by early bird deals if selected
-      const matchesEarlyBird = !filters.earlyBird || 
-        property.room.early_bird_discount > 0;
-
-      return matchesDestination && 
-             matchesRoomRequirements && 
-             matchesPropertyType && 
-             matchesStarRating &&
-             matchesFacilities && 
-             matchesPriceRange &&
-             matchesFreeCancellation &&
-             matchesBreakfast &&
-             matchesMealPlan &&
-             matchesBeachfront &&
-             matchesUnmarriedCouples &&
-             matchesEarlyBird;
+      return (
+        matchesDestination &&
+        hasEnoughCapacity &&
+        matchesPropertyType &&
+        matchesStarRating &&
+        matchesFacilities &&
+        matchesPriceRange &&
+        matchesFreeCancellation &&
+        matchesBreakfast &&
+        matchesMealPlan &&
+        matchesBeachfront &&
+        matchesUnmarriedCouples
+      );
     });
 
     setFilteredProperties(filtered);
-  }, [properties, searchParams, filters]);
+  }, [properties, filters, searchParams]);
 
   const priceRanges = [
     { id: 'price1', label: '₹0 - ₹2,000', count: 134 },

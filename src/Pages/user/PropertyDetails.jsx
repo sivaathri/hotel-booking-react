@@ -13,6 +13,16 @@ import { BiRestaurant } from 'react-icons/bi';
 import Header from './Header';
 import SearchBar from './SearchBar';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MapPin } from 'lucide-react';
+
+// Add API URL constant
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+// Helper function to construct image URL
+const getImageUrl = (path) => {
+  if (!path) return 'https://placehold.co/600x400?text=No+Image';
+  return `${API_URL}/assets/${path}`;
+};
 
 const FACILITY_MAP = [
   { key: 'room_service_24hr', label: 'Room service', icon: <FaConciergeBell /> },
@@ -197,92 +207,85 @@ export default function PropertyDetails() {
     }
   }
 
-  // Start with base price
-  totalPrice = Number(property?.room?.base_price || 0);
-  console.log('Initial base price:', totalPrice);
+  // Get the first room if rooms is an array
+  const room = Array.isArray(property?.rooms) && property.rooms.length > 0 
+    ? property.rooms[0] 
+    : property.room;
 
-  // Apply occupancy-based pricing adjustments
-  if (property?.room?.occupancy_price_adjustments) {
-    try {
-      let occupancyPricing;
+  // Log room data for debugging
+  console.log('Property data:', property);
+  console.log('Room data:', room);
+  console.log('Room structure:', {
+    base_price: room?.base_price,
+    occupancy_price_adjustments: room?.occupancy_price_adjustments,
+    child_pricing: room?.child_pricing,
+    image_urls: room?.image_urls
+  });
+
+  // Get images from the room data
+  const images = room?.image_urls || [];
+  console.log('Raw image URLs:', room?.image_urls);
+  console.log('Processed images array:', images);
+  console.log('First image URL:', images[0] ? getImageUrl(images[0]) : 'No image available');
+
+  // Price calculation
+  const calculatePrice = useCallback(() => {
+    let price = Number(room?.base_price || 0);
+    console.log('Initial base price:', price);
+
+    // Apply occupancy-based pricing adjustments
+    if (room?.occupancy_price_adjustments) {
       try {
-        // Handle double-stringified JSON
-        occupancyPricing = JSON.parse(property.room.occupancy_price_adjustments);
+        let occupancyPricing = JSON.parse(room.occupancy_price_adjustments);
         if (typeof occupancyPricing === 'string') {
           occupancyPricing = JSON.parse(occupancyPricing);
         }
-        console.log('Parsed occupancy pricing rules:', occupancyPricing);
-      } catch (e) {
-        console.error('Error parsing occupancy pricing:', e);
-        occupancyPricing = [];
-      }
 
-      // Sort by minGuests in descending order and find applicable pricing
-      const sortedPricing = occupancyPricing.sort((a, b) => b.minGuests - a.minGuests);
-      const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
-      console.log('Applicable occupancy pricing:', applicablePricing);
-
-      if (applicablePricing) {
-        totalPrice = Number(applicablePricing.adjustment);
-        console.log('Price after occupancy adjustment:', totalPrice);
-      }
-    } catch (error) {
-      console.error('Error calculating occupancy pricing:', error);
-    }
-  }
-
-  // Add child pricing if there are children
-  if (numberOfChildren > 0 && property?.room?.child_pricing) {
-    try {
-      let childPrice = 0;
-      console.log('Starting child price calculation...');
-      console.log('Number of children:', numberOfChildren);
-      console.log('Children ages:', childrenAges);
-
-      // Calculate price for each child based on their actual age
-      childrenAges.forEach((age, index) => {
-        let childPricing;
-        try {
-          childPricing = JSON.parse(property.room.child_pricing);
-          if (typeof childPricing === 'string') {
-            childPricing = JSON.parse(childPricing);
-          }
-          console.log(`Child pricing rules for child ${index + 1}:`, childPricing);
-        } catch (e) {
-          console.error('Error parsing child pricing:', e);
-          childPricing = [];
-        }
-
-        const applicablePricing = childPricing.find(p => 
-          age >= p.ageFrom && age <= p.ageTo
-        );
-        console.log(`Applicable pricing rule for child ${index + 1} (age ${age}):`, applicablePricing);
+        const sortedPricing = occupancyPricing.sort((a, b) => b.minGuests - a.minGuests);
+        const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
 
         if (applicablePricing) {
-          let currentChildPrice = 0;
-          if (applicablePricing.type === 'percentage') {
-            currentChildPrice = (Number(property.room.base_price) * Number(applicablePricing.price)) / 100;
-            console.log(`Child ${index + 1} price (${applicablePricing.price}% of ${property.room.base_price}):`, currentChildPrice);
-          } else {
-            currentChildPrice = Number(applicablePricing.price);
-            console.log(`Child ${index + 1} fixed price:`, currentChildPrice);
-          }
-          childPrice += currentChildPrice;
-          console.log(`Running total child price after child ${index + 1}:`, childPrice);
+          price = Number(applicablePricing.adjustment);
         }
-      });
-
-      totalPrice += childPrice;
-      console.log('Final total price after adding child price:', totalPrice);
-    } catch (error) {
-      console.error('Error calculating child pricing:', error);
+      } catch (error) {
+        console.error('Error calculating occupancy pricing:', error);
+      }
     }
-  }
 
-  // Calculate GST based on price range
-  const gstRate = totalPrice <= 7500 ? 0.12 : 0.18;
-  const gstAmount = Math.round(totalPrice * gstRate);
-  const finalPrice = Math.round(totalPrice + gstAmount);
+    // Add child pricing
+    if (numberOfChildren > 0 && room?.child_pricing) {
+      try {
+        let childPricing = JSON.parse(room.child_pricing);
+        if (typeof childPricing === 'string') {
+          childPricing = JSON.parse(childPricing);
+        }
+
+        childrenAges.forEach(age => {
+          const applicablePricing = childPricing.find(p => 
+            age >= p.ageFrom && age <= p.ageTo
+          );
+
+          if (applicablePricing) {
+            if (applicablePricing.type === 'percentage') {
+              price += (Number(room.base_price) * Number(applicablePricing.price)) / 100;
+            } else {
+              price += Number(applicablePricing.price);
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error calculating child pricing:', error);
+      }
+    }
+
+    return price;
+  }, [room, numberOfAdults, numberOfChildren, childrenAges]);
+
+  // Calculate final prices
+  const basePrice = calculatePrice();
+  const gstRate = basePrice <= 7500 ? 0.12 : 0.18;
+  const gstAmount = Math.round(basePrice * gstRate);
+  const finalPrice = Math.round(basePrice + gstAmount);
 
   // Add scroll handler for rules modal
   const handleRulesModalScroll = useCallback(() => {
@@ -317,18 +320,26 @@ export default function PropertyDetails() {
     if (property) return;
 
     setLoading(true);
-    fetch(`http://localhost:3000/api/getall/property/${propertyId}`)
+    fetch(`${API_URL}/api/getall/property/${propertyId}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data && data.data.length > 0) {
-          console.log('Property data:', data.data[0]);
-          setProperty(data.data[0]);
+        if (data.success && data.data) {
+          console.log('Raw API response:', data);
+          const propertyData = data.data;
+          
+          // Log the full property data structure
+          console.log('Full property data:', propertyData);
+          console.log('Property rooms:', propertyData.rooms);
+          console.log('Property room:', propertyData.room);
+          
+          setProperty(propertyData);
         } else {
           setError('Property not found');
         }
         setLoading(false);
       })
       .catch(err => {
+        console.error('Error fetching property:', err);
         setError('Failed to load property details');
         setLoading(false);
       });
@@ -353,15 +364,53 @@ export default function PropertyDetails() {
   if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
   if (!property) return <div className="text-center p-4">No property found</div>;
 
-  console.log('Property data:', property);
-  console.log('Room data:', property.room);
-  console.log('Image URLs:', property.room?.image_urls);
-
-  const images = property.room?.image_urls || [];
-  console.log('Images array:', images);
-
   const rulesSections = getRulesSections(property.rules);
   const sectionKeys = Object.keys(rulesSections);
+
+  // Image gallery component
+  const renderImage = (img, idx, isMainImage = false) => {
+    const imageUrl = getImageUrl(img);
+    console.log(`Rendering image ${idx}:`, { original: img, processed: imageUrl, isMainImage });
+    
+    if (isMainImage) {
+      return (
+        <motion.img
+          key={selectedImage}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          src={imageUrl}
+          alt={`${property.property_name} - Image ${selectedImage + 1}`}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            console.error('Main image failed to load:', e.target.src);
+            e.target.src = 'https://placehold.co/600x400?text=No+Image';
+          }}
+        />
+      );
+    }
+
+    return (
+      <motion.img
+        key={idx}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        src={imageUrl}
+        alt={`${property.property_name} thumbnail ${idx + 1}`}
+        className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${
+          selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
+        }`}
+        onClick={() => {
+          console.log('Selected thumbnail:', idx, imageUrl);
+          setSelectedImage(idx);
+        }}
+        onError={(e) => {
+          console.error('Thumbnail failed to load:', e.target.src);
+          e.target.src = 'https://placehold.co/200x150?text=No+Image';
+        }}
+      />
+    );
+  };
 
   return (
     <>
@@ -414,75 +463,81 @@ export default function PropertyDetails() {
           className="mb-8"
         >
           <div className="relative h-[400px] rounded-lg overflow-hidden mb-2 group">
-            <motion.img
-              key={selectedImage}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              src={images[selectedImage] ? `http://localhost:3000${images[selectedImage]}` : 'https://placehold.co/600x400?text=No+Image'}
-              alt={`${property.property_name} - Image ${selectedImage + 1}`}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                console.error('Image failed to load:', e.target.src);
-                e.target.src = 'https://placehold.co/600x400?text=No+Image';
-              }}
-            />
-            {/* Left Arrow Button */}
-            <button
-              onClick={() => {
-                setSelectedImage((prev) => {
-                  const newIndex = prev === 0 ? images.length - 1 : prev - 1;
-                  console.log('Previous image:', newIndex);
-                  return newIndex;
-                });
-              }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
-              aria-label="Previous image"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            {/* Right Arrow Button */}
-            <button
-              onClick={() => {
-                setSelectedImage((prev) => {
-                  const newIndex = prev === images.length - 1 ? 0 : prev + 1;
-                  console.log('Next image:', newIndex);
-                  return newIndex;
-                });
-              }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
-              aria-label="Next image"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-black/10" />
+            {images[selectedImage] ? (
+              <>
+                {renderImage(images[selectedImage], selectedImage, true)}
+                {/* Left Arrow Button */}
+                <button
+                  onClick={() => {
+                    setSelectedImage((prev) => {
+                      const newIndex = prev === 0 ? images.length - 1 : prev - 1;
+                      console.log('Previous image:', newIndex);
+                      return newIndex;
+                    });
+                  }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
+                  aria-label="Previous image"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                {/* Right Arrow Button */}
+                <button
+                  onClick={() => {
+                    setSelectedImage((prev) => {
+                      const newIndex = prev === images.length - 1 ? 0 : prev + 1;
+                      console.log('Next image:', newIndex);
+                      return newIndex;
+                    });
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
+                  aria-label="Next image"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-black/10" />
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                <span className="text-gray-400">No image available</span>
+              </div>
+            )}
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {images.map((img, idx) => (
-              <motion.img
-                key={idx}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                src={`http://localhost:3000${img}`}
-                alt={`${property.property_name} thumbnail ${idx + 1}`}
-                className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'}`}
-                onClick={() => {
-                  console.log('Selected thumbnail:', idx);
-                  setSelectedImage(idx);
-                }}
-                onError={(e) => {
-                  console.error('Thumbnail failed to load:', e.target.src);
-                  e.target.src = 'https://placehold.co/200x150?text=No+Image';
-                }}
-              />
-            ))}
+            {images.map((img, idx) => renderImage(img, idx))}
           </div>
         </motion.div>
 
+        {/* Room Details Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
+        >
+          <h3 className="text-lg font-bold mb-4">Room Details</h3>
+          {room ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-gray-600"><span className="font-semibold">Room Type:</span> {room.room_type}</p>
+                <p className="text-gray-600"><span className="font-semibold">Floor:</span> {room.floor}</p>
+                <p className="text-gray-600"><span className="font-semibold">Capacity:</span> {room.total_capacity} persons</p>
+              </div>
+              <div>
+                <p className="text-gray-600"><span className="font-semibold">Base Price:</span> ₹{room.base_price}</p>
+                <p className="text-gray-600"><span className="font-semibold">Number of Rooms:</span> {room.number_of_rooms}</p>
+                {room.free_cancellation_enabled && (
+                  <p className="text-green-600">Free Cancellation Available</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-500">No room details available</p>
+          )}
+        </motion.div>
 
         {/* Main Content */}
         <div className="grid grid-cols-3 gap-8">
@@ -646,11 +701,11 @@ export default function PropertyDetails() {
               {/* Room Name & Type */}
               <div className="mb-1">
                 <div className="font-bold text-lg text-gray-900">
-                  {property.room?.room_type || 'Deluxe room'}
-                  {property.room?.bed_type ? ` (${property.room.bed_type})` : ''}
+                  {room?.room_type || 'Deluxe room'}
+                  {room?.bed_type ? ` (${room.bed_type})` : ''}
                 </div>
                 <div className="text-gray-700 text-sm font-medium mb-2">
-                  Fits {property.room?.total_capacity || 2} Adults
+                  Fits {room?.total_capacity || 2} Adults
                 </div>
               </div>
               {/* Perks */}
@@ -664,7 +719,7 @@ export default function PropertyDetails() {
                     Free Breakfast
                   </li>
                 )}
-                {property.room?.free_cancellation_enabled === 1 && (
+                {room?.free_cancellation_enabled === 1 && (
                   <li className="flex items-center text-green-600">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
                     Free Cancellation before <span className="ml-1 font-medium">{property.rules?.free_cancellation_before || '12 May 12:59 PM'}</span>
@@ -675,59 +730,12 @@ export default function PropertyDetails() {
               <div className="mb-2">
                 <div className="text-xs text-gray-500 mb-1">Per Night:</div>
                 <div className="flex items-end gap-1">
-                  <span className="text-2xl font-extrabold text-gray-900">₹ {Number(totalPrice).toLocaleString('en-IN')}</span>
-                  <span className="text-gray-500 font-medium text-sm">+ ₹ {Number(gstAmount).toLocaleString('en-IN')} GST ({gstRate * 100}%)</span>
+                  <span className="text-2xl font-extrabold text-gray-900">₹ {Number(finalPrice).toLocaleString('en-IN')}</span>
+                  <span className="text-gray-500 font-medium text-sm">(Incl. {gstRate * 100}% GST)</span>
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
-                  Total: ₹ {Number(finalPrice).toLocaleString('en-IN')}
+                <div className="text-sm text-gray-500">
+                  Base Price: ₹ {Number(basePrice).toLocaleString('en-IN')} + GST: ₹ {Number(gstAmount).toLocaleString('en-IN')}
                 </div>
-                {/* Price Breakdown */}
-                {/* <div className="mt-2 text-sm text-gray-600">
-                  <div>Base Price: ₹ {Number(property.room?.base_price || 0).toLocaleString('en-IN')}</div>
-                  {numberOfChildren > 0 && property.room?.child_pricing && (
-                    <div className="mt-1">
-                      <div className="font-medium">Child Pricing:</div>
-                      {childrenAges.map((age, index) => {
-                        let childPrice = 0;
-                        try {
-                          let childPricing;
-                          try {
-                            // First try to parse the child pricing data
-                            childPricing = JSON.parse(property.room.child_pricing);
-                            // If it's still a string, parse it again
-                            if (typeof childPricing === 'string') {
-                              childPricing = JSON.parse(childPricing);
-                            }
-                          } catch (e) {
-                            console.error('Error parsing child pricing:', e);
-                            childPricing = [];
-                          }
-
-                          // Find applicable pricing for this child's age
-                          const applicablePricing = childPricing.find(p => 
-                            age >= p.ageFrom && age <= p.ageTo
-                          );
-
-                          if (applicablePricing) {
-                            // If the price type is percentage, calculate based on base price
-                            if (applicablePricing.type === 'percentage') {
-                              childPrice = (Number(property.room.base_price) * Number(applicablePricing.price)) / 100;
-                            } else {
-                              childPrice = Number(applicablePricing.price);
-                            }
-                          }
-                        } catch (error) {
-                          console.error('Error calculating child pricing:', error);
-                        }
-                        return (
-                          <div key={index} className="ml-2 text-gray-500">
-                            Child {index + 1} ({age} years): ₹ {childPrice.toLocaleString('en-IN')}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div> */}
               </div>
               {/* Book Button & More Options */}
               <div className="flex flex-col gap-2 mt-4">
@@ -889,8 +897,6 @@ export default function PropertyDetails() {
             Write a Review
           </motion.button>
         </div>
-
-   
 
         <div className="border-t pt-6">
           <div className="flex justify-between items-center">
