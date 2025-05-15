@@ -204,19 +204,19 @@ export default function PropertyDetails() {
   }
 
   // Get the first room if rooms is an array
-  const room = Array.isArray(property?.rooms) && property.rooms.length > 0 
+  const room = property ? (Array.isArray(property.rooms) && property.rooms.length > 0 
     ? property.rooms[0] 
-    : property.room;
+    : property.room) : null;
 
   // Log room data for debugging
   console.log('Property data:', property);
   console.log('Room data:', room);
-  console.log('Room structure:', {
+  console.log('Room structure:', room ? {
     base_price: room?.base_price,
     occupancy_price_adjustments: room?.occupancy_price_adjustments,
     child_pricing: room?.child_pricing,
     image_urls: room?.image_urls
-  });
+  } : null);
 
   // Get images from the room data
   const images = room?.image_urls || [];
@@ -357,16 +357,29 @@ export default function PropertyDetails() {
   }, [property]);
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <motion.div
-        className="rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-      />
-    </div>
+    <>
+      <Header />
+      <div className="flex items-center justify-center min-h-screen">
+        <motion.div
+          className="rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+    </>
   );
-  if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
-  if (!property) return <div className="text-center p-4">No property found</div>;
+  if (error) return (
+    <>
+      <Header />
+      <div className="text-red-500 text-center p-4">{error}</div>
+    </>
+  );
+  if (!property) return (
+    <>
+      <Header />
+      <div className="text-center p-4">No property found</div>
+    </>
+  );
 
   const rulesSections = getRulesSections(property.rules);
   const sectionKeys = Object.keys(rulesSections);
