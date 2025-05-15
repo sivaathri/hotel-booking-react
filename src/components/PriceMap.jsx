@@ -41,7 +41,13 @@ const PriceMap = ({ properties }) => {
         {properties.map((property, index) => {
           const lat = parseFloat(property.location.latitude);
           const lng = parseFloat(property.location.longitude);
-          const priceValue = parseInt(property.room?.base_price || '0', 10).toLocaleString();
+          
+          // Get the room price, handling both array and single room cases
+          const room = Array.isArray(property.rooms) && property.rooms.length > 0 
+            ? property.rooms[0] 
+            : property.room;
+          
+          const priceValue = parseInt(room?.base_price || '0', 10).toLocaleString();
           const price = `₹${priceValue}`;
           const name = property.property_name;
 
