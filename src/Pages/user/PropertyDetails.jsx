@@ -445,19 +445,7 @@ export default function PropertyDetails() {
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <div className="flex items-center gap-4 mb-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors duration-300"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>Back</span>
-            </motion.button>
-          </div>
+          
           <h1 className="text-3xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 font-sans">{property.property_name}</h1>
           <div className="flex items-center gap-2 mt-2">
             <motion.div
