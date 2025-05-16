@@ -260,7 +260,7 @@ export default function HomeSearchBar() {
                                 {i + 1}
                                 {(isCheckIn || isCheckOut) && (
                                   <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-500 whitespace-nowrap">
-                                    {isCheckIn ? 'Check-in' : 'Check-out'}
+                                    {/* {isCheckIn ? 'Check-in' : 'Check-out'} */}
                                   </div>
                                 )}
                               </motion.button>
@@ -318,7 +318,7 @@ export default function HomeSearchBar() {
                                 {i + 1}
                                 {(isCheckIn || isCheckOut) && (
                                   <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-500 whitespace-nowrap">
-                                    {isCheckIn ? 'Check-in' : 'Check-out'}
+                                    {/* {isCheckIn ? 'Check-in' : 'Check-out'} */}
                                   </div>
                                 )}
                               </motion.button>
