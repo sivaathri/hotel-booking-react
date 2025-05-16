@@ -91,7 +91,7 @@ const Home = () => {
         </div>
       </div>
       {/* Floating Search Bar */}
-      <div className=" flex items-start bg-white justify-center bg-gray-50 pt-1 -mt-14">
+      <div className=" flex items-start bg-white justify-center bg-gray-50  -hmt-14">
         <div className="w-full max-w-6xl rounded-full shadow-6xl px-8 py-6 flex flex-col justify-center min-h-[120px]">
           <HomeSearchBar />
         </div>
@@ -196,24 +196,25 @@ const Home = () => {
         </div>
 
         {/* Call to Action Section */}
-        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3]">
-          <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 drop-shadow-sm">
-              Ready to Book Your Perfect Stay?
-            </h2>
-            <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-[#FEA116] text-white font-bold py-4 px-8 rounded-full shadow-xl hover:bg-[#e1920e] transition-all duration-300 transform hover:-translate-y-1"
-              onClick={() => navigate("/rooms")}
-            >
-              Book Your Room Now
-            </motion.button>
-          </div>
-        </div>
+      <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
+  <div className="text-center">
+    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 drop-shadow-sm">
+      Ready to Book Your Perfect Stay?
+    </h2>
+    <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+      Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
+    </p>
+    <motion.button
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.95 }}
+      className="bg-[#FEA116] text-white font-bold py-4 px-8 rounded-full shadow-xl hover:bg-[#e1920e] transition-all duration-300 transform hover:-translate-y-1"
+      onClick={() => navigate("/rooms")}
+    >
+      Book Your Room Now
+    </motion.button>
+  </div>
+</div>
+
 
 
 
