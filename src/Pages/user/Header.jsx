@@ -79,7 +79,7 @@ const Header = () => {
       {/* Spinner End */}
 
       {/* Header Start */}
-      <div className="container-fluid bg-dark px-0 rounded-top-start-3">
+      <div className="container-fluid p-2 bg-dark px-0 rounded-top-start-3">
         <div className="row gx-0">
           <div className="col-lg-3 bg-dark d-none d-lg-block">
             <a
