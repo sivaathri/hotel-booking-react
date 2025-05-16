@@ -15,7 +15,8 @@ class GetAllInfo {
     pr.*,                      -- All columns from property_rules
     ri.image_paths,            -- Explicitly select image_paths from room_images
     rpa.*,                     -- All columns from room_pricing_availability
-    rs.*                       -- All columns from room_setup
+    rs.*,                      -- All columns from room_setup
+    rpa.number_of_rooms as rpa_number_of_rooms  -- Explicitly select number_of_rooms from room_pricing_availability
 FROM 
     basic_info bi
 LEFT JOIN 
@@ -52,6 +53,7 @@ LEFT JOIN
                     floor: result.floor,
                     room_type: result.room_type,
                     number_of_rooms: result.number_of_rooms,
+                    rpa_number_of_rooms: result.rpa_number_of_rooms,
                     total_capacity: result.total_capacity,
                     room_capacity_adults: result.room_capacity_adults,
                     room_capacity_children: result.room_capacity_children,
