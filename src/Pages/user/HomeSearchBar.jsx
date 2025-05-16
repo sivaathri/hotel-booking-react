@@ -10,12 +10,12 @@ export default function HomeSearchBar() {
   const [destination, setDestination] = useState('');
   const [childrenAges, setChildrenAges] = useState([]);
   const [isSticky, setIsSticky] = useState(false);
-  
+
   // Get today's date and day after tomorrow's date
   const today = new Date();
   const dayAfterTomorrow = new Date(today);
   dayAfterTomorrow.setDate(today.getDate() + 2);
-  
+
   // Format dates to YYYY-MM-DD
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
@@ -92,7 +92,7 @@ export default function HomeSearchBar() {
         ...prev,
         children: newChildrenCount
       }));
-      
+
       // Update children ages array
       if (value > 0) {
         setChildrenAges(prev => [...prev, 0]);
@@ -145,14 +145,14 @@ export default function HomeSearchBar() {
   return (
     <div className={`w-full transition-all duration-300 z-50 mb-5 `}>
       <div className="w-full max-w-6xl mx-auto px-4">
-        <motion.div 
+        <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
           className={`bg-white rounded-full shadow-lg flex items-center h-20 w-200 divide-x ${isSticky ? 'border border-gray-200' : ''}`}
         >
           {/* Where */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.02 }}
             className="flex-1 px-6"
           >
@@ -170,9 +170,9 @@ export default function HomeSearchBar() {
           </motion.div>
 
           {/* Date */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.02 }}
-            className="flex-1 px-6 relative" 
+            className="flex-1 px-6 relative"
             ref={datePickerRef}
           >
             <div className="flex flex-col">
@@ -185,10 +185,10 @@ export default function HomeSearchBar() {
                 {formatDateForDisplay(checkIn)} - {formatDateForDisplay(checkOut)}
               </motion.button>
             </div>
-            
+
             <AnimatePresence>
               {isDatePickerOpen && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -206,7 +206,7 @@ export default function HomeSearchBar() {
                       </svg>
                     </button>
                   </div>
-                  
+
                   <div className="flex gap-6">
                     {/* Current Month Calendar */}
                     <div className="flex-1">
@@ -233,7 +233,7 @@ export default function HomeSearchBar() {
                             const isCheckIn = dateString === checkIn;
                             const isCheckOut = dateString === checkOut;
                             const isPast = date < today;
-                            
+
                             return (
                               <motion.button
                                 key={i}
@@ -294,7 +294,7 @@ export default function HomeSearchBar() {
                             const isSelected = dateString >= checkIn && dateString <= checkOut;
                             const isCheckIn = dateString === checkIn;
                             const isCheckOut = dateString === checkOut;
-                            
+
                             return (
                               <motion.button
                                 key={i}
@@ -332,27 +332,21 @@ export default function HomeSearchBar() {
                   {/* Selected Range Display */}
                   <div className="mt-8 pt-4 border-t border-gray-100">
                     <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm text-gray-500">Selected Range</p>
-                        <p className="text-sm font-medium text-gray-800">
-                          {checkIn && checkOut
-                            ? `${formatDateForDisplay(checkIn)} - ${formatDateForDisplay(checkOut)}`
-                            : checkIn
-                            ? `${formatDateForDisplay(checkIn)} - Select check-out date`
-                            : 'Select dates'}
-                        </p>
-                      </div>
-                      {(checkIn || checkOut) && (
-                        <button
-                          onClick={() => {
-                            setCheckIn('');
-                            setCheckOut('');
-                          }}
-                          className="text-sm text-orange-500 hover:text-orange-600"
-                        >
-                          Clear dates
-                        </button>
-                      )}
+
+
+
+
+
+                      <button
+                        onClick={() => {
+                          setCheckIn('');
+                          setCheckOut('');
+                        }}
+                        className="text-sm text-orange-500 hover:text-orange-600"
+                      >
+                        Clear dates
+                      </button>
+
                     </div>
                   </div>
                 </motion.div>
@@ -361,7 +355,7 @@ export default function HomeSearchBar() {
           </motion.div>
 
           {/* Who */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.02 }}
             className="flex-1 px-6"
           >
@@ -378,7 +372,7 @@ export default function HomeSearchBar() {
               />
               <AnimatePresence>
                 {isOpen && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -438,7 +432,7 @@ export default function HomeSearchBar() {
 
           {/* Search Button */}
           <div className="px-2">
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleSearch}
