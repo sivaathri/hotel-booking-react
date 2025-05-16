@@ -252,7 +252,7 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
               {formData.rooms.map((room, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900">{room.floor}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{room.bhk}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{room.bhk.split('_')[0]}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{room.numberOfRooms}</td>
                   <td className="px-6 py-4">
                     <div className="space-y-3">

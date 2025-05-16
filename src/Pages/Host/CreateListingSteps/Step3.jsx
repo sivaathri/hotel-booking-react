@@ -166,15 +166,23 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
                   </select>
                 </div>
                 <div className="flex-1 min-w-[180px]">
-                  <label className="block text-sm font-medium mb-2">Number of Rooms</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Number of {roomTypeObj?.label || roomType} Rooms in {roomDetails[uniqueId]?.floor || '(Select floor first)'}
+                  </label>
                   <input
                     type="number"
                     value={roomDetails[uniqueId]?.numberOfRooms || ''}
                     onChange={e => handleDetailChange(uniqueId, 'numberOfRooms', e.target.value)}
-                    disabled={!isEditing}
-                    className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                    placeholder="e.g. 2, 3, 4"
+                    disabled={!isEditing || !roomDetails[uniqueId]?.floor}
+                    className={`w-full p-2 border rounded-lg ${(!isEditing || !roomDetails[uniqueId]?.floor) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    placeholder={`Enter number of ${roomTypeObj?.label || roomType} rooms`}
+                    min="1"
                   />
+                  {roomDetails[uniqueId]?.floor && roomDetails[uniqueId]?.numberOfRooms && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      {roomDetails[uniqueId]?.numberOfRooms} {roomTypeObj?.label || roomType} room(s) in {roomDetails[uniqueId]?.floor}
+                    </p>
+                  )}
                 </div>
               </div>
             );
