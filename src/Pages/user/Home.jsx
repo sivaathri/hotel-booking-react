@@ -84,8 +84,8 @@ const Home = () => {
         {/* Overlay */}
         <div className="absolute inset-0 h-200 bg-opacity-40 z-0" />
         {/* Centered Content */}
-        <div className="relative z-10 flex flex-col items-center w-full px-4">
-          <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold mb-8 mt-12 text-center drop-shadow-lg">
+        <div className="relative z-10 flex flex-col  w-full px-4">
+          <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold ml-10 drop-shadow-lg">
             Find hotels for your next trip
           </h1>
         </div>
