@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import carouselImg1 from "../../assets/Images/About Images/carousel-1.jpg";
+import carouselImg1 from "../../assets/Home/homeBG.jpg";
 import room1 from "../../assets/Images/About Images/room-1.jpg";
 import room2 from "../../assets/Images/About Images/room-2.jpg";
 import room3 from "../../assets/Images/About Images/room-3.jpg";
