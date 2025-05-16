@@ -9,9 +9,20 @@ import SearchBar from './SearchBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import HomeSearchBar from './HomeSearchBar';
+import DOMPurify from 'dompurify';
 
 // Add API URL constant
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+// Helper function to sanitize HTML content
+const sanitizeHTML = (html) => {
+  // Configure DOMPurify to allow certain tags and attributes
+  const config = {
+    ALLOWED_TAGS: ['p', 'br', 'b', 'i', 'em', 'strong', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'span', 'div'],
+    ALLOWED_ATTR: ['style', 'class']
+  };
+  return DOMPurify.sanitize(html, config);
+};
 
 // Helper function to construct image URL
 const getImageUrl = (path) => {
@@ -777,9 +788,12 @@ export default function PropertyDetails() {
           className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
         >
           <h2 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300 font-sans">About this property</h2>
-          <div className="text-gray-600 mb-4 whitespace-pre-line font-sans">
-            {property?.property_details?.description || 'No description available'}
-          </div>
+          <div 
+            className="text-gray-600 mb-4 font-sans prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ 
+              __html: sanitizeHTML(property?.property_details?.description || 'No description available') 
+            }}
+          />
         </motion.div>
 
         {/* Most Popular Facilities Section */}

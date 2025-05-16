@@ -2,12 +2,48 @@ import React from 'react';
 import { Form, Row, Col, Card, Checkbox, Radio, Input, InputNumber, Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { Editor } from '@tinymce/tinymce-react';
+import DOMPurify from 'dompurify';
 import './RichTextEditor.css';
 
 const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
-  const handleEditorChange = (content) => {
+  const cleanHtml = (html) => {
+    // First pass of DOMPurify to handle security
+    let clean = DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['p', 'strong', 'em', 'u', 'ol', 'ul', 'li'],
+      ALLOWED_ATTR: [], // No attributes allowed
+    });
+
+    // Create a temporary div to parse the HTML
+    const temp = document.createElement('div');
+    temp.innerHTML = clean;
+
+    // Remove empty tags and normalize spaces
+    const removeEmpty = (element) => {
+      Array.from(element.children).forEach(removeEmpty);
+      
+      if (
+        element.children.length === 0 && 
+        !element.textContent.trim() && 
+        element.tagName !== 'BR'
+      ) {
+        element.remove();
+      }
+    };
+    
+    removeEmpty(temp);
+
+    // Get the cleaned HTML
+    return temp.innerHTML
+      .replace(/&nbsp;/g, ' ')  // Replace &nbsp; with regular spaces
+      .replace(/\s+/g, ' ')     // Normalize multiple spaces
+      .replace(/>\s+</g, '><')  // Remove spaces between tags
+      .trim();
+  };
+
+  const handleEditorChange = (content, editor) => {
     if (!isEditing) return;
-    setFormData(prev => ({ ...prev, description: content }));
+    const cleanContent = cleanHtml(content);
+    setFormData(prev => ({ ...prev, description: cleanContent }));
   };
 
   const handleArrayToggle = (field, value) => {
@@ -52,18 +88,44 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
                 height: 300,
                 menubar: false,
                 plugins: [
-                  'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
-                  'searchreplace', 'visualblocks', 'fullscreen',
-                  'insertdatetime', 'table', 'help', 'wordcount'
+                  'lists', 'advlist', 'autolink', 'charmap',
+                  'searchreplace', 'wordcount'
                 ],
                 toolbar: isEditing ? 
-                  'undo redo | formatselect | bold italic underline | ' +
-                  'alignleft aligncenter alignright alignjustify | ' +
-                  'bullist numlist | removeformat help' : false,
-                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size: 14px }',
+                  'undo redo | bold italic underline | ' +
+                  'bullist numlist | removeformat' : false,
+                content_style: `
+                  body { 
+                    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; 
+                    font-size: 14px;
+                    line-height: 1.6;
+                  }
+                  p { margin: 0 0 1em 0; }
+                  ul, ol { margin: 0 0 1em 0; padding-left: 2em; }
+                  li { margin: 0 0 0.5em 0; }
+                `,
+                formats: {
+                  bold: { inline: 'strong' },
+                  italic: { inline: 'em' },
+                  underline: { inline: 'u' }
+                },
+                paste_as_text: true,
+                paste_enable_default_filters: false,
+                paste_word_valid_elements: "strong,em,u,p,ol,ul,li",
+                paste_remove_styles: true,
+                paste_remove_styles_if_webkit: true,
+                paste_strip_class_attributes: true,
+                valid_elements: 'strong,em,u,p,ol,ul,li',
+                valid_children: {
+                  'p': 'strong,em,u',
+                  'li': 'strong,em,u'
+                },
+                forced_root_block: 'p',
+                remove_trailing_brs: true,
                 readonly: !isEditing,
                 branding: false,
                 statusbar: false,
+                elementpath: false,
                 placeholder: "Write a detailed description of your property (minimum 1000 words). Include information about the location, amenities, nearby attractions, and what makes your property special."
               }}
               onEditorChange={handleEditorChange}
