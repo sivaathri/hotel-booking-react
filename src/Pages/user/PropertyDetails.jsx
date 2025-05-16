@@ -801,13 +801,14 @@ export default function PropertyDetails() {
                             value={currentSelection}
                           >
                             <option value="0">0</option>
-                            {[...Array(roomOption.number_of_rooms)].map((_, i) => (
+                            {console.log('rpa_number_of_rooms:', roomOption.rpa_number_of_rooms)}
+                            {[...Array(roomOption.rpa_number_of_rooms)].map((_, i) => (
                               <option key={i + 1} value={i + 1}>{i + 1}</option>
                             ))}
                           </select>
-                          {roomOption.number_of_rooms <= 3 && (
+                          {roomOption.rpa_number_of_rooms <= 3 && (
                             <div className="text-red-600 text-sm font-medium mt-2">
-                              Only {roomOption.number_of_rooms} {roomOption.number_of_rooms === 1 ? 'room' : 'rooms'} left!
+                              Only {roomOption.rpa_number_of_rooms} {roomOption.rpa_number_of_rooms === 1 ? 'room' : 'rooms'} left!
                             </div>
                           )}
                         </td>

@@ -334,6 +334,7 @@ LEFT JOIN
                             image_urls: result.image_paths ? JSON.parse(result.image_paths) : [],
                             floor: result.floor,
                             room_type: result.room_type,
+                            rpa_number_of_rooms: result.rpa_number_of_rooms,
                             number_of_rooms: result.number_of_rooms,
                             total_capacity: result.total_capacity,
                             room_capacity_adults: result.room_capacity_adults,
@@ -397,7 +398,8 @@ LEFT JOIN
                     pr.*,
                     ri.image_paths,
                     rpa.*,
-                    rs.*
+                    rs.*,
+                     rpa.number_of_rooms as rpa_number_of_rooms  -- Explicitly select number_of_rooms from room_pricing_availability
                 FROM basic_info bi
                 LEFT JOIN facilities_amenities fa ON bi.property_id = fa.property_id
                 LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
@@ -426,6 +428,7 @@ LEFT JOIN
                     image_urls: result.image_paths ? JSON.parse(result.image_paths) : [],
                     floor: result.floor,
                     room_type: result.room_type,
+                    rpa_number_of_rooms: result.rpa_number_of_rooms,
                     number_of_rooms: result.number_of_rooms,
                     total_capacity: result.total_capacity,
                     room_capacity_adults: result.room_capacity_adults,
