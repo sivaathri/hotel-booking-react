@@ -176,13 +176,25 @@ export default function HomeSearchBar() {
             ref={datePickerRef}
           >
             <div className="flex flex-col">
-              <label className="text-sm font-semibold text-gray-800">Date</label>
+              <label className="text-sm mt-2 font-semibold text-gray-800">Date</label>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
                 className="text-left outline-none text-gray-600 text-sm cursor-pointer"
               >
-                {formatDateForDisplay(checkIn)} - {formatDateForDisplay(checkOut)}
+                <p className="text-sm font-medium">
+                  {checkIn && checkOut ? (
+                    <span className="text-gray-800">
+                      {`${formatDateForDisplay(checkIn)} - ${formatDateForDisplay(checkOut)}`}
+                    </span>
+                  ) : (
+                    <span className="text-gray-500">
+                      Check-in - Check-out
+                    </span>
+                  )}
+                </p>
+
+
               </motion.button>
             </div>
 
