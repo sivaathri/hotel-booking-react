@@ -10,7 +10,7 @@ import "animate.css";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import HomeSearchBar from './HomeSearchBar';
+import HomeSearchBar from "./HomeSearchBar";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -18,14 +18,13 @@ const Home = () => {
   const [guests, setGuests] = useState({
     adults: 1,
     children: 0,
-
   });
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const handleChange = (type, delta) => {
-    setGuests(prev => ({
+    setGuests((prev) => ({
       ...prev,
       [type]: Math.max(0, prev[type] + delta),
     }));
@@ -77,90 +76,38 @@ const Home = () => {
     <>
       {/* Header  */}
       <Header />
-      {/* Header End */}
-      {/* Carousel Start */}
+      {/* Hero Section Start */}
+      <div
+        className="relative w-full h-[420px] md:h-[480px] lg:h-[520px] flex items-center justify-center bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${carouselImg1})`,
+        }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-40 z-0" />
+        {/* Centered Content */}
+        <div className="relative z-10 flex flex-col items-center w-full px-4">
+          <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold mb-8 mt-12 text-center drop-shadow-lg">
+            Find hotels for your next trip
+          </h1>
+        </div>
+      </div>
+      {/* Floating Search Bar */}
+      <div className="min-h-screen flex items-start justify-center bg-gray-50 pt-1 -mt-14">
+  <div className="w-full max-w-6xl rounded-full shadow-6xl px-8 py-6 flex flex-col justify-center min-h-[120px]">
+    <HomeSearchBar />
+  </div>
+</div>
+
+
+
+      {/* Hero Section End */}
       <div className="container-fluid p-0 mb-5">
         <div
           id="header-carousel"
           className="carousel slide"
           data-bs-ride="carousel"
-        >
-          <div className="carousel-inner">
-            <div className="carousel-item active relative" style={{ height: "500px" }}>
-              <img
-                className="w-100 h-50 object-cover"
-                src={carouselImg1}
-                alt="Luxury Hotel 1"
-              />
-
-              {/* Overlay Content */}
-              <div className="absolute top-0 left-0 w-full h-full flex items-start">
-                <div className="container mt-12 sm:mt-16 md:mt-20">
-                  <div className="p-3 pt-8 sm:pt-12" style={{ maxWidth: "900px" }}>
-                    <h1
-                      className="text-white mb-4 mt-0 sm:mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
-
-                    >
-                      Find The Right Hotel Today
-                    </h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-            <div className="carousel-item active relative" style={{ height: "500px" }}>
-              <img
-                className="w-100 h-50 object-cover"
-                src={carouselImg2}
-                alt="Luxury Hotel 1"
-              />
-
-              {/* Overlay Content */}
-              <div className="absolute top-0 left-0 w-full h-full flex items-start">
-                <div className="container mt-12 sm:mt-16 md:mt-20">
-                  <div className="p-3 pt-8 sm:pt-12" style={{ maxWidth: "900px" }}>
-                    <h1
-                      className="text-white mb-4 mt-0 sm:mt-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
-                      style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}
-                    >
-                      Find The Right Hotel Today
-                    </h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="carousel-control-prev"
-            type="button"
-            data-bs-target="#header-carousel"
-            data-bs-slide="prev"
-          >
-            <span
-              className="mr-20 carousel-control-prev-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Previous</span>
-          </button>
-
-          <button
-            className="carousel-control-next"
-            type="button"
-            data-bs-target="#header-carousel"
-            data-bs-slide="next"
-          >
-            <span
-              className="ml-20 carousel-control-next-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Next</span>
-          </button>
-        </div>
-
-        {/* Carousel End */}
-        <HomeSearchBar />
+        ></div>
 
         <div className="mt-50 py-10 px-4 md:px-10 bg-white">
           <div className="max-w-7xl mx-auto">
@@ -198,7 +145,9 @@ const Home = () => {
 
                     <div className="p-4">
                       <div className="flex justify-between mb-2">
-                        <h5 className="text-base font-semibold">{room.title}</h5>
+                        <h5 className="text-base font-semibold">
+                          {room.title}
+                        </h5>
                         <div className="space-x-1 text-[#FEA116]">
                           {Array(5)
                             .fill(0)
@@ -213,7 +162,8 @@ const Home = () => {
                           <i className="fa fa-bed text-[#FEA116] mr-1"></i>3 Bed
                         </span>
                         <span className="border-r pr-2">
-                          <i className="fa fa-bath text-[#FEA116] mr-1"></i>2 Bath
+                          <i className="fa fa-bath text-[#FEA116] mr-1"></i>2
+                          Bath
                         </span>
                         <span>
                           <i className="fa fa-wifi text-[#FEA116] mr-1"></i>Wifi
@@ -221,8 +171,8 @@ const Home = () => {
                       </div>
 
                       <p className="text-gray-500 text-sm mb-3 line-clamp-3">
-                        Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed
-                        diam stet diam sed stet lorem.
+                        Erat ipsum justo amet duo et elitr dolor, est duo duo
+                        eos lorem sed diam stet diam sed stet lorem.
                       </p>
 
                       {/* <div className="flex justify-between">
@@ -239,9 +189,7 @@ const Home = () => {
                           Book Now
                         </a>
                       </div> */}
-
                     </div>
-
                   </div>
                 </div>
               ))}
@@ -256,20 +204,19 @@ const Home = () => {
               Ready to Book Your Perfect Stay?
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
+              Discover our luxurious rooms and suites, each designed to provide
+              the ultimate comfort and experience.
             </p>
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
               className="bg-white text-purple-600 font-bold py-4 px-8 rounded-full shadow-2xl hover:bg-yellow-50 hover:text-pink-600 transition-all duration-300 transform hover:-translate-y-1"
-
-              onClick={() => navigate('/rooms')}
+              onClick={() => navigate("/rooms")}
             >
               Book Your Room Now
             </motion.button>
           </div>
         </div>
-
 
         <div className="py-10 mb-30 px-4 md:px-10">
           <div className="flex flex-wrap g-0">
@@ -297,8 +244,6 @@ const Home = () => {
                 </a>
               </div>
             </div>
-
-
           </div>
 
           {/* Video Modal */}
