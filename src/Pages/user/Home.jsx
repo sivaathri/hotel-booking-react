@@ -86,7 +86,7 @@ const Home = () => {
         {/* Centered Content */}
         <div className="relative z-10 flex flex-col  w-full px-4">
           <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold ml-10 drop-shadow-lg">
-            Find hotels for your next trip
+          Where Every Stay Tells a Story
           </h1>
         </div>
       </div>
