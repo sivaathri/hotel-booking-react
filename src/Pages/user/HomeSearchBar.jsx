@@ -193,7 +193,7 @@ export default function HomeSearchBar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full mt-2 left-0 bg-white rounded-2xl shadow-lg p-6 z-50 w-[650px]"
+                  className="absolute top-full mt-4 left-0 bg-white rounded-2xl shadow-lg p-6 z-50 w-[650px]"
                 >
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-gray-800">Select dates</h3>
