@@ -60,8 +60,10 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
   // Add room type from dropdown
   const handleAddRoomType = (e) => {
     const value = e.target.value;
-    if (value && !selectedRoomTypes.includes(value)) {
-      const updated = [...selectedRoomTypes, value];
+    if (value) {
+      // Generate a unique ID for this room instance
+      const uniqueId = `${value}_${Date.now()}`;
+      const updated = [...selectedRoomTypes, uniqueId];
       setSelectedRoomTypes(updated);
       setFormData(prev => ({ ...prev, selectedRoomTypes: updated }));
       setDropdownValue('');
@@ -69,23 +71,23 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
   };
 
   // Remove room type
-  const handleRemoveRoomType = (type) => {
-    const updated = selectedRoomTypes.filter(t => t !== type);
+  const handleRemoveRoomType = (uniqueId) => {
+    const updated = selectedRoomTypes.filter(t => t !== uniqueId);
     setSelectedRoomTypes(updated);
     setFormData(prev => ({ ...prev, selectedRoomTypes: updated }));
     // Optionally remove details for this type
     const updatedDetails = { ...roomDetails };
-    delete updatedDetails[type];
+    delete updatedDetails[uniqueId];
     setRoomDetails(updatedDetails);
     setFormData(prev => ({ ...prev, roomDetails: updatedDetails }));
   };
 
   // Handle detail change for a room type
-  const handleDetailChange = (type, field, value) => {
+  const handleDetailChange = (uniqueId, field, value) => {
     const updatedDetails = {
       ...roomDetails,
-      [type]: {
-        ...roomDetails[type],
+      [uniqueId]: {
+        ...roomDetails[uniqueId],
         [field]: value
       }
     };
@@ -93,8 +95,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
     setFormData(prev => ({ ...prev, roomDetails: updatedDetails }));
   };
 
-  // Filter out already selected room types from dropdown
-  const availableRoomTypes = roomTypes.filter(rt => !selectedRoomTypes.includes(rt.value));
+  // No need to filter available room types anymore
+  const availableRoomTypes = roomTypes;
 
   return (
     <div className="space-y-6">
@@ -109,7 +111,7 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
           <select
             value={dropdownValue}
             onChange={handleAddRoomType}
-            disabled={!isEditing || availableRoomTypes.length === 0}
+            disabled={!isEditing}
             className={`p-2 border rounded-lg min-w-[180px] ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           >
             <option value="">-- Select --</option>
@@ -120,16 +122,17 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
         </div>
         {/* Selected room types as tags/chips */}
         <div className="flex flex-wrap gap-2 items-center">
-          {selectedRoomTypes.map(type => {
-            const roomTypeObj = roomTypes.find(rt => rt.value === type);
+          {selectedRoomTypes.map(uniqueId => {
+            const roomType = uniqueId.split('_')[0];
+            const roomTypeObj = roomTypes.find(rt => rt.value === roomType);
             return (
-              <span key={type} className="flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-2">
-                {roomTypeObj ? roomTypeObj.label : type}
+              <span key={uniqueId} className="flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-2">
+                {roomTypeObj ? roomTypeObj.label : roomType}
                 {isEditing && (
                   <button
                     type="button"
                     className="ml-2 text-blue-700 hover:text-red-600 focus:outline-none"
-                    onClick={() => handleRemoveRoomType(type)}
+                    onClick={() => handleRemoveRoomType(uniqueId)}
                   >
                     &times;
                   </button>
@@ -142,16 +145,17 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
       {/* For each selected room type, show details in a single column */}
       {selectedRoomTypes.length > 0 && (
         <div className="flex flex-col gap-4">
-          {selectedRoomTypes.map((type) => {
-            const roomTypeObj = roomTypes.find(rt => rt.value === type);
+          {selectedRoomTypes.map((uniqueId) => {
+            const roomType = uniqueId.split('_')[0];
+            const roomTypeObj = roomTypes.find(rt => rt.value === roomType);
             return (
-              <div key={type} className="flex flex-row gap-6 border p-4 rounded-xl bg-white items-end">
-                <div className="text-base font-semibold min-w-[100px]">{roomTypeObj ? roomTypeObj.label : type}</div>
+              <div key={uniqueId} className="flex flex-row gap-6 border p-4 rounded-xl bg-white items-end">
+                <div className="text-base font-semibold min-w-[100px]">{roomTypeObj ? roomTypeObj.label : roomType}</div>
                 <div className="flex-1 min-w-[180px]">
                   <label className="block text-sm font-medium mb-2">Floor</label>
                   <select
-                    value={roomDetails[type]?.floor || ''}
-                    onChange={e => handleDetailChange(type, 'floor', e.target.value)}
+                    value={roomDetails[uniqueId]?.floor || ''}
+                    onChange={e => handleDetailChange(uniqueId, 'floor', e.target.value)}
                     disabled={!isEditing}
                     className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   >
@@ -165,8 +169,8 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
                   <label className="block text-sm font-medium mb-2">Number of Rooms</label>
                   <input
                     type="number"
-                    value={roomDetails[type]?.numberOfRooms || ''}
-                    onChange={e => handleDetailChange(type, 'numberOfRooms', e.target.value)}
+                    value={roomDetails[uniqueId]?.numberOfRooms || ''}
+                    onChange={e => handleDetailChange(uniqueId, 'numberOfRooms', e.target.value)}
                     disabled={!isEditing}
                     className={`w-full p-2 border rounded-lg ${!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     placeholder="e.g. 2, 3, 4"
