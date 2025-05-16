@@ -167,7 +167,7 @@ const Step3 = ({ formData, setFormData, floorTypes, bhkTypes, isEditing }) => {
                 </div>
                 <div className="flex-1 min-w-[180px]">
                   <label className="block text-sm font-medium mb-2">
-                    Number of {roomTypeObj?.label || roomType} Rooms in {roomDetails[uniqueId]?.floor || '(Select floor first)'}
+                    Number of {roomTypeObj?.label || roomType}  in {roomDetails[uniqueId]?.floor || '(Select floor first)'}
                   </label>
                   <input
                     type="number"

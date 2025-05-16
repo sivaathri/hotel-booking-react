@@ -2,13 +2,47 @@ import React, { useEffect } from 'react';
 import { FiDollarSign, FiPlus, FiTrash2 } from 'react-icons/fi';
 
 const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
+  // Format room data for API submission
+  const formatRoomDataForAPI = (room) => {
+    // Convert individualRoomCapacities object to array format
+    const roomCapacitiesArray = Object.entries(room.individualRoomCapacities || {}).map(([roomNum, capacity]) => ({
+      room_number: parseInt(roomNum),
+      adults: capacity.adults || 0,
+      children: capacity.children || 0
+    }));
+
+    return {
+      property_id: room.property_id,
+      floor: room.floor,
+      room_type: room.room_type,
+      number_of_rooms: room.numberOfRooms || room.number_of_rooms,
+      base_price: room.pricePerNight || room.base_price,
+      child_pricing: Array.isArray(room.childPricing) ? JSON.stringify(room.childPricing) : room.childPricing || "[]",
+      occupancy_price_adjustments: Array.isArray(room.occupancyRanges) ? JSON.stringify(room.occupancyRanges) : room.occupancy_price_adjustments || "[]",
+      instant_payment_enabled: room.instantPayment || false,
+      free_cancellation_enabled: room.freeCancellation || false,
+      room_capacity_adults: room.room_capacity_adults || 0,
+      room_capacity_children: room.room_capacity_children || 0,
+      total_capacity: room.capacity || 0,
+      room_capacities: JSON.stringify(roomCapacitiesArray),
+      refundable1: room.refundable1 || false,
+      refundable2: room.refundable2 || false,
+      refundable3: room.refundable3 || false,
+      days_before1: room.days_before1 || null,
+      days_before2: room.days_before2 || null,
+      days_before3: room.days_before3 || null,
+      refund_percent1: room.refund_percent1 || null,
+      refund_percent2: room.refund_percent2 || null,
+      refund_percent3: room.refund_percent3 || null
+    };
+  };
+
   // Initialize room capacities when component mounts
   useEffect(() => {
     if (formData.rooms) {
       setFormData(prev => ({
         ...prev,
         rooms: prev.rooms.map(room => {
-          // Initialize individualRoomCapacities if it doesn't exist
           const individualRoomCapacities = room.individualRoomCapacities || {};
           
           // Initialize capacities for each room number
@@ -23,18 +57,25 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
             return sum + ((capacity?.adults || 0) + (capacity?.children || 0));
           }, 0);
 
-          // Add room capacity data for API
           const roomCapacityAdults = Object.values(individualRoomCapacities).reduce((sum, capacity) => 
             sum + (capacity?.adults || 0), 0);
           const roomCapacityChildren = Object.values(individualRoomCapacities).reduce((sum, capacity) => 
             sum + (capacity?.children || 0), 0);
+
+          // Format individual room capacities for API
+          const roomCapacitiesArray = Object.entries(individualRoomCapacities).map(([roomNum, capacity]) => ({
+            room_number: parseInt(roomNum),
+            adults: capacity.adults || 0,
+            children: capacity.children || 0
+          }));
 
           return {
             ...room,
             individualRoomCapacities,
             capacity: totalCapacity,
             room_capacity_adults: roomCapacityAdults,
-            room_capacity_children: roomCapacityChildren
+            room_capacity_children: roomCapacityChildren,
+            room_capacities: roomCapacitiesArray
           };
         })
       }));
@@ -159,11 +200,9 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
       rooms: prev.rooms.map((room, i) => {
         if (i !== index) return room;
         
-        // Initialize individualRoomCapacities if it doesn't exist
         const individualRoomCapacities = room.individualRoomCapacities || {};
         const currentRoomCapacity = individualRoomCapacities[roomNumber] || { adults: 1, children: 0 };
         
-        // Update the specific room capacity
         const updatedRoomCapacities = {
           ...individualRoomCapacities,
           [roomNumber]: {
@@ -172,7 +211,6 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
           }
         };
 
-        // Calculate total capacity and room capacities
         const totalCapacity = Object.values(updatedRoomCapacities).reduce((sum, capacity) => {
           return sum + ((capacity?.adults || 0) + (capacity?.children || 0));
         }, 0);
@@ -182,12 +220,20 @@ const Step7 = ({ formData, setFormData, refundPolicies, isEditing }) => {
         const roomCapacityChildren = Object.values(updatedRoomCapacities).reduce((sum, capacity) => 
           sum + (capacity?.children || 0), 0);
 
+        // Format individual room capacities for API
+        const roomCapacitiesArray = Object.entries(updatedRoomCapacities).map(([roomNum, capacity]) => ({
+          room_number: parseInt(roomNum),
+          adults: capacity.adults || 0,
+          children: capacity.children || 0
+        }));
+
         return {
           ...room,
           individualRoomCapacities: updatedRoomCapacities,
           capacity: totalCapacity,
           room_capacity_adults: roomCapacityAdults,
-          room_capacity_children: roomCapacityChildren
+          room_capacity_children: roomCapacityChildren,
+          room_capacities: roomCapacitiesArray
         };
       })
     }));

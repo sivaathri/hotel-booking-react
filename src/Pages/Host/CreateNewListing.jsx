@@ -883,6 +883,13 @@ const CreateNewListing = () => {
 
       // Process each room's pricing data
       const roomPricingPromises = formData.rooms.map(async (room) => {
+        // Format individual room capacities
+        const roomCapacities = Object.entries(room.individualRoomCapacities || {}).map(([roomNum, capacity]) => ({
+          room_number: parseInt(roomNum),
+          adults: capacity.adults || 0,
+          children: capacity.children || 0
+        }));
+
         // Calculate room capacities
         const roomCapacityAdults = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => 
           sum + (capacity?.adults || 0), 0);
@@ -912,28 +919,29 @@ const CreateNewListing = () => {
           property_id: formData.property_id,
           floor: room.floor,
           room_type: room.bhk,
-          number_of_rooms: room.numberOfRooms,
+          number_of_rooms: room.numberOfRooms || "1",
           room_capacity_adults: roomCapacityAdults,
           room_capacity_children: roomCapacityChildren,
           total_capacity: totalCapacity,
-          base_price: parseFloat(room.pricePerNight),
+          base_price: parseFloat(room.pricePerNight || 0),
           occupancy_price_adjustments: JSON.stringify(occupancyPriceAdjustments),
           child_pricing: JSON.stringify(childPricingData),
           instant_payment_enabled: formData.instantPayment || false,
           free_cancellation_enabled: formData.freeCancellation || false,
-          // Refund Policy 1 - Fully Refundable
-          refundable1: formData.refundPolicies?.[0]?.type === 'Fully Refundable',
+          individual_room_capacities: JSON.stringify(roomCapacities),
+          // Refund policies
+          refundable1: formData.refundPolicies?.[0]?.type === 'fully_refundable' || false,
           days_before1: formData.refundPolicies?.[0]?.daysBeforeCheckIn || null,
           refund_percent1: formData.refundPolicies?.[0]?.percentage || null,
-          // Refund Policy 2 - Partially Refundable
-          refundable2: formData.refundPolicies?.[1]?.type === 'Partial Refund',
+          refundable2: formData.refundPolicies?.[1]?.type === 'partially_refundable' || false,
           days_before2: formData.refundPolicies?.[1]?.daysBeforeCheckIn || null,
           refund_percent2: formData.refundPolicies?.[1]?.percentage || null,
-          // Refund Policy 3 - Non-Refundable
-          refundable3: formData.refundPolicies?.[2]?.type === 'Non-refundable',
+          refundable3: formData.refundPolicies?.[2]?.type === 'non_refundable' || false,
           days_before3: formData.refundPolicies?.[2]?.daysBeforeCheckIn || null,
           refund_percent3: formData.refundPolicies?.[2]?.percentage || null
         };
+
+        console.log('Sending room pricing data:', pricingData); // Debug log
 
         const response = await axios.post(
           `${API_URL}/roomPricing/create`,
