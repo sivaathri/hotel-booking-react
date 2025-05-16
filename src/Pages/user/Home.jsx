@@ -91,7 +91,7 @@ const Home = () => {
         </div>
       </div>
       {/* Floating Search Bar */}
-      <div className=" flex items-start bg-white justify-center bg-gray-50  -hmt-14">
+      <div className=" flex items-start bg-white justify-center bg-gray-50  -mt-14">
         <div className="w-full max-w-6xl rounded-full shadow-6xl px-8 py-6 flex flex-col justify-center min-h-[120px]">
           <HomeSearchBar />
         </div>
