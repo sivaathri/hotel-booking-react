@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import carouselImg1 from "../../assets/Images/About Images/carousel-1.jpg";
-import carouselImg2 from "../../assets/Images/About Images/carousel-2.jpg";
-
 import room1 from "../../assets/Images/About Images/room-1.jpg";
 import room2 from "../../assets/Images/About Images/room-2.jpg";
 import room3 from "../../assets/Images/About Images/room-3.jpg";
@@ -78,13 +76,13 @@ const Home = () => {
       <Header />
       {/* Hero Section Start */}
       <div
-        className="relative w-full h-[420px] md:h-[480px] lg:h-[520px] flex items-center justify-center bg-cover bg-center"
+        className="relative w-full h-[420px] md:h-[280px] lg:h-[390px] flex items-center justify-center bg-cover bg-center"
         style={{
           backgroundImage: `url(${carouselImg1})`,
         }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-40 z-0" />
+        <div className="absolute inset-0 bg-black h-200 bg-opacity-40 z-0" />
         {/* Centered Content */}
         <div className="relative z-10 flex flex-col items-center w-full px-4">
           <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold mb-8 mt-12 text-center drop-shadow-lg">
