@@ -176,7 +176,7 @@ export default function HomeSearchBar() {
             ref={datePickerRef}
           >
             <div className="flex flex-col">
-              <label className="text-sm mt-2 font-semibold text-gray-800">Date</label>
+              <label className="text-sm mt-3 font-semibold text-gray-800">Date</label>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
