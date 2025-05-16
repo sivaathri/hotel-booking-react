@@ -1,8 +1,15 @@
 import React from 'react';
-import { Form, Row, Col, Card, Checkbox, Radio, Input, InputNumber } from 'antd';
-const { TextArea } = Input;
+import { Form, Row, Col, Card, Checkbox, Radio, Input, InputNumber, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Editor } from '@tinymce/tinymce-react';
+import './RichTextEditor.css';
 
 const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
+  const handleEditorChange = (content) => {
+    if (!isEditing) return;
+    setFormData(prev => ({ ...prev, description: content }));
+  };
+
   const handleArrayToggle = (field, value) => {
     if (!isEditing) return;
     setFormData(prev => ({
@@ -25,17 +32,44 @@ const Step8 = ({ formData, setFormData, guestTypes, isEditing }) => {
   return (
     <div className="p-4">
       {/* Property Description */}
-      <Card title="About this property" className="mb-6">
+      <Card 
+        title={
+          <div className="flex items-center gap-2">
+            About this property
+            <Tooltip title="Write a detailed description of your property. Include unique features, amenities, and what makes it special. A good description helps attract more guests.">
+              <InfoCircleOutlined className="text-blue-500 cursor-help" />
+            </Tooltip>
+          </div>
+        } 
+        className="mb-6"
+      >
         <Form.Item>
-          <TextArea
-            value={formData.description || ''}
-            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-            placeholder="Write a detailed description of your property (minimum 1000 words). Include information about the location, amenities, nearby attractions, and what makes your property special."
-            disabled={!isEditing}
-            autoSize={{ minRows: 10, maxRows: 20 }}
-            maxLength={5000}
-            showCount
-          />
+          <div className={`border rounded-lg ${!isEditing ? 'bg-gray-50' : 'bg-white'}`}>
+            <Editor
+              apiKey="lq1ipb4lm97xlal4jcgck7qi4m4k2y1522763ta8ojddoh7q"
+              value={formData.description || ''}
+              init={{
+                height: 300,
+                menubar: false,
+                plugins: [
+                  'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+                  'searchreplace', 'visualblocks', 'fullscreen',
+                  'insertdatetime', 'table', 'help', 'wordcount'
+                ],
+                toolbar: isEditing ? 
+                  'undo redo | formatselect | bold italic underline | ' +
+                  'alignleft aligncenter alignright alignjustify | ' +
+                  'bullist numlist | removeformat help' : false,
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; font-size: 14px }',
+                readonly: !isEditing,
+                branding: false,
+                statusbar: false,
+                placeholder: "Write a detailed description of your property (minimum 1000 words). Include information about the location, amenities, nearby attractions, and what makes your property special."
+              }}
+              onEditorChange={handleEditorChange}
+              disabled={!isEditing}
+            />
+          </div>
         </Form.Item>
       </Card>
 

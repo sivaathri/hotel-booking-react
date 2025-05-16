@@ -1,0 +1,58 @@
+.tox-tinymce {
+  border: none !important;
+  border-radius: 0.5rem !important;
+}
+
+.tox .tox-toolbar__primary {
+  background: none !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.tox .tox-toolbar__group {
+  border: none !important;
+}
+
+.tox .tox-tbtn {
+  border-radius: 0.25rem !important;
+  color: #4a5568 !important;
+}
+
+.tox .tox-tbtn:hover {
+  background-color: #edf2f7 !important;
+}
+
+.tox .tox-tbtn--enabled,
+.tox .tox-tbtn--enabled:hover {
+  background-color: #e2e8f0 !important;
+  color: #2d3748 !important;
+}
+
+/* Styles for read-only mode */
+.tox.tox-tinymce.tox-tinymce--disabled {
+  opacity: 1 !important;
+}
+
+.tox.tox-tinymce.tox-tinymce--disabled .tox-editor-container {
+  background-color: #f7fafc !important;
+}
+
+/* Editor content area */
+.tox .tox-edit-area__iframe {
+  background-color: transparent !important;
+}
+
+/* Placeholder text */
+.tox .tox-editor-container .tox-editor-placeholder {
+  color: #a0aec0 !important;
+}
+
+/* Remove unnecessary borders */
+.tox:not(.tox-tinymce-inline) .tox-editor-header {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* Adjust padding */
+.tox .tox-edit-area {
+  padding: 1rem !important;
+} 

@@ -193,36 +193,166 @@ export default function HomeSearchBar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full mt-2 left-0 bg-white rounded-2xl shadow-lg p-4 z-50 w-[300px]"
+                  className="absolute top-full mt-2 left-0 bg-white rounded-2xl shadow-lg p-6 z-50 w-[650px]"
                 >
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
-                      <input
-                        type="date"
-                        value={checkIn}
-                        min={formatDate(today)}
-                        onChange={(e) => {
-                          setCheckIn(e.target.value);
-                          // Ensure checkout is after checkin
-                          if (e.target.value >= checkOut) {
-                            const nextDay = new Date(e.target.value);
-                            nextDay.setDate(nextDay.getDate() + 1);
-                            setCheckOut(formatDate(nextDay));
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800">Select dates</h3>
+                    <button
+                      onClick={() => setIsDatePickerOpen(false)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="flex gap-6">
+                    {/* Current Month Calendar */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-sm font-medium text-gray-600">
+                          {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        </h4>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                          <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray-400">
+                            {day}
+                          </div>
+                        ))}
+                        {Array.from({ length: new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay() }, (_, i) => (
+                          <div key={`empty-start-${i}`} className="h-10" />
+                        ))}
+                        {Array.from(
+                          { length: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() },
+                          (_, i) => {
+                            const date = new Date(new Date().getFullYear(), new Date().getMonth(), i + 1);
+                            const dateString = formatDate(date);
+                            const isSelected = dateString >= checkIn && dateString <= checkOut;
+                            const isCheckIn = dateString === checkIn;
+                            const isCheckOut = dateString === checkOut;
+                            const isPast = date < today;
+                            
+                            return (
+                              <motion.button
+                                key={i}
+                                whileHover={!isPast ? { scale: 1.1 } : {}}
+                                whileTap={!isPast ? { scale: 0.95 } : {}}
+                                onClick={() => {
+                                  if (!isPast) {
+                                    if (!checkIn || (checkIn && checkOut) || dateString < checkIn) {
+                                      setCheckIn(dateString);
+                                      setCheckOut('');
+                                    } else {
+                                      setCheckOut(dateString);
+                                    }
+                                  }
+                                }}
+                                disabled={isPast}
+                                className={`h-10 rounded-lg flex items-center justify-center text-sm relative
+                                  ${isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-orange-50 cursor-pointer'}
+                                  ${isSelected ? 'bg-orange-100' : ''}
+                                  ${isCheckIn ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                                  ${isCheckOut ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                                `}
+                              >
+                                {i + 1}
+                                {(isCheckIn || isCheckOut) && (
+                                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-500 whitespace-nowrap">
+                                    {isCheckIn ? 'Check-in' : 'Check-out'}
+                                  </div>
+                                )}
+                              </motion.button>
+                            );
                           }
-                        }}
-                        className="w-full p-2 border rounded-lg"
-                      />
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
-                      <input
-                        type="date"
-                        value={checkOut}
-                        min={checkIn}
-                        onChange={(e) => setCheckOut(e.target.value)}
-                        className="w-full p-2 border rounded-lg"
-                      />
+
+                    {/* Next Month Calendar */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-sm font-medium text-gray-600">
+                          {new Date(new Date().getFullYear(), new Date().getMonth() + 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        </h4>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                          <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray-400">
+                            {day}
+                          </div>
+                        ))}
+                        {Array.from({ length: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).getDay() }, (_, i) => (
+                          <div key={`empty-start-next-${i}`} className="h-10" />
+                        ))}
+                        {Array.from(
+                          { length: new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0).getDate() },
+                          (_, i) => {
+                            const date = new Date(new Date().getFullYear(), new Date().getMonth() + 1, i + 1);
+                            const dateString = formatDate(date);
+                            const isSelected = dateString >= checkIn && dateString <= checkOut;
+                            const isCheckIn = dateString === checkIn;
+                            const isCheckOut = dateString === checkOut;
+                            
+                            return (
+                              <motion.button
+                                key={i}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                  if (!checkIn || (checkIn && checkOut) || dateString < checkIn) {
+                                    setCheckIn(dateString);
+                                    setCheckOut('');
+                                  } else {
+                                    setCheckOut(dateString);
+                                  }
+                                }}
+                                className={`h-10 rounded-lg flex items-center justify-center text-sm relative
+                                  hover:bg-orange-50 cursor-pointer
+                                  ${isSelected ? 'bg-orange-100' : ''}
+                                  ${isCheckIn ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                                  ${isCheckOut ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                                `}
+                              >
+                                {i + 1}
+                                {(isCheckIn || isCheckOut) && (
+                                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-500 whitespace-nowrap">
+                                    {isCheckIn ? 'Check-in' : 'Check-out'}
+                                  </div>
+                                )}
+                              </motion.button>
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Selected Range Display */}
+                  <div className="mt-8 pt-4 border-t border-gray-100">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-sm text-gray-500">Selected Range</p>
+                        <p className="text-sm font-medium text-gray-800">
+                          {checkIn && checkOut
+                            ? `${formatDateForDisplay(checkIn)} - ${formatDateForDisplay(checkOut)}`
+                            : checkIn
+                            ? `${formatDateForDisplay(checkIn)} - Select check-out date`
+                            : 'Select dates'}
+                        </p>
+                      </div>
+                      {(checkIn || checkOut) && (
+                        <button
+                          onClick={() => {
+                            setCheckIn('');
+                            setCheckOut('');
+                          }}
+                          className="text-sm text-orange-500 hover:text-orange-600"
+                        >
+                          Clear dates
+                        </button>
+                      )}
                     </div>
                   </div>
                 </motion.div>
