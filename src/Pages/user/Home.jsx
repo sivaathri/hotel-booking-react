@@ -86,7 +86,7 @@ const Home = () => {
         {/* Centered Content */}
         <div className="relative z-10 flex flex-col  w-full px-4">
           <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold ml-10 drop-shadow-lg">
-          Where Every Stay Tells a Story
+            Where Every Stay Tells a Story
           </h1>
         </div>
       </div>
@@ -196,14 +196,32 @@ const Home = () => {
         </div>
 
         {/* Call to Action Section */}
-      <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
-  <div className="text-center">
-    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 drop-shadow-sm">
+       <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
+  <motion.div
+    className="text-center"
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, ease: "easeOut" }}
+    viewport={{ once: true }}
+  >
+    <motion.h2
+      className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 drop-shadow-sm"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2, duration: 0.6 }}
+    >
       Ready to Book Your Perfect Stay?
-    </h2>
-    <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+    </motion.h2>
+
+    <motion.p
+      className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4, duration: 0.6 }}
+    >
       Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
-    </p>
+    </motion.p>
+
     <motion.button
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.95 }}
@@ -212,7 +230,7 @@ const Home = () => {
     >
       Book Your Room Now
     </motion.button>
-  </div>
+  </motion.div>
 </div>
 
 
