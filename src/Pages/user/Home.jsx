@@ -76,7 +76,7 @@ const Home = () => {
       <Header />
       {/* Hero Section Start */}
       <div
-        className="relative w-full h-[420px] md:h-[280px] lg:h-[390px] flex items-center justify-center"
+        className="relative w-full h-full md:h-[280px] lg:h-[500px] flex items-center justify-center"
         style={{
           backgroundImage: `url(${carouselImg1})`,
         }}
