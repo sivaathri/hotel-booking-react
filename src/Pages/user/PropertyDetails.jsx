@@ -1,6 +1,6 @@
 import { useParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { FaStar, FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake, FaConciergeBell, FaBed, FaArrowUp, FaUmbrellaBeach, FaVideo, FaFirstAid, FaBell, FaSuitcaseRolling, FaHandHoldingHeart, FaRuler, FaUser, FaChild, FaCalendarCheck, FaMoneyBillWave, FaCheck } from 'react-icons/fa';
+import { FaStar, FaWifi, FaParking, FaSwimmingPool, FaUtensils, FaSnowflake, FaConciergeBell, FaBed, FaArrowUp, FaUmbrellaBeach, FaVideo, FaFirstAid, FaBell, FaSuitcaseRolling, FaHandHoldingHeart, FaRuler, FaUser, FaChild, FaCalendarCheck, FaMoneyBillWave, FaCheck, FaWheelchair } from 'react-icons/fa';
 import { MdMeetingRoom, MdLocalLaundryService, MdPower, MdSecurity, MdTv, MdRoom } from 'react-icons/md';
 import { GiVacuumCleaner } from 'react-icons/gi';
 import { BiRestaurant } from 'react-icons/bi';
@@ -33,13 +33,7 @@ const getImageUrl = (path) => {
 const FACILITY_MAP = [
   { key: 'room_service_24hr', label: 'Room service', icon: <FaConciergeBell /> },
   { key: 'free_wifi', label: 'Free WiFi', icon: <FaWifi /> },
-  { key: 'non_smoking_rooms', label: 'Non-smoking rooms', icon: <FaBed /> },
-  { key: 'facilities_for_disabled_guests', label: 'Facilities for disabled guests', icon: <MdSecurity /> },
   { key: 'free_parking', label: 'Free parking', icon: <FaParking /> },
-  { key: 'airport_shuttle', label: 'Airport shuttle', icon: <FaSuitcaseRolling /> },
-  { key: 'family_rooms', label: 'Family rooms', icon: <MdRoom /> },
-  { key: 'tea_coffee_maker', label: 'Tea/coffee maker in all rooms', icon: <BiRestaurant /> },
-  { key: 'very_good_breakfast', label: <span className="underline">Very good breakfast</span>, icon: <FaUtensils /> },
   { key: 'swimming_pool', label: 'Swimming Pool', icon: <FaSwimmingPool /> },
   { key: 'restaurant', label: 'Restaurant', icon: <FaUtensils /> },
   { key: 'lounge', label: 'Lounge', icon: <FaBed /> },
@@ -64,7 +58,11 @@ const FACILITY_MAP = [
   { key: 'photocopying', label: 'Photocopying', icon: <MdPower /> },
   { key: 'conference_room', label: 'Conference Room', icon: <MdMeetingRoom /> },
   { key: 'banquet', label: 'Banquet', icon: <MdMeetingRoom /> },
-  // Add more as needed
+  { key: 'dining_area', label: 'Dining Area', icon: <FaUtensils /> },
+  { key: 'cafe_24hr', label: '24/7 Cafe', icon: <FaUtensils /> },
+  { key: 'wheelchair', label: 'Wheelchair Access', icon: <FaWheelchair /> },
+  { key: 'bellboy_service', label: 'Bellboy Service', icon: <FaConciergeBell /> },
+  { key: 'reflexology', label: 'Reflexology', icon: <FaHandHoldingHeart /> }
 ];
 
 // Helper to convert rules object to readable array
@@ -190,7 +188,7 @@ export default function PropertyDetails() {
   let totalPrice = 0;
   const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
   const numberOfChildren = parseInt(searchParams.get('children')) || 0;
-  
+
   // Add more detailed logging for children ages parsing
   console.log('Raw childrenAges from URL:', searchParams.get('childrenAges'));
   let childrenAges = [];
@@ -216,8 +214,8 @@ export default function PropertyDetails() {
   }
 
   // Get the first room if rooms is an array
-  const room = property ? (Array.isArray(property.rooms) && property.rooms.length > 0 
-    ? property.rooms[0] 
+  const room = property ? (Array.isArray(property.rooms) && property.rooms.length > 0
+    ? property.rooms[0]
     : property.room) : null;
 
   // Log room data for debugging
@@ -239,7 +237,7 @@ export default function PropertyDetails() {
   // Price calculation
   const calculatePrice = useCallback((roomData) => {
     if (!roomData) return 0;
-    
+
     let price = parseFloat(roomData.base_price || 0);
     console.log('Initial base price:', price);
 
@@ -275,7 +273,7 @@ export default function PropertyDetails() {
         }
 
         childrenAges.forEach(age => {
-          const applicablePricing = childPricing.find(p => 
+          const applicablePricing = childPricing.find(p =>
             age >= p.ageFrom && age <= p.ageTo
           );
 
@@ -342,12 +340,12 @@ export default function PropertyDetails() {
         if (data.success && data.data) {
           console.log('Raw API response:', data);
           const propertyData = data.data;
-          
+
           // Log the full property data structure
           console.log('Full property data:', propertyData);
           console.log('Property rooms:', propertyData.rooms);
           console.log('Property room:', propertyData.room);
-          
+
           setProperty(propertyData);
         } else {
           setError('Property not found');
@@ -400,7 +398,7 @@ export default function PropertyDetails() {
   const renderImage = (img, idx, isMainImage = false) => {
     const imageUrl = getImageUrl(img);
     console.log(`Rendering image ${idx}:`, { original: img, processed: imageUrl, isMainImage });
-    
+
     if (isMainImage) {
       return (
         <motion.img
@@ -426,9 +424,8 @@ export default function PropertyDetails() {
         whileTap={{ scale: 0.95 }}
         src={imageUrl}
         alt={`${property.property_name} thumbnail ${idx + 1}`}
-        className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${
-          selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
-        }`}
+        className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
+          }`}
         onClick={() => {
           console.log('Selected thumbnail:', idx, imageUrl);
           setSelectedImage(idx);
@@ -451,17 +448,17 @@ export default function PropertyDetails() {
         className="max-w-7xl mx-auto p-4"
       >
         {/* Header Section with Back Button */}
-    
-        <HomeSearchBar/>
-       
-       
+
+        <HomeSearchBar />
+
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          
+
           <h1 className="text-3xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 font-sans">{property.property_name}</h1>
           <div className="flex items-center gap-2 mt-2">
             <motion.div
@@ -531,11 +528,38 @@ export default function PropertyDetails() {
             {images.map((img, idx) => renderImage(img, idx))}
           </div>
         </motion.div>
+        {/* Add this new Facilities Section at the bottom, before the closing tags */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="w-full py-12 px-4 sm:px-6 lg:px-8 mb-8"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+              {FACILITY_MAP
+                .filter(facility => property.facilities?.[facility.key] === 1) // only available
+                .slice(0, 10) // limit to 10
+                .map(facility => (
+                  <motion.div
+                    key={facility.key}
+                    whileHover={{ scale: 1.05 }}
+                    className="flex flex-col items-center justify-center p-4 rounded-lg  hover:bg-gray-100 transition-all duration-300"
+                  >
+                    <div className="text-2xl text-blue-600 mb-2">
+                      {facility.icon}
+                    </div>
+                    <span className="text-sm text-gray-600 text-center">{facility.label}</span>
+                  </motion.div>
+                ))}
+            </div>
+          </div>
+        </motion.div>
 
         {/* Room Selection Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-2xl font-bold mb-6">Book this apartment</h2>
-          
+          <h2 className="text-2xl font-bold mb-6">Book this  {property.property_type}</h2>
+
           {/* Room Comparison Table */}
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
@@ -558,7 +582,7 @@ export default function PropertyDetails() {
                     const totalSearchedGuests = searchedAdults + searchedChildren;
 
                     // Get room capacity
-                    const roomCapacity = roomOption.total_capacity || 
+                    const roomCapacity = roomOption.total_capacity ||
                       (roomOption.room_capacity_adults + roomOption.room_capacity_children);
 
                     // Show room only if it can accommodate the searched number of guests
@@ -584,11 +608,11 @@ export default function PropertyDetails() {
                           <div className="space-y-4">
                             <div>
                               <a href="#" className="text-blue-600 font-semibold text-lg hover:underline">
-                                {roomOption.room_type === "2BHK" ? "Two-Bedroom Apartment" : "Three-Bedroom Apartment"}
+                                {roomOption.room_type.split('_')[0]} - {property.property_type}
+                                {roomOption.floor > 0 && ` - Floor ${roomOption.floor}`}
                               </a>
-                              {/* Show recommended tag if room capacity matches guest count perfectly or is optimal */}
-                              {((roomOption.room_type === "2BHK" && totalSearchedGuests <= 6) || 
-                                (roomOption.room_type === "3BHK" && totalSearchedGuests > 6 && totalSearchedGuests <= 9)) && (
+                              {/* Show recommended tag if room capacity matches guest count */}
+                              {totalSearchedGuests <= roomOption.total_capacity && (
                                 <div className="mt-1 text-sm text-green-600 bg-green-50 inline-block px-2 py-1 rounded">
                                   Recommended for {totalSearchedGuests} {totalSearchedGuests === 1 ? 'guest' : 'guests'}
                                 </div>
@@ -597,49 +621,99 @@ export default function PropertyDetails() {
 
                             {/* Room Details */}
                             <div className="space-y-2 text-sm text-gray-600">
-                              {[1, 2, 3].slice(0, roomOption.room_type === "2BHK" ? 2 : 3).map((num) => (
-                                <div key={num} className="flex items-center gap-2">
-                                  <span className="font-semibold">Bedroom {num}:</span>
-                                  <span className="flex items-center gap-1">
-                                    1 double bed <FaBed className="text-gray-400" />
-                                  </span>
-                                </div>
-                              ))}
+                              {/* Dynamic bedroom layout based on room type */}
+                              {(() => {
+                                const roomType = roomOption.room_type.split('_')[0];
+                                const bedroomCount = parseInt(roomType.match(/\d+/)?.[0] || 1);
+                                
+                                return Array.from({ length: bedroomCount }).map((_, index) => (
+                                  <div key={index} className="flex items-center gap-2">
+                                    <span className="font-semibold">
+                                      {index === 0 ? 'Master Bedroom' : `Bedroom ${index + 1}`}:
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      {index === 0 ? '1 king bed' : '1 queen bed'} <FaBed className="text-gray-400" />
+                                    </span>
+                                  </div>
+                                ));
+                              })()}
+
+                              {/* Living Room */}
                               <div className="flex items-center gap-2">
-                                <span className="font-semibold">Living room:</span>
+                                <span className="font-semibold">Living Room:</span>
                                 <span className="flex items-center gap-1">
                                   1 sofa bed <FaBed className="text-gray-400" />
                                 </span>
                               </div>
+
+                              {/* Room Capacity */}
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold">Maximum occupancy:</span>
                                 <span className="flex items-center gap-1">
-                                  {roomOption.room_type === "2BHK" ? "6 guests" : "9 guests"}
+                                  {roomOption.total_capacity} guests ({roomOption.room_capacity_adults} adults + {roomOption.room_capacity_children} children)
                                 </span>
                               </div>
+
+                              {/* Floor Information */}
                               <div className="flex items-center gap-2">
-                                <span className="font-semibold">Bathrooms:</span>
-                                <span>2</span>
+                                <span className="font-semibold">Floor:</span>
+                                <span>{roomOption.floor === 0 ? "Ground Floor" : `Floor ${roomOption.floor}`}</span>
                               </div>
                             </div>
 
-                            {/* Apartment Features */}
+                            {/* Room Features */}
                             <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                              {property.facilities?.air_conditioning === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <FaSnowflake className="text-gray-400" />
+                                  <span>Air conditioning</span>
+                                </div>
+                              )}
+                              {property.facilities?.free_wifi === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <FaWifi className="text-gray-400" />
+                                  <span>Free WiFi</span>
+                                </div>
+                              )}
+                              {property.facilities?.tv === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <MdTv className="text-gray-400" />
+                                  <span>TV</span>
+                                </div>
+                              )}
+                              {property.facilities?.refrigerator === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <MdPower className="text-gray-400" />
+                                  <span>Refrigerator</span>
+                                </div>
+                              )}
+                              {property.facilities?.dining_area === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <BiRestaurant className="text-gray-400" />
+                                  <span>Private kitchen & dining</span>
+                                </div>
+                              )}
+                              {property.facilities?.housekeeping === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <GiVacuumCleaner className="text-gray-400" />
+                                  <span>Housekeeping</span>
+                                </div>
+                              )}
+                              {property.facilities?.room_service_24hr === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <FaConciergeBell className="text-gray-400" />
+                                  <span>24/7 Room Service</span>
+                                </div>
+                              )}
+                              {property.facilities?.laundry_service === 1 && (
+                                <div className="flex items-center gap-2">
+                                  <MdLocalLaundryService className="text-gray-400" />
+                                  <span>Laundry Service</span>
+                                </div>
+                              )}
                               <div className="flex items-center gap-2">
                                 <FaRuler className="text-gray-400" />
-                                <span>Entire apartment {roomOption.room_type === "2BHK" ? "1000" : "1500"} m²</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <BiRestaurant className="text-gray-400" />
-                                <span>Private kitchen</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <FaWifi className="text-gray-400" />
-                                <span>Free WiFi</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <FaSnowflake className="text-gray-400" />
-                                <span>Air conditioning</span>
+                                <span>Entire {property.property_type.toLowerCase()} {roomOption.room_type.includes("2BHK") ? "1000" : "1500"} m²</span>
                               </div>
                             </div>
                           </div>
@@ -647,10 +721,66 @@ export default function PropertyDetails() {
 
                         {/* Number of Guests Column */}
                         <td className="py-6 px-6">
-                          <div className="flex items-center gap-1">
-                            {[...Array(roomOption.room_capacity_adults)].map((_, i) => (
-                              <FaUser key={i} className="text-gray-600" />
-                            ))}
+                          <div className="space-y-4">
+                            {/* 3 Adults */}
+                            {roomOption.room_capacity_adults >= 3 && (
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1">
+                                  {[...Array(3)].map((_, i) => (
+                                    <FaUser key={i} className="text-gray-600" />
+                                  ))}
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-gray-400 line-through">₹ {Math.round(roomPrice * 1.1)}</div>
+                                  <div className="font-semibold">₹ {Math.round(roomPrice)}</div>
+                                  <div className="text-xs text-gray-500">+₹ {Math.round(roomPrice * 0.12)} taxes and fees</div>
+                                  <div className="text-xs text-green-600">19% off</div>
+                                  <div className="mt-1">
+                                    <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* 2 Adults */}
+                            {roomOption.room_capacity_adults >= 2 && (
+                              <div className="flex items-center justify-between border-t pt-4">
+                                <div className="flex items-center gap-1">
+                                  {[...Array(2)].map((_, i) => (
+                                    <FaUser key={i} className="text-gray-600" />
+                                  ))}
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-gray-400 line-through">₹ {Math.round(roomPrice * 0.9)}</div>
+                                  <div className="font-semibold">₹ {Math.round(roomPrice * 0.8)}</div>
+                                  <div className="text-xs text-gray-500">+₹ {Math.round(roomPrice * 0.8 * 0.12)} taxes and fees</div>
+                                  <div className="text-xs text-green-600">19% off</div>
+                                  <div className="mt-1">
+                                    <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* 1 Adult */}
+                            <div className="flex items-center justify-between border-t pt-4">
+                              <div className="flex items-center gap-1">
+                                <FaUser className="text-gray-600" />
+                              </div>
+                              <div className="text-right">
+                                <div className="text-gray-400 line-through">₹ {Math.round(roomPrice * 0.8)}</div>
+                                <div className="font-semibold">₹ {Math.round(roomPrice * 0.7)}</div>
+                                <div className="text-xs text-gray-500">+₹ {Math.round(roomPrice * 0.7 * 0.12)} taxes and fees</div>
+                                <div className="text-xs text-green-600">19% off</div>
+                                <div className="mt-1">
+                                  <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="text-sm text-gray-500 mt-2">
+                              Max {roomOption.total_capacity} guests
+                            </div>
                           </div>
                         </td>
 
@@ -659,24 +789,36 @@ export default function PropertyDetails() {
                           <div className="flex flex-col">
                             <div className="text-xl font-bold">₹ {roomFinalPrice.toLocaleString('en-IN')}</div>
                             <div className="text-sm text-gray-500">+ ₹ {roomGstAmount} taxes and charges</div>
+                            {roomOption.free_cancellation_enabled === 1 && (
+                              <div className="text-green-600 text-sm mt-2">
+                                <FaCheck className="inline-block mr-1" />
+                                Free cancellation
+                              </div>
+                            )}
                           </div>
                         </td>
 
                         {/* Choices Column */}
                         <td className="py-6 px-6">
                           <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-green-600">
-                              <FaCheck className="text-sm" />
-                              <span>Includes parking + early check-in + late check-out + high-speed internet</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-green-600">
-                              <FaCheck className="text-sm" />
-                              <span>Free cancellation before 21 May 2025</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-green-600">
-                              <FaCheck className="text-sm" />
-                              <span>No prepayment needed – pay at the property</span>
-                            </div>
+                            {roomOption.instant_payment_enabled === 1 && (
+                              <div className="flex items-center gap-2 text-green-600">
+                                <FaCheck className="text-sm" />
+                                <span>Instant booking available</span>
+                              </div>
+                            )}
+                            {roomOption.free_cancellation_enabled === 1 && (
+                              <div className="flex items-center gap-2 text-green-600">
+                                <FaCheck className="text-sm" />
+                                <span>Free cancellation available</span>
+                              </div>
+                            )}
+                            {roomOption.refundable2 === 1 && (
+                              <div className="flex items-center gap-2 text-green-600">
+                                <FaCheck className="text-sm" />
+                                <span>{roomOption.refund_percent2}% refund {roomOption.days_before2} days before check-in</span>
+                              </div>
+                            )}
                             <div className="flex items-center gap-2 text-green-600">
                               <FaCheck className="text-sm" />
                               <span>No credit card needed</span>
@@ -695,7 +837,7 @@ export default function PropertyDetails() {
                                 [roomOption.room_id]: count
                               }));
                               if (count > 0) {
-                                setSelectedRoom({...roomOption, selectedCount: count});
+                                setSelectedRoom({ ...roomOption, selectedCount: count });
                               } else {
                                 setSelectedRoom(null);
                               }
@@ -703,13 +845,14 @@ export default function PropertyDetails() {
                             value={currentSelection}
                           >
                             <option value="0">0</option>
-                            {[...Array(roomOption.number_of_rooms)].map((_, i) => (
+                            {console.log('rpa_number_of_rooms:', roomOption.rpa_number_of_rooms)}
+                            {[...Array(roomOption.rpa_number_of_rooms)].map((_, i) => (
                               <option key={i + 1} value={i + 1}>{i + 1}</option>
                             ))}
                           </select>
-                          {roomOption.number_of_rooms <= 3 && (
+                          {roomOption.rpa_number_of_rooms <= 3 && (
                             <div className="text-red-600 text-sm font-medium mt-2">
-                              Only {roomOption.number_of_rooms} {roomOption.number_of_rooms === 1 ? 'room' : 'rooms'} left!
+                              Only {roomOption.rpa_number_of_rooms} {roomOption.rpa_number_of_rooms === 1 ? 'room' : 'rooms'} left!
                             </div>
                           )}
                         </td>
@@ -718,16 +861,15 @@ export default function PropertyDetails() {
                         <td className="py-6 px-6">
                           <div className="space-y-4">
                             <button
-                              className={`w-full font-semibold py-2 px-6 rounded-lg transition-colors ${
-                                currentSelection > 0 
-                                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                  : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                              }`}
+                              className={`w-full font-semibold py-2 px-6 rounded-lg transition-colors ${currentSelection > 0
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                }`}
                               disabled={currentSelection === 0}
                               onClick={() => {
                                 navigate(`/book/${propertyId}`, {
                                   state: {
-                                    room: {...roomOption, selectedCount: currentSelection},
+                                    room: { ...roomOption, selectedCount: currentSelection },
                                     dates: {
                                       checkIn: searchParamsState.checkIn,
                                       checkOut: searchParamsState.checkOut
@@ -757,24 +899,24 @@ export default function PropertyDetails() {
                     );
                   })}
                 {/* Show message if no rooms match the guest count */}
-                {Array.isArray(property.rooms) && 
-                 !property.rooms.some(roomOption => {
-                   const searchedAdults = parseInt(searchParamsState.adults) || 1;
-                   const searchedChildren = parseInt(searchParamsState.children) || 0;
-                   const totalSearchedGuests = searchedAdults + searchedChildren;
-                   const roomCapacity = roomOption.total_capacity || 
-                     (roomOption.room_capacity_adults + roomOption.room_capacity_children);
-                   return roomCapacity >= totalSearchedGuests;
-                 }) && (
-                  <tr>
-                    <td colSpan="6" className="py-8 text-center text-gray-500">
-                      <div className="space-y-2">
-                        <p className="text-lg font-semibold">No apartments available for {parseInt(searchParamsState.adults) + parseInt(searchParamsState.children)} guests</p>
-                        <p>Please try modifying your search or contact us for alternative options</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                {Array.isArray(property.rooms) &&
+                  !property.rooms.some(roomOption => {
+                    const searchedAdults = parseInt(searchParamsState.adults) || 1;
+                    const searchedChildren = parseInt(searchParamsState.children) || 0;
+                    const totalSearchedGuests = searchedAdults + searchedChildren;
+                    const roomCapacity = roomOption.total_capacity ||
+                      (roomOption.room_capacity_adults + roomOption.room_capacity_children);
+                    return roomCapacity >= totalSearchedGuests;
+                  }) && (
+                    <tr>
+                      <td colSpan="6" className="py-8 text-center text-gray-500">
+                        <div className="space-y-2">
+                          <p className="text-lg font-semibold">No apartments available for {parseInt(searchParamsState.adults) + parseInt(searchParamsState.children)} guests</p>
+                          <p>Please try modifying your search or contact us for alternative options</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
               </tbody>
             </table>
           </div>
@@ -788,10 +930,10 @@ export default function PropertyDetails() {
           className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
         >
           <h2 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300 font-sans">About this property</h2>
-          <div 
+          <div
             className="text-gray-600 mb-4 font-sans prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ 
-              __html: sanitizeHTML(property?.property_details?.description || 'No description available') 
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHTML(property?.property_details?.description || 'No description available')
             }}
           />
         </motion.div>
@@ -816,7 +958,37 @@ export default function PropertyDetails() {
             ))}
           </div>
         </motion.div>
-
+        {/* Add this new Facilities Section at the bottom, before the closing tags */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="w-full bg-white py-12 px-4 sm:px-6 lg:px-8 mb-8"
+        >
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Property Facilities</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+              {FACILITY_MAP.map(facility => {
+                // Only show facilities that are available (value is 1)
+                if (property.facilities?.[facility.key] === 1) {
+                  return (
+                    <motion.div
+                      key={facility.key}
+                      whileHover={{ scale: 1.05 }}
+                      className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all duration-300"
+                    >
+                      <div className="text-2xl text-blue-600 mb-2">
+                        {facility.icon}
+                      </div>
+                      <span className="text-sm text-gray-600 text-center">{facility.label}</span>
+                    </motion.div>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </div>
+        </motion.div>
         {/* Property Rules Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -952,7 +1124,7 @@ export default function PropertyDetails() {
           </div>
           <div className=" space-y-6">
             {/* Sample Review Card */}
-            
+
           </div>
         </div>
       </motion.div>
@@ -990,8 +1162,8 @@ export default function PropertyDetails() {
                       <button
                         key={section}
                         className={`px-4 py-2 font-semibold text-sm focus:outline-none transition-colors relative ${activeRulesTab === section
-                            ? "text-blue-600"
-                            : "text-gray-700 hover:text-blue-600"
+                          ? "text-blue-600"
+                          : "text-gray-700 hover:text-blue-600"
                           }`}
                         onClick={() => {
                           setActiveRulesTab(section);
@@ -1019,8 +1191,8 @@ export default function PropertyDetails() {
                         key={section}
                         data-section={section}
                         className={`mb-8 transition-all duration-300 ${activeRulesTab === section
-                            ? 'bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400'
-                            : ''
+                          ? 'bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400'
+                          : ''
                           }`}
                       >
                         <h3 className="font-bold mb-1 text-lg font-sans">{section}</h3>
@@ -1159,6 +1331,8 @@ export default function PropertyDetails() {
           </motion.div>
         )}
       </AnimatePresence>
+
+
     </>
   );
 }
