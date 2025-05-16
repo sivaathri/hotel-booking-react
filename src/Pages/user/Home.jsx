@@ -76,13 +76,13 @@ const Home = () => {
       <Header />
       {/* Hero Section Start */}
       <div
-        className="relative w-full h-[420px] md:h-[280px] lg:h-[390px] flex items-center justify-center bg-cover bg-center"
+        className="relative w-full h-[420px] md:h-[280px] lg:h-[390px] flex items-center justify-center"
         style={{
           backgroundImage: `url(${carouselImg1})`,
         }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black h-200 bg-opacity-40 z-0" />
+        <div className="absolute inset-0 h-200 bg-opacity-40 z-0" />
         {/* Centered Content */}
         <div className="relative z-10 flex flex-col items-center w-full px-4">
           <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold mb-8 mt-12 text-center drop-shadow-lg">
@@ -91,23 +91,23 @@ const Home = () => {
         </div>
       </div>
       {/* Floating Search Bar */}
-      <div className="min-h-screen flex items-start justify-center bg-gray-50 pt-1 -mt-14">
-  <div className="w-full max-w-6xl rounded-full shadow-6xl px-8 py-6 flex flex-col justify-center min-h-[120px]">
-    <HomeSearchBar />
-  </div>
-</div>
+      <div className=" flex items-start bg-white justify-center bg-gray-50 pt-1 -mt-14">
+        <div className="w-full max-w-6xl rounded-full shadow-6xl px-8 py-6 flex flex-col justify-center min-h-[120px]">
+          <HomeSearchBar />
+        </div>
+      </div>
 
 
 
       {/* Hero Section End */}
-      <div className="container-fluid p-0 mb-5">
+      <div className="container-fluid bg-white ">
         <div
           id="header-carousel"
           className="carousel slide"
           data-bs-ride="carousel"
         ></div>
 
-        <div className="mt-50 py-10 px-4 md:px-10 bg-white">
+        <div className="mt-50 py-10 px-4 md:px-10 ">
           <div className="max-w-7xl mx-auto">
             <div
               className="text-center animate__animated animate__fadeInUp"
