@@ -196,25 +196,26 @@ const Home = () => {
         </div>
 
         {/* Call to Action Section */}
-        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500">
+        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#0f172a]   to-[#1e293b]">
           <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-md">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-sm">
               Ready to Book Your Perfect Stay?
             </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
               Discover our luxurious rooms and suites, each designed to provide
               the ultimate comfort and experience.
             </p>
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white text-purple-600 font-bold py-4 px-8 rounded-full shadow-2xl hover:bg-yellow-50 hover:text-pink-600 transition-all duration-300 transform hover:-translate-y-1"
+              className="bg-[#FEA116] text-white font-bold py-4 px-8 rounded-full shadow-xl hover:hover:bg-[#d98e0a] transition-all duration-300 transform hover:-translate-y-1"
               onClick={() => navigate("/rooms")}
             >
               Book Your Room Now
             </motion.button>
           </div>
         </div>
+
 
         <div className="py-10 mb-30 px-4 md:px-10">
           <div className="flex flex-wrap g-0">
