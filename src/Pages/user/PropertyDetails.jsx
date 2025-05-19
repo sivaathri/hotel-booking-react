@@ -448,7 +448,7 @@ export default function PropertyDetails() {
         className="max-w-7xl mx-auto p-4"
       >
         {/* Header Section with Back Button */}
-
+ 
         <HomeSearchBar />
 
 
@@ -555,7 +555,21 @@ export default function PropertyDetails() {
             </div>
           </div>
         </motion.div>
-
+ {/* Property Description */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
+        >
+          <h2 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300 font-sans">About this property</h2>
+          <div
+            className="text-gray-600 mb-4 font-sans prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHTML(property?.property_details?.description || 'No description available')
+            }}
+          />
+        </motion.div>
         {/* Room Selection Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
           <h2 className="text-2xl font-bold mb-6">Book this  {property.property_type}</h2>
@@ -922,21 +936,7 @@ export default function PropertyDetails() {
           </div>
         </div>
 
-        {/* Property Description */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="w-2/3 mt-5 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
-        >
-          <h2 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300 font-sans">About this property</h2>
-          <div
-            className="text-gray-600 mb-4 font-sans prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHTML(property?.property_details?.description || 'No description available')
-            }}
-          />
-        </motion.div>
+       
 
         {/* Most Popular Facilities Section */}
         <motion.div

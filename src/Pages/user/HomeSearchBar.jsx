@@ -197,7 +197,6 @@ export default function HomeSearchBar() {
 
               </motion.button>
             </div>
-
             <AnimatePresence>
               {isDatePickerOpen && (
                 <motion.div
@@ -205,36 +204,59 @@ export default function HomeSearchBar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full mt-3 left-0 bg-white rounded-2xl shadow-lg p-6 z-50 w-[650px]"
+                  className="absolute top-full mt-2 left-0 bg-white rounded-2xl shadow-lg p-4 z-50 w-[400px]"
                 >
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800">Select dates</h3>
-                    <button
-                      onClick={() => setIsDatePickerOpen(false)}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </button>
+                  <div className="mb-3">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-base font-semibold text-gray-800">Select dates</h3>
+                      <button
+                        onClick={() => setIsDatePickerOpen(false)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Check-in and Check-out display */}
+                    <div className="flex justify-between items-center text-xs text-gray-600 mt-2 px-1">
+                      <div>
+                        <span className="font-semibold">Check-in:</span>{' '}
+                        {checkIn ? (
+                          <span>(checkIn)</span>
+                        ) : (
+                          <span className="text-gray-400">Not selected</span>
+                        )}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Check-out:</span>{' '}
+                        {checkOut ? (
+                          <span>(checkOut)</span>
+                        ) : (
+                          <span className="text-gray-400">Not selected</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex gap-6">
-                    {/* Current Month Calendar */}
+
+                  <div className="flex gap-4">
+                    {/* Current Month */}
                     <div className="flex-1">
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-sm font-medium text-gray-600">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-xs font-medium text-gray-600">
                           {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </h4>
                       </div>
-                      <div className="grid grid-cols-7 gap-1">
+                      <div className="grid grid-cols-7 gap-0.5">
                         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                          <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray-400">
+                          <div key={day} className="h-6 flex items-center justify-center text-[10px] font-medium text-gray-400">
                             {day}
                           </div>
                         ))}
                         {Array.from({ length: new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay() }, (_, i) => (
-                          <div key={`empty-start-${i}`} className="h-10" />
+                          <div key={`empty-start-${i}`} className="h-8" />
                         ))}
                         {Array.from(
                           { length: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() },
@@ -249,7 +271,7 @@ export default function HomeSearchBar() {
                             return (
                               <motion.button
                                 key={i}
-                                whileHover={!isPast ? { scale: 1.1 } : {}}
+                                whileHover={!isPast ? { scale: 1.05 } : {}}
                                 whileTap={!isPast ? { scale: 0.95 } : {}}
                                 onClick={() => {
                                   if (!isPast) {
@@ -262,19 +284,14 @@ export default function HomeSearchBar() {
                                   }
                                 }}
                                 disabled={isPast}
-                                className={`h-10 rounded-lg flex items-center justify-center text-sm relative
-                                  ${isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-orange-50 cursor-pointer'}
-                                  ${isSelected ? 'bg-orange-100' : ''}
-                                  ${isCheckIn ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
-                                  ${isCheckOut ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
-                                `}
+                                className={`h-8 w-8 rounded-md flex items-center justify-center text-xs relative
+                      ${isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-orange-50 cursor-pointer'}
+                      ${isSelected ? 'bg-orange-100' : ''}
+                      ${isCheckIn ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                      ${isCheckOut ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                    `}
                               >
                                 {i + 1}
-                                {(isCheckIn || isCheckOut) && (
-                                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-500 whitespace-nowrap">
-                                    {/* {isCheckIn ? 'Check-in' : 'Check-out'} */}
-                                  </div>
-                                )}
                               </motion.button>
                             );
                           }
@@ -282,21 +299,21 @@ export default function HomeSearchBar() {
                       </div>
                     </div>
 
-                    {/* Next Month Calendar */}
+                    {/* Next Month */}
                     <div className="flex-1">
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-sm font-medium text-gray-600">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-xs font-medium text-gray-600">
                           {new Date(new Date().getFullYear(), new Date().getMonth() + 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </h4>
                       </div>
-                      <div className="grid grid-cols-7 gap-1">
+                      <div className="grid grid-cols-7 gap-0.5">
                         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                          <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray-400">
+                          <div key={day} className="h-6 flex items-center justify-center text-[10px] font-medium text-gray-400">
                             {day}
                           </div>
                         ))}
                         {Array.from({ length: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).getDay() }, (_, i) => (
-                          <div key={`empty-start-next-${i}`} className="h-10" />
+                          <div key={`empty-start-next-${i}`} className="h-8" />
                         ))}
                         {Array.from(
                           { length: new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0).getDate() },
@@ -310,7 +327,7 @@ export default function HomeSearchBar() {
                             return (
                               <motion.button
                                 key={i}
-                                whileHover={{ scale: 1.1 }}
+                                whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => {
                                   if (!checkIn || (checkIn && checkOut) || dateString < checkIn) {
@@ -320,19 +337,14 @@ export default function HomeSearchBar() {
                                     setCheckOut(dateString);
                                   }
                                 }}
-                                className={`h-10 rounded-lg flex items-center justify-center text-sm relative
-                                  hover:bg-orange-50 cursor-pointer
-                                  ${isSelected ? 'bg-orange-100' : ''}
-                                  ${isCheckIn ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
-                                  ${isCheckOut ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
-                                `}
+                                className={`h-8 w-8 rounded-md flex items-center justify-center text-xs relative
+                      hover:bg-orange-50 cursor-pointer
+                      ${isSelected ? 'bg-orange-100' : ''}
+                      ${isCheckIn ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                      ${isCheckOut ? 'bg-orange-500 text-white hover:bg-orange-600' : ''}
+                    `}
                               >
                                 {i + 1}
-                                {(isCheckIn || isCheckOut) && (
-                                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-500 whitespace-nowrap">
-                                    {/* {isCheckIn ? 'Check-in' : 'Check-out'} */}
-                                  </div>
-                                )}
                               </motion.button>
                             );
                           }
@@ -341,29 +353,24 @@ export default function HomeSearchBar() {
                     </div>
                   </div>
 
-                  {/* Selected Range Display */}
-                  <div className="mt-8 pt-4 border-t border-gray-100">
+                  {/* Footer */}
+                  <div className="mt-6 pt-3 border-t border-gray-100">
                     <div className="flex justify-between items-center">
-
-
-
-
-
                       <button
                         onClick={() => {
                           setCheckIn('');
                           setCheckOut('');
                         }}
-                        className="text-sm text-orange-500 hover:text-orange-600"
+                        className="text-xs text-orange-500 hover:text-orange-600"
                       >
                         Clear dates
                       </button>
-
                     </div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
+
           </motion.div>
 
           {/* Who */}

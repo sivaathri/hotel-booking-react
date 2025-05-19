@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import carouselImg1 from "../../assets/Home/homeBG.jpg";
+import carouselImg1 from "../../assets/Home/Leo.jpg";
 import room1 from "../../assets/Images/About Images/room-1.jpg";
 import room2 from "../../assets/Images/About Images/room-2.jpg";
 import room3 from "../../assets/Images/About Images/room-3.jpg";
@@ -76,7 +76,7 @@ const Home = () => {
       <Header />
       {/* Hero Section Start */}
       <div
-        className="relative w-full  h-full md:h-[280px] lg:h-[500px] flex items-center justify-center"
+        className="relative w-full  h-full md:h-[180px] lg:h-[400px] flex items-center justify-center"
         style={{
           backgroundImage: `url(${carouselImg1})`,
         }}
