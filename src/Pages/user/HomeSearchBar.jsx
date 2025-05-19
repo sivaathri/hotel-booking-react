@@ -149,7 +149,7 @@ export default function HomeSearchBar() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className={`bg-white rounded-full shadow-lg flex items-center h-21 w-200 divide-x ${isSticky ? 'border border-gray-200' : ''}`}
+          className={`bg-white rounded-full shadow-lg flex items-center h-30 w-200 divide-x ${isSticky ? 'border border-gray-200' : ''}`}
         >
           {/* Where */}
           <motion.div
