@@ -48,7 +48,7 @@ export default function PropertyList({ properties, loading, error }) {
     const totalGuests = numberOfAdults + numberOfChildren;
 
     // Start with base price
-    let totalPrice = basePrice;
+    let totalPrice = 0;
 
     // Apply occupancy-based pricing adjustments
     if (room?.occupancy_price_adjustments) {
@@ -73,44 +73,62 @@ export default function PropertyList({ properties, loading, error }) {
         if (applicablePricing) {
           totalPrice = Number(applicablePricing.adjustment);
           console.log('Applied price adjustment:', totalPrice, 'for', numberOfAdults, 'adults');
+        } else {
+          // If no specific pricing found, multiply base price by number of adults
+          totalPrice = basePrice * numberOfAdults;
         }
       } catch (error) {
         console.error('Error calculating occupancy pricing:', error);
+        // Fallback to base price multiplication if there's an error
+        totalPrice = basePrice * numberOfAdults;
       }
+    } else {
+      // If no occupancy pricing specified, multiply base price by number of adults
+      totalPrice = basePrice * numberOfAdults;
     }
 
     // Add child pricing if there are children
-    if (numberOfChildren > 0 && room?.child_pricing) {
-      try {
-        // Parse the child pricing data
-        let childPricing;
+    if (numberOfChildren > 0) {
+      if (room?.child_pricing) {
         try {
-          childPricing = JSON.parse(room.child_pricing);
-          if (typeof childPricing === 'string') {
-            childPricing = JSON.parse(childPricing);
+          // Parse the child pricing data
+          let childPricing;
+          try {
+            childPricing = JSON.parse(room.child_pricing);
+            if (typeof childPricing === 'string') {
+              childPricing = JSON.parse(childPricing);
+            }
+          } catch (e) {
+            console.error('Error parsing child pricing:', e);
+            childPricing = [];
           }
-        } catch (e) {
-          console.error('Error parsing child pricing:', e);
-          childPricing = [];
+
+          let childPrice = 0;
+
+          // Calculate price for each child based on their actual age
+          childrenAges.forEach(age => {
+            const applicablePricing = childPricing.find(p => 
+              age >= p.ageFrom && age <= p.ageTo
+            );
+            if (applicablePricing) {
+              childPrice += Number(applicablePricing.price);
+            } else {
+              // If no specific pricing found for age, use base price
+              childPrice += basePrice;
+            }
+          });
+
+          // Add child price to total
+          totalPrice += childPrice;
+          console.log('Child price:', childPrice);
+        } catch (error) {
+          console.error('Error calculating child pricing:', error);
+          // Fallback to base price multiplication if there's an error
+          totalPrice += basePrice * numberOfChildren;
         }
-
-        let childPrice = 0;
-
-        // Calculate price for each child based on their actual age
-        childrenAges.forEach(age => {
-          const applicablePricing = childPricing.find(p => 
-            age >= p.ageFrom && age <= p.ageTo
-          );
-          if (applicablePricing) {
-            childPrice += Number(applicablePricing.price);
-          }
-        });
-
-        // Add child price to total
-        totalPrice += childPrice;
-        console.log('Child price:', childPrice);
-      } catch (error) {
-        console.error('Error calculating child pricing:', error);
+      } else {
+        // If no child pricing specified, multiply base price by number of children
+        totalPrice += basePrice * numberOfChildren;
       }
     }
 
