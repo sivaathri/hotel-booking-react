@@ -194,201 +194,107 @@ export default function PropertyList({ properties, loading, error }) {
   }
 
   return (
-    <div className="w-full h-40px lg:w-4/5">
+    <div className="w-full lg:w-4/5">
       {properties.map((property) => {
-        // Get the first room's details for display
         const firstRoom = property.rooms?.[0] || {};
         const price = calculatePrice(property, firstRoom);
         const gst = calculateGST(price);
-
+        // Mock data for missing fields
+        const reviews = property.reviews_count || 164;
+        const rating = property.rating || 7.9;
+        const ratingText = rating >= 8 ? 'Very Good' : rating >= 7 ? 'Good' : 'Average';
+        const breakfastIncluded = firstRoom.breakfast_included ?? true;
+        const freeCancellation = firstRoom.free_cancellation_enabled ?? true;
+        const noPrepayment = true;
+        const urgencyMsg = 'Only 3 rooms left at this price on our site';
+        const tag = property.property_details?.beachfront ? 'Beachfront' : '';
+        const roomType = firstRoom.room_type || 'Double Room';
+        const bedType = firstRoom.bed_type || '1 single bed';
+        const city = property.location?.city || 'Puducherry';
+        const distance = property.property_details?.distance_from_center || '3.9';
+        const imageUrl = firstRoom.image_urls?.[0] ? getImageUrl(firstRoom.image_urls[0]) : 'https://placehold.co/400x320?text=No+Image';
+        const adults = searchParams.get('adults') || '2';
+        const nights = 1;
         return (
           <div
             key={property.property_id}
-            className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row gap-6 cursor-pointer"
-            onClick={() => {
-              const searchParamsObj = {
-                destination: searchParams.get('destination') || '',
-                checkIn: searchParams.get('checkIn') || '',
-                checkOut: searchParams.get('checkOut') || '',
-                adults: searchParams.get('adults') || '1',
-                children: searchParams.get('children') || '0'
-              };
-
-              // Create URL with search parameters
-              const searchParamsString = new URLSearchParams(searchParamsObj).toString();
-              window.open(`/property/${property.property_id}?${searchParamsString}`, '_blank');
-            }}
+            className="flex bg-white rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-hidden relative"
           >
-            {/* Image Gallery */}
-            <div className="relative w-full md:w-1/3">
+            {/* Image with heart icon */}
+            <div className="relative min-w-[220px] max-w-[220px] h-[180px] flex-shrink-0">
               <img
-                src={firstRoom.image_urls?.[0] ? getImageUrl(firstRoom.image_urls[0]) : 'https://placehold.co/400x320?text=No+Image'}
+                src={imageUrl}
                 alt={property.property_name}
-                className="w-full h-40 object-cover rounded-xl"
-                onError={(e) => {
-                  console.error('Image failed to load:', e.target.src);
-                  e.target.src = 'https://placehold.co/400x320?text=No+Image';
-                }}
+                className="w-full  object-cover "
               />
-              <div className="absolute mt-2 border-white rounded-lg left-2 flex gap-1">
-                {firstRoom.image_urls?.slice(1, 4).map((img, index) => (
-                  <img
-                    key={index}
-                    src={getImageUrl(img)}
-                    className="w-12 h-8 object-cover rounded"
-                    onError={(e) => {
-                      console.error('Thumbnail failed to load:', e.target.src);
-                      e.target.src = 'https://placehold.co/400x320?text=No+Image';
-                    }}
-                  />
-                ))}
-                <div
-                  className="w-12 h-8 bg-black/60 text-white flex items-center justify-center rounded text-xs font-bold cursor-pointer"
+              <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow text-gray-500 hover:text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+                </svg>
+              </button>
+            </div>
+            {/* Info section */}
+            <div className="flex-1 flex flex-col justify-between p-4">
+              <div>
+                {/* Name, location, tag */}
+                <div className="flex items-center gap-2 mb-1">
+                  <a href={`/property/${property.property_id}`} target="_blank" rel="noopener noreferrer" className="text-xl font-bold text-blue-700 hover:underline">
+                    {property.property_name}
+                  </a>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-blue-700 mb-1">
+                  <span>{city}</span>
+                  <span className="text-gray-400">·</span>
+                  <a href="#" className="underline hover:text-blue-900">Show on map</a>
+                  <span className="text-gray-400">·</span>
+                  <span>{distance} km from centre</span>
+                </div>
+                {tag && (
+                  <div className="flex items-center text-xs text-gray-700 mb-2">
+                    <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 11c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8" /></svg>
+                    {tag}
+                  </div>
+                )}
+                {/* Room info */}
+                <div className="text-sm font-bold text-gray-800 mb-1">{roomType}</div>
+                <div className="text-sm text-gray-700 mb-2">{bedType}</div>
+                {/* Breakfast, cancellation, payment */}
+                {breakfastIncluded && <div className="text-green-700 font-semibold text-sm">Breakfast included</div>}
+                <ul className="text-green-700 text-sm mb-1">
+                  {freeCancellation && <li className="flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Free cancellation</li>}
+                  {noPrepayment && <li className="flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>No prepayment needed <span className="text-gray-500 ml-1">– pay at the property</span></li>}
+                </ul>
+                <div className="text-red-600 text-sm font-semibold mb-1">{urgencyMsg}</div>
+              </div>
+            </div>
+            {/* Price and rating section */}
+            <div className="flex flex-col justify-between items-end p-4 min-w-[200px]">
+              <div className="flex flex-col items-end">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-semibold text-gray-700">{ratingText}</span>
+                  <span className="bg-blue-700 text-white font-bold px-2 py-1 rounded text-lg">{rating}</span>
+                </div>
+                <span className="text-xs text-gray-500 mb-2">{reviews} reviews</span>
+                <span className="text-xs text-gray-500 mb-2">{nights} night, {adults} adults</span>
+                <span className="text-2xl font-bold text-gray-900 mb-1">₹ {price.toLocaleString('en-IN')}</span>
+                <span className="text-sm text-gray-500 mb-1">+ ₹ {gst.amount.toLocaleString('en-IN')} taxes and charges</span>
+                <button
+                  className="mt-2 px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setModalImages(firstRoom.image_urls || []);
-                    setCurrentImageIdx(0);
-                    setModalOpen(true);
+                    const searchParamsObj = {
+                      destination: searchParams.get('destination') || '',
+                      checkIn: searchParams.get('checkIn') || '',
+                      checkOut: searchParams.get('checkOut') || '',
+                      adults: searchParams.get('adults') || '1',
+                      children: searchParams.get('children') || '0'
+                    };
+                    const searchParamsString = new URLSearchParams(searchParamsObj).toString();
+                    window.open(`/property/${property.property_id}?${searchParamsString}`, '_blank');
                   }}
                 >
-                  View All
-                </div>
-              </div>
-            </div>
-
-            {/* Property Info */}
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-bold text-gray-800">{property.property_name}</h3>
-                  <span className="text-orange-500 mb-2 text-lg">★★★★★</span>
-                </div>
-                <p className="text-orange-500 text-sm mb-2">
-                  <span className="font-bold">{property.location.city}</span>
-                </p>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-                  {(() => {
-                    const distances = [
-                      {
-                        type: 'beach',
-                        distance: Number(property.property_details.nearest_beach_distance),
-                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16.5L7 21l-2.5-1.5L2 21l-1-4.5M16 4c0-1.1.9-2 2-2s2 .9 2 2M3 11c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8M3 15c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8" />,
-                        text: 'Beach'
-                      },
-                      {
-                        type: 'airport',
-                        distance: Number(property.property_details.nearest_airport_distance),
-                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />,
-                        text: 'Airport'
-                      },
-                      {
-                        type: 'railway',
-                        distance: Number(property.property_details.nearest_railway_station_distance),
-                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />,
-                        text: 'Railway'
-                      },
-                      {
-                        type: 'bus',
-                        distance: Number(property.property_details.nearest_bus_stand_distance),
-                        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />,
-                        text: 'Bus Stand'
-                      }
-                    ];
-
-                    // Filter out invalid distances and find the nearest
-                    const validDistances = distances.filter(d => !isNaN(d.distance) && d.distance > 0);
-                    if (validDistances.length === 0) return null;
-
-                    const nearest = validDistances.reduce((prev, curr) => 
-                      prev.distance < curr.distance ? prev : curr
-                    );
-
-                    return (
-                      <span className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          {nearest.icon}
-                        </svg>
-                        {nearest.distance.toString()} km to {nearest.text}
-                      </span>
-                    );
-                  })()}
-                </div>
-
-                <div className="mt-3 grid gap-2">
-                  {[
-                    firstRoom.free_cancellation_enabled && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Cancellation" },
-                    property.facilities.free_wifi && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free WiFi" },
-                    property.facilities.air_conditioning && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Air Conditioning" },
-                    property.facilities.free_parking && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Free Parking" },
-                    property.facilities.gym && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Gym" },
-                    property.facilities.restaurant && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Restaurant" },
-                    property.facilities.bar && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Bar" },
-                    property.facilities.spa && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Spa" },
-                    property.facilities.laundry && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Laundry" },
-                    property.facilities.room_service && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Room Service" },
-                    property.facilities.business_centre && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Business Centre" },
-                    property.facilities.conference_hall && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Conference Hall" },
-                    property.facilities.kids_play_area && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Kids Play Area" },
-                    property.facilities.coffee_shop && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Coffee Shop" },
-                    property.facilities.cafe && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Cafe" },
-                    property.facilities.lounge && { icon: <CheckCircle className="h-4 w-4 mr-1" />, text: "Lounge" }
-                  ]
-                    .filter(Boolean)
-                    .slice(0, 3)
-                    .map((facility, index) => (
-                      <div key={index} className="flex items-center text-green-600 text-sm">
-                        {facility.icon} {facility.text}
-                      </div>
-                    ))}
-                </div>
-              </div>
-              <p
-                className='text-gray-500 mt-3 mb-0 text-sm cursor-pointer hover:text-blue-500 flex items-center gap-1'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedLocation({
-                    lat: property.location.latitude,
-                    lng: property.location.longitude,
-                    name: property.property_name,
-                    address: `${property.location.address_line1}${property.location.address_line2 ? ', ' + property.location.address_line2 : ''}, ${property.location.city}, ${property.location.state_province}, ${property.location.country}`
-                  });
-                  setMapModalOpen(true);
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                View on Map
-              </p>
-            </div>
-
-            {/* Price Section */}
-            <div className="flex flex-col md:flex-row items-stretch">
-              <div className="w-px bg-gray-200 mx-10 hidden md:block" />
-              <div className="flex flex-col min-w-[160px]">
-                <div className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <span className="text-yellow-400 text-lg"></span>
-                    <span className="text-sm font-medium bg-orange-500 px-2 py-1 rounded-full text-white">4.8</span>
-                  </div>
-                  <span className="text-sm text-gray-400">(2,345 ratings)</span>
-                  <p className="text-2xl mt-5 mb-0 font-extrabold text-gray-900">
-                    ₹ {price.toLocaleString('en-IN')}
-                  </p>
-                  <p className="text-sm mb-0 text-gray-500">
-                    + ₹ {gst.amount.toLocaleString('en-IN')} <span className="lowercase">taxes & fees</span>
-                  </p>
-                  <p className="text-sm text-gray-400">Per Night</p>
-                  {numberOfAdults > 0 && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Price for {numberOfAdults} {numberOfAdults === 1 ? 'adult' : 'adults'}
-                      {parseInt(searchParams.get('children')) > 0 && (
-                        <> and {searchParams.get('children')} {parseInt(searchParams.get('children')) === 1 ? 'child' : 'children'}</>
-                      )}
-                    </p>
-                  )}
-                </div>
+                  See availability
+                </button>
               </div>
             </div>
           </div>
