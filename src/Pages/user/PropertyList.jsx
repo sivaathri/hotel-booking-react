@@ -28,7 +28,7 @@ export default function PropertyList({ properties, loading, error }) {
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   // Get number of adults from search params
-  const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
+  const numberOfAdults = parseInt(searchParams.get('adults')) || 1;
 
   // Debug log to check properties data
   console.log('Properties data:', properties);
@@ -42,7 +42,7 @@ export default function PropertyList({ properties, loading, error }) {
   // Helper function to calculate price based on occupancy
   const calculatePrice = (property, room) => {
     const basePrice = Number(room?.base_price) || 0;
-    const numberOfAdults = parseInt(searchParams.get('adults')) || 0;
+    const numberOfAdults = parseInt(searchParams.get('adults')) || 1;
     const numberOfChildren = parseInt(searchParams.get('children')) || 0;
     const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
     const totalGuests = numberOfAdults + numberOfChildren;
