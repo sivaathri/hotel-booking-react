@@ -122,7 +122,7 @@ const Home = () => {
               </h1>
             </div>
 
-            <div className="grid grid-cols-1 mt-10 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1  mt-10 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {rooms.map((room, idx) => (
                 <div
                   key={idx}
@@ -136,9 +136,7 @@ const Home = () => {
                         alt={room.title}
                         className="w-full h-40 object-cover"
                       />
-                      <small className="absolute left-4 top-[calc(100%-0.75rem)] transform -translate-y-1/2 bg-[#FEA116] text-white text-sm px-3 py-1 rounded shadow">
-                        $100/Night
-                      </small>
+                 
                     </div>
 
                     <div className="p-4">
@@ -146,13 +144,7 @@ const Home = () => {
                         <h5 className="text-base font-semibold">
                           {room.title}
                         </h5>
-                        <div className="space-x-1 text-[#FEA116]">
-                          {Array(5)
-                            .fill(0)
-                            .map((_, i) => (
-                              <i key={i} className="fa fa-star text-sm" />
-                            ))}
-                        </div>
+                      
                       </div>
 
                       <div className="flex flex-wrap text-xs text-gray-600 mb-2 gap-x-3 gap-y-1">
