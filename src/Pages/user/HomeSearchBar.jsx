@@ -389,7 +389,7 @@ export default function HomeSearchBar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full mt-2 right-0 w-80 bg-white rounded-2xl shadow-lg p-4 z-50"
+                    className="absolute top-full  right-0 mt-4 w-80 bg-white rounded-2xl shadow-lg p-4 z-50"
                   >
                     {['adults', 'children'].map(type => (
                       <div key={type} className="flex justify-between items-center mb-2">
