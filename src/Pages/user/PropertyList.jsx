@@ -146,6 +146,13 @@ export default function PropertyList({ properties, loading, error }) {
     };
   };
 
+  // Helper function to clean room type string
+  const cleanRoomType = (type) => {
+    if (!type) return 'Double Room';
+    // Remove any numbers and underscores after the room type name
+    return type.split('_')[0] || 'Double Room';
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -196,22 +203,27 @@ export default function PropertyList({ properties, loading, error }) {
   return (
     <div className="w-full lg:w-4/5">
       {properties.map((property) => {
+        // Get all unique room types
+        const roomTypes = property.rooms?.map(room => cleanRoomType(room.room_type)) || [];
+        const uniqueRoomTypes = [...new Set(roomTypes)];
+        
+        // Get the first room for initial pricing calculation
         const firstRoom = property.rooms?.[0] || {};
         const price = calculatePrice(property, firstRoom);
         const gst = calculateGST(price);
-        // Mock data for missing fields
-        const reviews = property.reviews_count || 164;
-        const rating = property.rating || 7.9;
+        
+        // Get data from API response
+        const reviews = property.reviews_count || 0;
+        const rating = property.rating || 0;
         const ratingText = rating >= 8 ? 'Very Good' : rating >= 7 ? 'Good' : 'Average';
-        const breakfastIncluded = firstRoom.breakfast_included ?? true;
-        const freeCancellation = firstRoom.free_cancellation_enabled ?? true;
-        const noPrepayment = true;
+        const breakfastIncluded = firstRoom.breakfast_included ?? false;
+        const freeCancellation = property.rules?.instant_booking ?? false;
+        const noPrepayment = property.rules?.manual_approval ?? false;
         const urgencyMsg = 'Only 3 rooms left at this price on our site';
-        const tag = property.property_details?.beachfront ? 'Beachfront' : '';
-        const roomType = firstRoom.room_type || 'Double Room';
+        const tag = property.property_type || '';
         const bedType = firstRoom.bed_type || '1 single bed';
-        const city = property.location?.city || 'Puducherry';
-        const distance = property.property_details?.distance_from_center || '3.9';
+        const city = property.location?.city || '';
+        const distance = property.location?.distance_from_center || '0';
         const imageUrl = firstRoom.image_urls?.[0] ? getImageUrl(firstRoom.image_urls[0]) : 'https://placehold.co/400x320?text=No+Image';
         const adults = searchParams.get('adults') || '2';
         const nights = 1;
@@ -262,17 +274,44 @@ export default function PropertyList({ properties, loading, error }) {
                     Show on map
                   </button>
                   <span className="text-gray-400">·</span>
-                  <span>{distance} km from centre</span>
+                  <span>{Math.round(parseFloat(distance))} km from centre</span>
                 </div>
+                {/* Show nearest available location */}
+                {(() => {
+                  const locations = [
+                    { type: 'Beach', distance: property.property_details?.nearest_beach_distance },
+                    { type: 'Airport', distance: property.property_details?.nearest_airport_distance },
+                    { type: 'Railway', distance: property.property_details?.nearest_railway_station_distance },
+                    { type: 'Bus Stand', distance: property.property_details?.nearest_bus_stand_distance }
+                  ].filter(loc => loc.distance);
+
+                  if (locations.length > 0) {
+                    const nearestLocation = locations.reduce((nearest, current) => 
+                      parseFloat(current.distance) < parseFloat(nearest.distance) ? current : nearest
+                    );
+
+                    return (
+                      <div className="flex items-center text-sm text-gray-600 mb-2">
+                        <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8" />
+                        </svg>
+                        Nearest {nearestLocation.type}: {Math.round(parseFloat(nearestLocation.distance))} km
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
                 {tag && (
                   <div className="flex items-center text-xs text-gray-700 mb-2">
                     <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 11c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8" /></svg>
                     {tag}
                   </div>
                 )}
-                {/* Room info */}
-                <div className="text-sm font-bold text-gray-800 mb-1">{roomType}</div>
-                <div className="text-sm text-gray-700 mb-2">{bedType}</div>
+                {/* Room info - Show all room types */}
+                <div className="text-sm font-bold text-gray-800 mb-1">
+                  {uniqueRoomTypes.join(', ')}
+                </div>
+          
                 {/* Breakfast, cancellation, payment */}
                 {breakfastIncluded && <div className="text-green-700 font-semibold text-sm">Breakfast included</div>}
                 <ul className="text-green-700 text-sm mb-1">
@@ -287,11 +326,12 @@ export default function PropertyList({ properties, loading, error }) {
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-gray-700">{ratingText}</span>
-                  <span className="bg-blue-700 text-white font-bold px-2 py-1 rounded text-lg">{rating}</span>
+                  <span className="bg-blue-700 rounded-2xl text-white font-bold px-2 py-1 rounded text-lg">{rating}</span>
                 </div>
                 <span className="text-xs text-gray-500 mb-2">{reviews} reviews</span>
+               
+                <span className="text-2xl  font-bold text-gray-900 mb-1">₹ {price.toLocaleString('en-IN')}</span>
                 <span className="text-xs text-gray-500 mb-2">{nights} night, {adults} adults</span>
-                <span className="text-2xl font-bold text-gray-900 mb-1">₹ {price.toLocaleString('en-IN')}</span>
                 <span className="text-sm text-gray-500 mb-1">+ ₹ {gst.amount.toLocaleString('en-IN')} taxes and charges</span>
                 <button
                   className="mt-2 px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
@@ -308,7 +348,7 @@ export default function PropertyList({ properties, loading, error }) {
                     window.open(`/property/${property.property_id}?${searchParamsString}`, '_blank');
                   }}
                 >
-                  See availability
+                  Book Now
                 </button>
               </div>
             </div>
