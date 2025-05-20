@@ -583,7 +583,7 @@ export default function PropertyDetails() {
                   <th className="py-4 px-6 text-left">Number of guests</th>
                   <th className="py-4 px-6 text-left">Today's price</th>
                   <th className="py-4 px-6 text-left">Your choices</th>
-                  <th className="py-4 px-6 text-left">Select an apartment</th>
+                  <th className="py-4 px-6 text-left">Select an  {property.property_type}</th>
                   <th className="py-4 px-6"></th>
                 </tr>
               </thead>
@@ -783,10 +783,8 @@ export default function PropertyDetails() {
                               </div>
                               <div className="text-right">
                                 <div className="text-gray-400 line-through">₹ {Math.round(roomPrice * 0.8)}</div>
-                                <div className="font-semibold">₹ {Math.round(roomPrice * 0.7)}</div>
-                                <div className="text-xs text-gray-500">+₹ {Math.round(roomPrice * 0.7 * 0.12)} taxes and fees</div>
-                                <div className="text-xs text-green-600">19% off</div>
-                                <div className="mt-1">
+                              
+                               
                                   <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
                                 </div>
                               </div>
@@ -795,7 +793,7 @@ export default function PropertyDetails() {
                             <div className="text-sm text-gray-500 mt-2">
                               Max {roomOption.total_capacity} guests
                             </div>
-                          </div>
+                         
                         </td>
 
                         {/* Price Column */}
