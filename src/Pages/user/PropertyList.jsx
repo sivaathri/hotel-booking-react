@@ -221,11 +221,11 @@ export default function PropertyList({ properties, loading, error }) {
             className="flex bg-white rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-hidden relative"
           >
             {/* Image with heart icon */}
-            <div className="relative min-w-[220px] max-w-[220px] h-[180px] flex-shrink-0">
+            <div className="relative min-w-[220px] max-w-[220px] h-[244px] flex-shrink-0">
               <img
                 src={imageUrl}
                 alt={property.property_name}
-                className="w-full  object-cover "
+                className="w-full h-full object-cover"
               />
               <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow text-gray-500 hover:text-red-500">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
