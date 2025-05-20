@@ -736,64 +736,49 @@ export default function PropertyDetails() {
                         {/* Number of Guests Column */}
                         <td className="py-6 px-6">
                           <div className="space-y-4">
-                            {/* 3 Adults */}
-                            {roomOption.room_capacity_adults >= 3 && (
-                              <div className="flex items-center justify-between">
+                            {/* Guest Pricing */}
+                            {JSON.parse(roomOption.occupancy_price_adjustments).map((price, index) => (
+                              <div key={index} className="flex items-center justify-between border-t pt-4">
                                 <div className="flex items-center gap-1">
-                                  {[...Array(3)].map((_, i) => (
+                                  {[...Array(price.minGuests)].map((_, i) => (
                                     <FaUser key={i} className="text-gray-600" />
                                   ))}
                                 </div>
                                 <div className="text-right">
-                                  <div className="text-gray-400 line-through">₹ {Math.round(roomPrice * 1.1)}</div>
-                                  <div className="font-semibold">₹ {Math.round(roomPrice)}</div>
-                                  <div className="text-xs text-gray-500">+₹ {Math.round(roomPrice * 0.12)} taxes and fees</div>
-                                  <div className="text-xs text-green-600">19% off</div>
-                                  <div className="mt-1">
-                                    <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* 2 Adults */}
-                            {roomOption.room_capacity_adults >= 2 && (
-                              <div className="flex items-center justify-between border-t pt-4">
-                                <div className="flex items-center gap-1">
-                                  {[...Array(2)].map((_, i) => (
-                                    <FaUser key={i} className="text-gray-600" />
-                                  ))}
-                                </div>
-                                <div className="text-right">
-                                  <div className="text-gray-400 line-through">₹ {Math.round(roomPrice * 0.9)}</div>
-                                  <div className="font-semibold">₹ {Math.round(roomPrice * 0.8)}</div>
-                                  <div className="text-xs text-gray-500">+₹ {Math.round(roomPrice * 0.8 * 0.12)} taxes and fees</div>
-                                  <div className="text-xs text-green-600">19% off</div>
-                                  <div className="mt-1">
-                                    <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* 1 Adult */}
-                            <div className="flex items-center justify-between border-t pt-4">
-                              <div className="flex items-center gap-1">
-                                <FaUser className="text-gray-600" />
-                              </div>
-                              <div className="text-right">
-                                <div className="text-gray-400 line-through">₹ {Math.round(roomPrice * 0.8)}</div>
-                              
+                                 
+                                  <div className="font-semibold">₹ {Math.round(price.adjustment)}</div>
                                
-                                  <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
+                                
+                                  {/* <div className="mt-1">
+                                    <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">Genius</span>
+                                  </div> */}
                                 </div>
                               </div>
-                            </div>
+                            ))}
+
+                            {/* Child Pricing */}
+                            {/* {JSON.parse(roomOption.child_pricing).length > 0 && (
+                              <div className="mt-4">
+                                <h3 className="text-sm font-semibold mb-2">Child Pricing</h3>
+                                {JSON.parse(roomOption.child_pricing).map((childPrice, index) => (
+                                  <div key={index} className="flex items-center justify-between text-sm">
+                                    <div>
+                                      <FaChild className="text-gray-600 mr-2" />
+                                      {childPrice.ageFrom}-{childPrice.ageTo} years
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="font-semibold">₹ {childPrice.price}</div>
+                                      <div className="text-xs text-gray-500">+₹ {Math.round(childPrice.price * 0.12)} taxes and fees</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )} */}
 
                             <div className="text-sm text-gray-500 mt-2">
                               Max {roomOption.total_capacity} guests
                             </div>
-                         
+                          </div>
                         </td>
 
                         {/* Price Column */}
