@@ -245,7 +245,22 @@ export default function PropertyList({ properties, loading, error }) {
                 <div className="flex items-center gap-2 text-sm text-blue-700 mb-1">
                   <span>{city}</span>
                   <span className="text-gray-400">·</span>
-                  <a href="#" className="underline hover:text-blue-900">Show on map</a>
+                  <button 
+                    onClick={() => {
+                      if (property.location?.latitude && property.location?.longitude) {
+                        setSelectedLocation({
+                          lat: property.location.latitude,
+                          lng: property.location.longitude,
+                          name: property.property_name,
+                          address: `${property.location?.address || ''}, ${city}`
+                        });
+                        setMapModalOpen(true);
+                      }
+                    }}
+                    className="underline hover:text-blue-900 cursor-pointer"
+                  >
+                    Show on map
+                  </button>
                   <span className="text-gray-400">·</span>
                   <span>{distance} km from centre</span>
                 </div>
