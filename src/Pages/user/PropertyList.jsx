@@ -4,6 +4,17 @@ import { useNavigate, useLocation, useParams, useSearchParams } from 'react-rout
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { FaHotel, FaBuilding, FaHome, FaUmbrellaBeach, FaWater } from 'react-icons/fa';
+
+// Property type icons mapping
+const propertyTypeIcons = {
+  'Hotel': FaHotel,
+  'Apartment': FaBuilding,
+  'Hut House': FaHome,
+  'Resort': FaUmbrellaBeach,
+  'Beach House': FaWater,
+  'Villa': FaHome
+};
 
 // Fix for default marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -214,11 +225,11 @@ export default function PropertyList({ properties, loading, error }) {
         
         // Get data from API response
         const reviews = property.reviews_count || 0;
-        const rating = property.rating || 0;
+        const rating = property.rating || 5.0;
         const ratingText = rating >= 8 ? 'Very Good' : rating >= 7 ? 'Good' : 'Average';
         const breakfastIncluded = firstRoom.breakfast_included ?? false;
-        const freeCancellation = property.rules?.instant_booking ?? false;
-        const noPrepayment = property.rules?.manual_approval ?? false;
+        const freeCancellation = firstRoom.free_cancellation_enabled === 1;
+        const instantPayment = firstRoom.instant_payment_enabled === 1;
         const urgencyMsg = 'Only 3 rooms left at this price on our site';
         const tag = property.property_type || '';
         const bedType = firstRoom.bed_type || '1 single bed';
@@ -230,10 +241,10 @@ export default function PropertyList({ properties, loading, error }) {
         return (
           <div
             key={property.property_id}
-            className="flex bg-white rounded-2xl shadow-lg mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-hidden relative"
+            className="flex bg-white rounded-2xl shadow-lg mb-3 border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-hidden relative"
           >
             {/* Image with heart icon */}
-            <div className="relative min-w-[220px] max-w-[220px] h-[244px] flex-shrink-0">
+            <div className="relative min-w-[220px] max-w-[220px] flex-shrink-0">
               <img
                 src={imageUrl}
                 alt={property.property_name}
@@ -256,54 +267,14 @@ export default function PropertyList({ properties, loading, error }) {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-blue-700 mb-1">
                   <span>{city}</span>
-                  <span className="text-gray-400">·</span>
-                  <button 
-                    onClick={() => {
-                      if (property.location?.latitude && property.location?.longitude) {
-                        setSelectedLocation({
-                          lat: property.location.latitude,
-                          lng: property.location.longitude,
-                          name: property.property_name,
-                          address: `${property.location?.address || ''}, ${city}`
-                        });
-                        setMapModalOpen(true);
-                      }
-                    }}
-                    className="underline hover:text-blue-900 cursor-pointer"
-                  >
-                    Show on map
-                  </button>
-                  <span className="text-gray-400">·</span>
-                  <span>{Math.round(parseFloat(distance))} km from centre</span>
                 </div>
                 {/* Show nearest available location */}
-                {(() => {
-                  const locations = [
-                    { type: 'Beach', distance: property.property_details?.nearest_beach_distance },
-                    { type: 'Airport', distance: property.property_details?.nearest_airport_distance },
-                    { type: 'Railway', distance: property.property_details?.nearest_railway_station_distance },
-                    { type: 'Bus Stand', distance: property.property_details?.nearest_bus_stand_distance }
-                  ].filter(loc => loc.distance);
-
-                  if (locations.length > 0) {
-                    const nearestLocation = locations.reduce((nearest, current) => 
-                      parseFloat(current.distance) < parseFloat(nearest.distance) ? current : nearest
-                    );
-
-                    return (
-                      <div className="flex items-center text-sm text-gray-600 mb-2">
-                        <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8" />
-                        </svg>
-                        Nearest {nearestLocation.type}: {Math.round(parseFloat(nearestLocation.distance))} km
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
+            
                 {tag && (
                   <div className="flex items-center text-xs text-gray-700 mb-2">
-                    <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 11c3 0 6 1.8 6 1.8s3-1.8 6-1.8 6 1.8 6 1.8" /></svg>
+                    {React.createElement(propertyTypeIcons[tag] || FaHome, {
+                      className: "w-4 h-4 mr-1 text-blue-400"
+                    })}
                     {tag}
                   </div>
                 )}
@@ -316,9 +287,30 @@ export default function PropertyList({ properties, loading, error }) {
                 {breakfastIncluded && <div className="text-green-700 font-semibold text-sm">Breakfast included</div>}
                 <ul className="text-green-700 text-sm mb-1">
                   {freeCancellation && <li className="flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Free cancellation</li>}
-                  {noPrepayment && <li className="flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>No prepayment needed <span className="text-gray-500 ml-1">– pay at the property</span></li>}
+                  {!instantPayment && <li className="flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>No prepayment needed <span className="text-gray-500 ml-1">– pay at the property</span></li>}
                 </ul>
-                <div className="text-red-600 text-sm font-semibold mb-1">{urgencyMsg}</div>
+
+                {/* Show on map button */}
+                {property.location?.latitude && property.location?.longitude && (
+                  <button 
+                    onClick={() => {
+                      setSelectedLocation({
+                        lat: property.location.latitude,
+                        lng: property.location.longitude,
+                        name: property.property_name,
+                        address: `${property.location?.address || ''}, ${city}`
+                      });
+                      setMapModalOpen(true);
+                    }}
+                    className="text-blue-600 hover:text-blue-800 text-sm flex items-center mt-2"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Show on map
+                  </button>
+                )}
               </div>
             </div>
             {/* Price and rating section */}
