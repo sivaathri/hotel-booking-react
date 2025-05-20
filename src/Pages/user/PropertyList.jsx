@@ -236,7 +236,7 @@ export default function PropertyList({ properties, loading, error }) {
         const city = property.location?.city || '';
         const distance = property.location?.distance_from_center || '0';
         const imageUrl = firstRoom.image_urls?.[0] ? getImageUrl(firstRoom.image_urls[0]) : 'https://placehold.co/400x320?text=No+Image';
-        const adults = searchParams.get('adults') || '2';
+        const adults = searchParams.get('adults') || '1';
         const nights = 1;
         return (
           <div
