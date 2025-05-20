@@ -267,21 +267,44 @@ export default function PropertyList({ properties, loading, error }) {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-blue-700 mb-1">
                   <span>{city}</span>
+                  {(() => {
+                    const locations = [
+                      { type: 'Beach', distance: property.property_details?.nearest_beach_distance, icon: <FaUmbrellaBeach className="w-4 h-4 mr-1 text-blue-400" /> },
+                      { type: 'Railway', distance: property.property_details?.nearest_railway_station_distance, icon: <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg> },
+                      { type: 'Airport', distance: property.property_details?.nearest_airport_distance, icon: <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg> },
+                      { type: 'Bus Stand', distance: property.property_details?.nearest_bus_stand_distance, icon: <svg className="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg> }
+                    ];
+
+                    // Filter out locations with no distance data and sort by distance
+                    const availableLocations = locations
+                      .filter(loc => loc.distance && parseFloat(loc.distance) > 0)
+                      .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+
+                    // Return the nearest location if available
+                    if (availableLocations.length > 0) {
+                      const nearest = availableLocations[0];
+                      return (
+                        <>
+                          <span className="text-gray-400">|</span>
+                          <span className="flex items-center text-gray-600">
+                            {nearest.icon}
+                            Nearest {nearest.type}: {nearest.distance} km
+                          </span>
+                        </>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
-                {/* Show nearest available location */}
-            
                 {tag && (
-                  <div className="flex items-center text-xs text-gray-700 mb-2">
+                  <div className="flex items-center mt-2 text-xs text-gray-700 mb-2">
                     {React.createElement(propertyTypeIcons[tag] || FaHome, {
-                      className: "w-4 h-4 mr-1 text-blue-400"
+                      className: "w-4 h-4 mr-1 text-gray-400"
                     })}
                     {tag}
                   </div>
                 )}
-                {/* Room info - Show all room types */}
-                <div className="text-sm font-bold text-gray-800 mb-1">
-                  {uniqueRoomTypes.join(', ')}
-                </div>
+               
           
                 {/* Breakfast, cancellation, payment */}
                 {breakfastIncluded && <div className="text-green-700 font-semibold text-sm">Breakfast included</div>}
