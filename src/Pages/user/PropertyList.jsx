@@ -250,11 +250,7 @@ export default function PropertyList({ properties, loading, error }) {
                 alt={property.property_name}
                 className="w-full h-full object-cover"
               />
-              <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow text-gray-500 hover:text-red-500">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
-                </svg>
-              </button>
+             
             </div>
             {/* Info section */}
             <div className="flex-1 flex flex-col justify-between p-4">
