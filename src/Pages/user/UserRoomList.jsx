@@ -35,6 +35,19 @@ export default function UserRoomList() {
     propertyType: [],
     priceRange: [0, 30000]
   });
+  const [filterCounts, setFilterCounts] = useState({
+    freeCancel: 0,
+    breakfast: 0,
+    mealPlan: 0,
+    beachfront: 0,
+    couples: 0,
+    wifi: 0,
+    pool: 0,
+    parking: 0,
+    ac: 0,
+    spa: 0,
+    gym: 0
+  });
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -148,6 +161,54 @@ export default function UserRoomList() {
     setFilteredProperties(filtered);
   }, [properties, filters, searchParams]);
 
+  useEffect(() => {
+    // Calculate filter counts whenever properties change
+    const calculateFilterCounts = () => {
+      const counts = {
+        freeCancel: 0,
+        breakfast: 0,
+        mealPlan: 0,
+        beachfront: 0,
+        couples: 0,
+        wifi: 0,
+        pool: 0,
+        parking: 0,
+        ac: 0,
+        spa: 0,
+        gym: 0
+      };
+
+      properties.forEach(property => {
+        // Count free cancellation
+        if (property.rooms?.[0]?.free_cancellation_enabled === 1) counts.freeCancel++;
+        
+        // Count breakfast and meal plan
+        if (property.facilities?.restaurant === 1) {
+          counts.breakfast++;
+          counts.mealPlan++;
+        }
+        
+        // Count beachfront
+        if (parseFloat(property.property_details?.nearest_beach_distance) <= 0.5) counts.beachfront++;
+        
+        // Count unmarried couples
+        if (property.rules?.unmarried_couples_allowed === 1) counts.couples++;
+        
+        // Count facilities
+        if (property.facilities?.free_wifi === 1) counts.wifi++;
+        if (property.facilities?.swimming_pool === 1) counts.pool++;
+        if (property.facilities?.free_parking === 1) counts.parking++;
+        if (property.facilities?.air_conditioning === 1) counts.ac++;
+        if (property.facilities?.spa === 1) counts.spa++;
+        if (property.facilities?.gym === 1) counts.gym++;
+      });
+
+      setFilterCounts(counts);
+    };
+
+    calculateFilterCounts();
+  }, [properties]);
+
   const priceRanges = [
     { id: 'price1', label: '₹0 - ₹2,000', count: 134 },
     { id: 'price2', label: '₹2,000 - ₹4,500', count: 171 },
@@ -159,17 +220,17 @@ export default function UserRoomList() {
 
   const filterOptions = [
     { id: 'early-bird', label: 'Early Bird Deals', count: null },
-    { id: 'free-cancel', label: 'Free Cancellation', count: 555 },
-    { id: 'breakfast', label: 'Breakfast Included', count: 342 },
-    { id: 'meal-plan', label: 'Breakfast + Lunch/Dinner Included', count: 10 },
-    { id: 'beachfront', label: 'Beachfront', count: 8 },
-    { id: 'couples', label: 'Allows Unmarried Couples', count: 344 },
-    { id: 'wifi', label: 'Free WiFi', count: 412 },
-    { id: 'pool', label: 'Swimming Pool', count: 156 },
-    { id: 'parking', label: 'Free Parking', count: 289 },
-    { id: 'ac', label: 'Air Conditioning', count: 478 },
-    { id: 'spa', label: 'Spa & Wellness', count: 89 },
-    { id: 'gym', label: 'Fitness Center', count: 123 }
+    { id: 'free-cancel', label: 'Free Cancellation', count: filterCounts.freeCancel },
+    { id: 'breakfast', label: 'Breakfast Included', count: filterCounts.breakfast },
+    { id: 'meal-plan', label: 'Breakfast + Lunch/Dinner Included', count: filterCounts.mealPlan },
+    { id: 'beachfront', label: 'Beachfront', count: filterCounts.beachfront },
+    { id: 'couples', label: 'Allows Unmarried Couples', count: filterCounts.couples },
+    { id: 'wifi', label: 'Free WiFi', count: filterCounts.wifi },
+    { id: 'pool', label: 'Swimming Pool', count: filterCounts.pool },
+    { id: 'parking', label: 'Free Parking', count: filterCounts.parking },
+    { id: 'ac', label: 'Air Conditioning', count: filterCounts.ac },
+    { id: 'spa', label: 'Spa & Wellness', count: filterCounts.spa },
+    { id: 'gym', label: 'Fitness Center', count: filterCounts.gym }
   ];
 
   const starRatingOptions = [
@@ -250,7 +311,7 @@ export default function UserRoomList() {
           {/* Filters Column - Left */}
           <div className="w-full lg:w-1/4 flex flex-col gap-6">
             {/* Local Search */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
               <div className="relative">
                 <input
                   type="text"
@@ -262,14 +323,14 @@ export default function UserRoomList() {
             </div>
 
             {/* Popular Filters */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
-              <h3 className="text-lg font-bold mb-4 text-gray-800">Popular Filters</h3>
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+              <h3 className="text-lg font-bold mb-3 text-gray-800">Popular Filters</h3>
               {filterOptions.map((option) => (
-                <div key={option.id} className="flex items-center mb-3">
+                <div key={option.id} className="flex items-center mb-2">
                   <input
                     type="checkbox"
                     id={option.id}
-                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     checked={filters[option.id]}
                     onChange={() => setFilters({ ...filters, [option.id]: !filters[option.id] })}
                   />
@@ -280,7 +341,7 @@ export default function UserRoomList() {
             </div>
 
             {/* Star Rating */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
               <h3 className="text-lg font-bold mb-4 text-gray-800">Star Rating</h3>
               {starRatingOptions.map((option) => (
                 <div key={option.id} className="flex items-center mb-3">
@@ -303,7 +364,7 @@ export default function UserRoomList() {
             </div>
 
             {/* Property Type */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
               <h3 className="text-lg font-bold mb-4 text-gray-800">Property Type</h3>
               {propertyTypeOptions.map((option) => (
                 <div key={option.id} className="flex items-center mb-3">
@@ -326,7 +387,7 @@ export default function UserRoomList() {
             </div>
 
             {/* Price Range */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
               <h3 className="text-lg font-bold mb-4 text-gray-800">Price per night</h3>
               {priceRanges.map((range) => (
                 <div key={range.id} className="flex items-center mb-3">
