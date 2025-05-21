@@ -589,7 +589,7 @@ export default function PropertyDetails() {
               </thead>
               {/* Add Reserve Button at the top */}
               <tr className="bg-gray-50">
-                <td colSpan="6" className="py-4 px-6">
+                <td colSpan="5" className="py-4 px-6">
                   <div className="flex justify-end">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
