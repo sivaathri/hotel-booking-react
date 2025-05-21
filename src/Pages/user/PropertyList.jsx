@@ -522,7 +522,10 @@ export default function PropertyList({ properties, loading, error }) {
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-gray-700">{ratingText}</span>
-                  <span className="bg-blue-700 rounded-2xl text-white font-bold px-2 py-1 rounded text-lg">{rating}</span>
+                  <span className="bg-orange-500 text-white font-bold px-3 py-1 rounded-2xl text-lg border border-white">
+  {rating}
+</span>
+
                 </div>
                 <span className="text-xs text-gray-500 mb-2">
                   {reviews} reviews
