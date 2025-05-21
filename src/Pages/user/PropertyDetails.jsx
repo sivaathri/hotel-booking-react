@@ -180,6 +180,7 @@ export default function PropertyDetails() {
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [roomSelections, setRoomSelections] = useState({});
+  const [totalAmount, setTotalAmount] = useState(0);
 
   // Calculate guest capacity from search params
   const capacity = Number(searchParams.get('adults') || 1) + Number(searchParams.get('children') || 0);
@@ -238,10 +239,45 @@ export default function PropertyDetails() {
   const calculatePrice = useCallback((roomData) => {
     if (!roomData) return 0;
 
-    let price = parseFloat(roomData.base_price || 0);
+    // Get search parameters
+    const checkIn = searchParams.get('checkIn');
+    const checkOut = searchParams.get('checkOut');
+    const numberOfAdults = parseInt(searchParams.get('adults')) || 1;
+    const numberOfChildren = parseInt(searchParams.get('children')) || 0;
+    const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
+
+    // Ensure base_price is a number
+    let price = parseFloat(roomData.base_price) || 0;
     console.log('Initial base price:', price);
 
-    // Parse occupancy adjustments
+    // First try to use guest_pricing if available
+    if (roomData.guest_pricing && roomData.guest_pricing.length > 0) {
+      try {
+        // Find matching guest pricing for the current date and number of adults
+        const matchingPricing = roomData.guest_pricing.find(pricing => {
+          const pricingDate = new Date(pricing.pricing_date).toISOString().split('T')[0];
+          const searchDate = checkIn ? new Date(checkIn).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+          return pricingDate === searchDate && pricing.adults === numberOfAdults;
+        });
+
+        if (matchingPricing) {
+          price = Number(matchingPricing.price);
+          
+          // Add child pricing if there are children
+          if (numberOfChildren > 0) {
+            const childPricing = matchingPricing.child_price ? Number(matchingPricing.child_price) : 0;
+            price += childPricing * numberOfChildren;
+          }
+          
+          console.log('Using guest pricing:', price);
+          return price;
+        }
+      } catch (error) {
+        console.error('Error using guest pricing:', error);
+      }
+    }
+
+    // Fallback to occupancy_price_adjustments if guest_pricing not available or no match found
     if (roomData.occupancy_price_adjustments) {
       try {
         let occupancyPricing = JSON.parse(roomData.occupancy_price_adjustments);
@@ -255,7 +291,12 @@ export default function PropertyDetails() {
         const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
 
         if (applicablePricing) {
-          price = parseFloat(applicablePricing.adjustment);
+          // If adjustment is a percentage, calculate accordingly
+          if (applicablePricing.type === 'percentage') {
+            price = price * (1 + parseFloat(applicablePricing.adjustment) / 100);
+          } else {
+            price = parseFloat(applicablePricing.adjustment);
+          }
           console.log('Applied occupancy adjustment:', price);
         }
       } catch (error) {
@@ -263,37 +304,40 @@ export default function PropertyDetails() {
       }
     }
 
-    // Add child pricing
-    if (numberOfChildren > 0 && roomData.child_pricing) {
-      try {
-        let childPricing = JSON.parse(roomData.child_pricing);
-        // Handle double-encoded JSON
-        if (typeof childPricing === 'string') {
-          childPricing = JSON.parse(childPricing);
-        }
-
-        childrenAges.forEach(age => {
-          const applicablePricing = childPricing.find(p =>
-            age >= p.ageFrom && age <= p.ageTo
-          );
-
-          if (applicablePricing) {
-            const childPrice = parseFloat(applicablePricing.price);
-            if (applicablePricing.type === 'percentage') {
-              price += (price * childPrice) / 100;
-            } else {
-              price += childPrice;
-            }
-            console.log('Added child price:', childPrice);
+    // Add child pricing if there are children and we're using occupancy pricing
+    if (numberOfChildren > 0 && !roomData.guest_pricing) {
+      if (roomData.child_pricing) {
+        try {
+          let childPricing = JSON.parse(roomData.child_pricing);
+          // Handle double-encoded JSON
+          if (typeof childPricing === 'string') {
+            childPricing = JSON.parse(childPricing);
           }
-        });
-      } catch (error) {
-        console.error('Error calculating child pricing:', error);
+
+          childrenAges.forEach(age => {
+            const applicablePricing = childPricing.find(p =>
+              age >= p.ageFrom && age <= p.ageTo
+            );
+
+            if (applicablePricing) {
+              const childPrice = parseFloat(applicablePricing.price);
+              if (applicablePricing.type === 'percentage') {
+                price += (price * childPrice) / 100;
+              } else {
+                price += childPrice;
+              }
+              console.log('Added child price:', childPrice);
+            }
+          });
+        } catch (error) {
+          console.error('Error calculating child pricing:', error);
+        }
       }
     }
 
-    return price;
-  }, [numberOfAdults, numberOfChildren, childrenAges]);
+    // Ensure we return a valid number
+    return Math.max(0, price);
+  }, [searchParams]);
 
   // Calculate final prices
   const basePrice = calculatePrice(room);
@@ -365,6 +409,66 @@ export default function PropertyDetails() {
       setActiveRulesTab(keys[0] || "");
     }
   }, [property]);
+
+  // Add useEffect to calculate total when room selections change
+  useEffect(() => {
+    const calculateTotal = () => {
+      console.log('Calculating total for selections:', roomSelections);
+      console.log('Property rooms:', property?.rooms);
+
+      const total = Object.entries(roomSelections)
+        .filter(([_, count]) => count > 0)
+        .reduce((total, [roomId, count]) => {
+          // Convert roomId to number for comparison
+          const numericRoomId = parseInt(roomId);
+          const room = property?.rooms?.find(r => parseInt(r.room_id) === numericRoomId);
+          console.log('Processing room:', room, 'count:', count, 'roomId:', roomId);
+          
+          if (!room) {
+            console.log('Room not found for ID:', roomId);
+            return total;
+          }
+          
+          const roomPrice = calculatePrice(room);
+          const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+          const roomGstAmount = Math.round(roomPrice * roomGstRate);
+          const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+          
+          console.log('Room price details:', {
+            roomId,
+            roomType: room.room_type,
+            roomPrice,
+            roomGstRate,
+            roomGstAmount,
+            roomFinalPrice,
+            count,
+            subtotal: roomFinalPrice * count
+          });
+          
+          return total + (roomFinalPrice * count);
+        }, 0);
+      
+      console.log('Final calculated total:', total);
+      setTotalAmount(total);
+    };
+
+    if (property?.rooms) {
+      calculateTotal();
+    }
+  }, [roomSelections, property]);
+
+  // Update the room selection handler
+  const handleRoomSelection = (roomId, count) => {
+    console.log('Handling room selection:', { roomId, count });
+    setRoomSelections(prev => {
+      const newSelections = {
+        ...prev,
+        [roomId]: count
+      };
+      console.log('New room selections:', newSelections);
+      return newSelections;
+    });
+  };
 
   if (loading) return (
     <>
@@ -708,25 +812,155 @@ export default function PropertyDetails() {
                     </p>
                   </div>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-64 font-semibold py-3 px-6 rounded-lg transition-all duration-300 ${
-                    Object.values(roomSelections).some(count => count > 0)
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }`}
-                  disabled={!Object.values(roomSelections).some(count => count > 0)}
-                  onClick={() => {
-                    const selectedRooms = Object.entries(roomSelections)
-                      .filter(([_, count]) => count > 0)
-                      .map(([roomId, count]) => {
-                        const room = property.rooms.find(r => r.room_id === roomId);
-                        return { ...room, selectedCount: count };
+                <div className="flex items-center gap-6">
+                  {/* Add Selected Property Summary */}
+                  {Object.values(roomSelections).some(count => count > 0) && (
+                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                      <h4 className="font-semibold text-gray-800 mb-2">Selected Rooms Summary</h4>
+                      <div className="space-y-2">
+                        {Object.entries(roomSelections)
+                          .filter(([_, count]) => count > 0)
+                          .map(([roomId, count]) => {
+                            const numericRoomId = parseInt(roomId);
+                            const room = property.rooms.find(r => parseInt(r.room_id) === numericRoomId);
+                            if (!room) return null;
+                            
+                            const roomPrice = calculatePrice(room);
+                            const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                            const roomGstAmount = Math.round(roomPrice * roomGstRate);
+                            const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                            
+                            return (
+                              <div key={roomId} className="flex items-center justify-between text-sm">
+                                <div>
+                                  <span className="font-medium">{room?.room_type ? room.room_type.split('_')[0] : 'Room'}</span>
+                                  <span className="text-gray-500"> x {count}</span>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-medium">₹{(roomPrice * count).toLocaleString('en-IN')}</div>
+                                  <div className="text-gray-500 text-xs">+ ₹{(roomGstAmount * count).toLocaleString('en-IN')} taxes</div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        <div className="border-t pt-2 mt-2">
+                          <div className="flex items-center justify-between font-semibold">
+                            <span>Total</span>
+                            <div className="text-right">
+                              <div>₹{totalAmount.toLocaleString('en-IN')}</div>
+                              <div className="text-gray-500 text-xs">including taxes</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-64 font-semibold py-3 px-6 rounded-lg transition-all duration-300 ${
+                      Object.values(roomSelections).some(count => count > 0)
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl'
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
+                    disabled={!Object.values(roomSelections).some(count => count > 0)}
+                    onClick={() => {
+                      const selectedRooms = Object.entries(roomSelections)
+                        .filter(([_, count]) => count > 0)
+                        .map(([roomId, count]) => {
+                          // Convert roomId to number for comparison
+                          const numericRoomId = parseInt(roomId);
+                          const room = property.rooms.find(r => parseInt(r.room_id) === numericRoomId);
+                          
+                          if (!room) {
+                            console.error('Room not found:', roomId);
+                            return null;
+                          }
+
+                          const roomPrice = calculatePrice(room);
+                          const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                          const roomGstAmount = Math.round(roomPrice * roomGstRate);
+                          const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                          
+                          console.log('Room price calculation:', {
+                            roomId,
+                            roomType: room.room_type,
+                            basePrice: roomPrice,
+                            gstRate: roomGstRate,
+                            gstAmount: roomGstAmount,
+                            finalPrice: roomFinalPrice,
+                            count
+                          });
+
+                          return { 
+                            ...room, 
+                            selectedCount: count,
+                            price: {
+                              basePrice: roomPrice,
+                              gstAmount: roomGstAmount,
+                              finalPrice: roomFinalPrice
+                            }
+                          };
+                        })
+                        .filter(Boolean); // Remove any null entries
+
+                      if (selectedRooms.length === 0) {
+                        console.error('No valid rooms selected');
+                        return;
+                      }
+
+                      // Calculate total price including taxes
+                      const totalBasePrice = selectedRooms.reduce((total, room) => {
+                        return total + (room.price.basePrice * room.selectedCount);
+                      }, 0);
+
+                      const totalGstAmount = selectedRooms.reduce((total, room) => {
+                        return total + (room.price.gstAmount * room.selectedCount);
+                      }, 0);
+
+                      const totalFinalPrice = totalBasePrice + totalGstAmount;
+
+                      console.log('Total price calculation:', {
+                        totalBasePrice,
+                        totalGstAmount,
+                        totalFinalPrice
                       });
 
-                    navigate(`/book/${propertyId}`, {
-                      state: {
+                      // Log property details before navigation
+                      console.log('Property details being passed:', {
+                        propertyName: property.property_name,
+                        propertyType: property.property_type,
+                        propertyAddress: `${property.location?.address || ''}, ${property.location?.city || ''}, ${property.location?.state || ''}, ${property.location?.country || ''}`,
+                        facilities: property.facilities,
+                        amenities: property.amenities,
+                        rules: property.rules
+                      });
+
+                      // Validate property data before navigation
+                      if (!property.property_name || !property.location) {
+                        console.error('Missing critical property data:', property);
+                        return;
+                      }
+
+                      // Ensure we have all required property data
+                      const propertyDetails = {
+                        propertyName: property.property_name,
+                        propertyType: property.property_type,
+                        propertyAddress: [
+                          property.location.address,
+                          property.location.city,
+                          property.location.state,
+                          property.location.country
+                        ].filter(Boolean).join(', '),
+                        facilities: property.facilities || {},
+                        amenities: property.amenities || [],
+                        rules: property.rules || {}
+                      };
+
+                      console.log('Property details prepared:', propertyDetails);
+
+                      const bookingState = {
+                        ...propertyDetails, // Spread property details first
                         rooms: selectedRooms,
                         dates: {
                           checkIn: searchParamsState.checkIn,
@@ -737,28 +971,32 @@ export default function PropertyDetails() {
                           children: searchParamsState.children
                         },
                         price: {
-                          basePrice: selectedRooms.reduce((total, room) => {
-                            const roomPrice = calculatePrice(room);
-                            return total + (roomPrice * room.selectedCount);
-                          }, 0),
-                          gstAmount: selectedRooms.reduce((total, room) => {
-                            const roomPrice = calculatePrice(room);
-                            const gstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                            return total + (Math.round(roomPrice * gstRate) * room.selectedCount);
-                          }, 0),
-                          finalPrice: selectedRooms.reduce((total, room) => {
-                            const roomPrice = calculatePrice(room);
-                            const gstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                            const gstAmount = Math.round(roomPrice * gstRate);
-                            return total + (Math.round(roomPrice + gstAmount) * room.selectedCount);
-                          }, 0)
+                          basePrice: totalBasePrice,
+                          gstAmount: totalGstAmount,
+                          finalPrice: totalFinalPrice
                         }
+                      };
+
+                      // Final validation of booking state
+                      const requiredFields = ['propertyName', 'propertyType', 'propertyAddress', 'facilities', 'amenities', 'rules'];
+                      const missingFields = requiredFields.filter(field => !bookingState[field]);
+                      
+                      if (missingFields.length > 0) {
+                        console.error('Missing required fields in booking state:', missingFields);
+                        return;
                       }
-                    });
-                  }}
-                >
-                  Reserve Selected Rooms
-                </motion.button>
+
+                      console.log('Final booking state being passed:', bookingState);
+
+                      navigate(`/book/${propertyId}`, {
+                        state: bookingState,
+                        replace: true // Use replace to prevent back button issues
+                      });
+                    }}
+                  >
+                    Reserve Selected Rooms
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
 
@@ -879,10 +1117,7 @@ export default function PropertyDetails() {
                             className="w-48 border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                             onChange={(e) => {
                               const count = parseInt(e.target.value);
-                              setRoomSelections(prev => ({
-                                ...prev,
-                                [roomOption.room_id]: count
-                              }));
+                              handleRoomSelection(roomOption.room_id, count);
                               if (count > 0) {
                                 setSelectedRoom({ ...roomOption, selectedCount: count });
                               } else {
@@ -903,6 +1138,16 @@ export default function PropertyDetails() {
                               );
                             })}
                           </motion.select>
+
+                          {/* Update debug information */}
+                          <div className="text-xs text-gray-500 mt-1">
+                            Selected rooms: {Object.entries(roomSelections)
+                              .filter(([_, count]) => count > 0)
+                              .map(([roomId, count]) => {
+                                const room = property.rooms.find(r => r.room_id === roomId);
+                                return `${room?.room_type?.split('_')[0] || 'Room'} (${count})`;
+                              }).join(', ')}
+                          </div>
 
                           {roomOption.rpa_number_of_rooms <= 3 && (
                             <motion.div
