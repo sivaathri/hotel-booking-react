@@ -131,6 +131,31 @@ const UserBookRoom = () => {
   return (
   <>
       <Header />
+      {/* Price Summary - Moved to top right */}
+      <div className="fixed top-24 right-8 w-96 z-10">
+        <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 border-2 border-blue-100 shadow-xl">
+          <div className="font-bold text-xl text-gray-800 mb-2">Price Summary</div>
+          <div className="text-3xl font-bold text-blue-600 mb-1">{formatCurrency(finalPrice)}</div>
+          <div className="text-sm text-gray-500 mb-4">+ ₹{gstAmount} taxes and fees</div>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between text-gray-600">
+              <span>Base price</span>
+              <span>{formatCurrency(totalBasePrice)}</span>
+            </div>
+            <div className="flex justify-between text-gray-600">
+              <span>GST ({gstRate * 100}%)</span>
+              <span>₹{gstAmount}</span>
+            </div>
+            <div className="pt-2 border-t border-gray-200">
+              <div className="flex justify-between font-semibold text-gray-800">
+                <span>Total</span>
+                <span>{formatCurrency(finalPrice)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Step Progress Bar */}
       <div className="max-w-7xl mx-auto mt-8 mb-8 px-4">
         <div className="flex items-center justify-center gap-12">
@@ -265,29 +290,6 @@ const UserBookRoom = () => {
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-600">Guests</span>
                   <span className="font-medium text-gray-800">{guests.adults} adults, {guests.children} children</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Price Summary */}
-          <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 border-2 border-blue-100">
-            <div className="font-bold text-xl text-gray-800 mb-2">Price Summary</div>
-            <div className="text-3xl font-bold text-blue-600 mb-1">{formatCurrency(finalPrice)}</div>
-            <div className="text-sm text-gray-500 mb-4">+ ₹{gstAmount} taxes and fees</div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>Base price</span>
-                <span>{formatCurrency(totalBasePrice)}</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>GST ({gstRate * 100}%)</span>
-                <span>₹{gstAmount}</span>
-              </div>
-              <div className="pt-2 border-t border-gray-200">
-                <div className="flex justify-between font-semibold text-gray-800">
-                  <span>Total</span>
-                  <span>{formatCurrency(finalPrice)}</span>
                 </div>
               </div>
             </div>
