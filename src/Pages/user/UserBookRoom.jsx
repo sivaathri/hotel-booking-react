@@ -143,7 +143,7 @@ const UserBookRoom = () => {
     <>
       <Header />
       {/* Price Summary - Redesigned */}
-      <div className="fixed mt-6 right-9 w-99 z-10">
+      <div className="fixed mt-6 right-9 w-96 z-10">
         <motion.div 
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -154,7 +154,7 @@ const UserBookRoom = () => {
           <div className="space-y-5 text-sm  p-4 rounded-xl">
             <div className='ml-40'>
             <div className="font-bold text-xl text-gray-800"> {propertyName}</div>
-            <div className="text-gray-800"> Entire Servised {propertyType}</div>
+            <div className="text-gray-800"> {propertyType}</div>
             </div>
         
           <div className="border-b border-gray-200 my-3"></div>
