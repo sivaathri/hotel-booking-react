@@ -780,6 +780,7 @@ export default function PropertyDetails() {
                       // Log property details before navigation
                       console.log('Property details being passed:', {
                         propertyName: property.property_name,
+                        propertyType: property.property_type,
                         propertyAddress: `${property.location?.address || ''}, ${property.location?.city || ''}, ${property.location?.state || ''}, ${property.location?.country || ''}`,
                         facilities: property.facilities,
                         amenities: property.amenities,
@@ -795,6 +796,7 @@ export default function PropertyDetails() {
                       // Ensure we have all required property data
                       const propertyDetails = {
                         propertyName: property.property_name,
+                        propertyType: property.property_type,
                         propertyAddress: [
                           property.location.address,
                           property.location.city,
@@ -827,7 +829,7 @@ export default function PropertyDetails() {
                       };
 
                       // Final validation of booking state
-                      const requiredFields = ['propertyName', 'propertyAddress', 'facilities', 'amenities', 'rules'];
+                      const requiredFields = ['propertyName', 'propertyType', 'propertyAddress', 'facilities', 'amenities', 'rules'];
                       const missingFields = requiredFields.filter(field => !bookingState[field]);
                       
                       if (missingFields.length > 0) {

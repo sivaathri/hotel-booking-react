@@ -75,8 +75,8 @@ const UserBookRoom = () => {
     );
   }
 
-  const { rooms, dates, guests, price, propertyName, propertyAddress, facilities, amenities, rules } = bookingDetails;
-  console.log('Property Details:', { propertyName, propertyAddress, facilities, amenities, rules });
+  const { rooms, dates, guests, price, propertyName, propertyType, propertyAddress, facilities, amenities, rules } = bookingDetails;
+  console.log('Property Details:', { propertyName, propertyType, propertyAddress, facilities, amenities, rules });
 
   // Calculate number of nights between check-in and check-out
   const calculateNights = () => {
@@ -154,7 +154,7 @@ const UserBookRoom = () => {
           <div className="space-y-5 text-sm  p-4 rounded-xl">
             <div className='ml-40'>
             <div className="font-bold text-xl text-gray-800"> {propertyName}</div>
-            <div className="text-gray-800"> Entire Servised {propertyName}</div>
+            <div className="text-gray-800"> Entire Servised {propertyType}</div>
             </div>
         
           <div className="border-b border-gray-200 my-3"></div>
