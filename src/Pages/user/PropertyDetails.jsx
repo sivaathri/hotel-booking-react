@@ -747,8 +747,12 @@ export default function PropertyDetails() {
                         {/* Right Column - Price and Selection */}
                         <div className="ml-8 flex flex-col items-end space-y-4">
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-gray-900">₹ {roomPrice.toLocaleString('en-IN')}</div>
-                            <div className="text-sm text-gray-500">+ ₹ {roomGstAmount} taxes</div>
+                            <div className="text-2xl font-bold text-gray-900">
+                              ₹ {(roomPrice * (currentSelection || 1)).toLocaleString('en-IN')}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              + ₹ {(roomGstAmount * (currentSelection || 1)).toLocaleString('en-IN')} taxes
+                            </div>
                             {roomOption.free_cancellation_enabled === 1 && (
                               <div className="text-green-600 text-sm mt-1 flex items-center gap-1">
                                 <FaCheck />
