@@ -257,7 +257,7 @@ const UserBookRoom = () => {
             <div className="text-sm text-gray-500  flex items-center">
               <FaCheckCircle className="text-green-500 mr-2" />
               Includes all taxes and fees
-            </div>
+            </div>=
           </div>
         </motion.div>
       </div>
