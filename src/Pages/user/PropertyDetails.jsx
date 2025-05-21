@@ -239,7 +239,8 @@ export default function PropertyDetails() {
   const calculatePrice = useCallback((roomData) => {
     if (!roomData) return 0;
 
-    let price = parseFloat(roomData.base_price || 0);
+    // Ensure base_price is a number
+    let price = parseFloat(roomData.base_price) || 0;
     console.log('Initial base price:', price);
 
     // Parse occupancy adjustments
@@ -256,7 +257,12 @@ export default function PropertyDetails() {
         const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
 
         if (applicablePricing) {
-          price = parseFloat(applicablePricing.adjustment);
+          // If adjustment is a percentage, calculate accordingly
+          if (applicablePricing.type === 'percentage') {
+            price = price * (1 + parseFloat(applicablePricing.adjustment) / 100);
+          } else {
+            price = parseFloat(applicablePricing.adjustment);
+          }
           console.log('Applied occupancy adjustment:', price);
         }
       } catch (error) {
@@ -293,7 +299,8 @@ export default function PropertyDetails() {
       }
     }
 
-    return price;
+    // Ensure we return a valid number
+    return Math.max(0, price);
   }, [numberOfAdults, numberOfChildren, childrenAges]);
 
   // Calculate final prices
@@ -712,18 +719,63 @@ export default function PropertyDetails() {
                       const selectedRooms = Object.entries(roomSelections)
                         .filter(([_, count]) => count > 0)
                         .map(([roomId, count]) => {
-                          const room = property.rooms.find(r => r.room_id === roomId);
-                          return { ...room, selectedCount: count };
-                        });
+                          // Convert roomId to number for comparison
+                          const numericRoomId = parseInt(roomId);
+                          const room = property.rooms.find(r => parseInt(r.room_id) === numericRoomId);
+                          
+                          if (!room) {
+                            console.error('Room not found:', roomId);
+                            return null;
+                          }
+
+                          const roomPrice = calculatePrice(room);
+                          const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                          const roomGstAmount = Math.round(roomPrice * roomGstRate);
+                          const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                          
+                          console.log('Room price calculation:', {
+                            roomId,
+                            roomType: room.room_type,
+                            basePrice: roomPrice,
+                            gstRate: roomGstRate,
+                            gstAmount: roomGstAmount,
+                            finalPrice: roomFinalPrice,
+                            count
+                          });
+
+                          return { 
+                            ...room, 
+                            selectedCount: count,
+                            price: {
+                              basePrice: roomPrice,
+                              gstAmount: roomGstAmount,
+                              finalPrice: roomFinalPrice
+                            }
+                          };
+                        })
+                        .filter(Boolean); // Remove any null entries
+
+                      if (selectedRooms.length === 0) {
+                        console.error('No valid rooms selected');
+                        return;
+                      }
 
                       // Calculate total price including taxes
-                      const totalPrice = selectedRooms.reduce((total, room) => {
-                        const roomPrice = calculatePrice(room);
-                        const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                        const roomGstAmount = Math.round(roomPrice * roomGstRate);
-                        const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
-                        return total + (roomFinalPrice * room.selectedCount);
+                      const totalBasePrice = selectedRooms.reduce((total, room) => {
+                        return total + (room.price.basePrice * room.selectedCount);
                       }, 0);
+
+                      const totalGstAmount = selectedRooms.reduce((total, room) => {
+                        return total + (room.price.gstAmount * room.selectedCount);
+                      }, 0);
+
+                      const totalFinalPrice = totalBasePrice + totalGstAmount;
+
+                      console.log('Total price calculation:', {
+                        totalBasePrice,
+                        totalGstAmount,
+                        totalFinalPrice
+                      });
 
                       navigate(`/book/${propertyId}`, {
                         state: {
@@ -737,16 +789,9 @@ export default function PropertyDetails() {
                             children: searchParamsState.children
                           },
                           price: {
-                            basePrice: selectedRooms.reduce((total, room) => {
-                              const roomPrice = calculatePrice(room);
-                              return total + (roomPrice * room.selectedCount);
-                            }, 0),
-                            gstAmount: selectedRooms.reduce((total, room) => {
-                              const roomPrice = calculatePrice(room);
-                              const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                              return total + (Math.round(roomPrice * roomGstRate) * room.selectedCount);
-                            }, 0),
-                            finalPrice: totalPrice
+                            basePrice: totalBasePrice,
+                            gstAmount: totalGstAmount,
+                            finalPrice: totalFinalPrice
                           }
                         }
                       });
