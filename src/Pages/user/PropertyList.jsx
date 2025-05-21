@@ -267,8 +267,7 @@ export default function PropertyList({ properties, loading, error }) {
         // Get data from API response
         const reviews = property.reviews_count || 0;
         const rating = property.rating || 5.0;
-        const ratingText =
-          rating >= 8 ? "Very Good" : rating >= 7 ? "Good" : "Average";
+        const ratingText = rating >= 8 ? 'Very Good' : rating >= 7 ? 'Good' : 'Average';
         const breakfastIncluded = firstRoom.breakfast_included ?? false;
         const freeCancellation = firstRoom.free_cancellation_enabled === 1;
         const instantPayment = firstRoom.instant_payment_enabled === 1;
@@ -522,12 +521,8 @@ export default function PropertyList({ properties, loading, error }) {
             <div className="flex flex-col justify-between items-end p-4 min-w-[200px]">
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-gray-700">
-                    {ratingText}
-                  </span>
-                  <span className="bg-blue-700 rounded-2xl text-white font-bold px-2 py-1 rounded text-lg">
-                    {rating}
-                  </span>
+                  <span className="font-semibold text-gray-700">{ratingText}</span>
+                  <span className="bg-blue-700 rounded-2xl text-white font-bold px-2 py-1 rounded text-lg">{rating}</span>
                 </div>
                 <span className="text-xs text-gray-500 mb-2">
                   {reviews} reviews
