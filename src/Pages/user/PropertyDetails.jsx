@@ -180,6 +180,7 @@ export default function PropertyDetails() {
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [roomSelections, setRoomSelections] = useState({});
+  const [totalAmount, setTotalAmount] = useState(0);
 
   // Calculate guest capacity from search params
   const capacity = Number(searchParams.get('adults') || 1) + Number(searchParams.get('children') || 0);
@@ -365,6 +366,66 @@ export default function PropertyDetails() {
       setActiveRulesTab(keys[0] || "");
     }
   }, [property]);
+
+  // Add useEffect to calculate total when room selections change
+  useEffect(() => {
+    const calculateTotal = () => {
+      console.log('Calculating total for selections:', roomSelections);
+      console.log('Property rooms:', property?.rooms);
+
+      const total = Object.entries(roomSelections)
+        .filter(([_, count]) => count > 0)
+        .reduce((total, [roomId, count]) => {
+          // Convert roomId to number for comparison
+          const numericRoomId = parseInt(roomId);
+          const room = property?.rooms?.find(r => parseInt(r.room_id) === numericRoomId);
+          console.log('Processing room:', room, 'count:', count, 'roomId:', roomId);
+          
+          if (!room) {
+            console.log('Room not found for ID:', roomId);
+            return total;
+          }
+          
+          const roomPrice = calculatePrice(room);
+          const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+          const roomGstAmount = Math.round(roomPrice * roomGstRate);
+          const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+          
+          console.log('Room price details:', {
+            roomId,
+            roomType: room.room_type,
+            roomPrice,
+            roomGstRate,
+            roomGstAmount,
+            roomFinalPrice,
+            count,
+            subtotal: roomFinalPrice * count
+          });
+          
+          return total + (roomFinalPrice * count);
+        }, 0);
+      
+      console.log('Final calculated total:', total);
+      setTotalAmount(total);
+    };
+
+    if (property?.rooms) {
+      calculateTotal();
+    }
+  }, [roomSelections, property]);
+
+  // Update the room selection handler
+  const handleRoomSelection = (roomId, count) => {
+    console.log('Handling room selection:', { roomId, count });
+    setRoomSelections(prev => {
+      const newSelections = {
+        ...prev,
+        [roomId]: count
+      };
+      console.log('New room selections:', newSelections);
+      return newSelections;
+    });
+  };
 
   if (loading) return (
     <>
@@ -595,57 +656,105 @@ export default function PropertyDetails() {
                     </p>
                   </div>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-64 font-semibold py-3 px-6 rounded-lg transition-all duration-300 ${
-                    Object.values(roomSelections).some(count => count > 0)
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }`}
-                  disabled={!Object.values(roomSelections).some(count => count > 0)}
-                  onClick={() => {
-                    const selectedRooms = Object.entries(roomSelections)
-                      .filter(([_, count]) => count > 0)
-                      .map(([roomId, count]) => {
-                        const room = property.rooms.find(r => r.room_id === roomId);
-                        return { ...room, selectedCount: count };
-                      });
+                <div className="flex items-center gap-6">
+                  {/* Add Selected Property Summary */}
+                  {Object.values(roomSelections).some(count => count > 0) && (
+                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                      <h4 className="font-semibold text-gray-800 mb-2">Selected Rooms Summary</h4>
+                      <div className="space-y-2">
+                        {Object.entries(roomSelections)
+                          .filter(([_, count]) => count > 0)
+                          .map(([roomId, count]) => {
+                            const numericRoomId = parseInt(roomId);
+                            const room = property.rooms.find(r => parseInt(r.room_id) === numericRoomId);
+                            if (!room) return null;
+                            
+                            const roomPrice = calculatePrice(room);
+                            const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                            const roomGstAmount = Math.round(roomPrice * roomGstRate);
+                            const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                            
+                            return (
+                              <div key={roomId} className="flex items-center justify-between text-sm">
+                                <div>
+                                  <span className="font-medium">{room?.room_type ? room.room_type.split('_')[0] : 'Room'}</span>
+                                  <span className="text-gray-500"> x {count}</span>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-medium">₹{(roomPrice * count).toLocaleString('en-IN')}</div>
+                                  <div className="text-gray-500 text-xs">+ ₹{(roomGstAmount * count).toLocaleString('en-IN')} taxes</div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        <div className="border-t pt-2 mt-2">
+                          <div className="flex items-center justify-between font-semibold">
+                            <span>Total</span>
+                            <div className="text-right">
+                              <div>₹{totalAmount.toLocaleString('en-IN')}</div>
+                              <div className="text-gray-500 text-xs">including taxes</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-64 font-semibold py-3 px-6 rounded-lg transition-all duration-300 ${
+                      Object.values(roomSelections).some(count => count > 0)
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl'
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
+                    disabled={!Object.values(roomSelections).some(count => count > 0)}
+                    onClick={() => {
+                      const selectedRooms = Object.entries(roomSelections)
+                        .filter(([_, count]) => count > 0)
+                        .map(([roomId, count]) => {
+                          const room = property.rooms.find(r => r.room_id === roomId);
+                          return { ...room, selectedCount: count };
+                        });
 
-                    navigate(`/book/${propertyId}`, {
-                      state: {
-                        rooms: selectedRooms,
-                        dates: {
-                          checkIn: searchParamsState.checkIn,
-                          checkOut: searchParamsState.checkOut
-                        },
-                        guests: {
-                          adults: searchParamsState.adults,
-                          children: searchParamsState.children
-                        },
-                        price: {
-                          basePrice: selectedRooms.reduce((total, room) => {
-                            const roomPrice = calculatePrice(room);
-                            return total + (roomPrice * room.selectedCount);
-                          }, 0),
-                          gstAmount: selectedRooms.reduce((total, room) => {
-                            const roomPrice = calculatePrice(room);
-                            const gstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                            return total + (Math.round(roomPrice * gstRate) * room.selectedCount);
-                          }, 0),
-                          finalPrice: selectedRooms.reduce((total, room) => {
-                            const roomPrice = calculatePrice(room);
-                            const gstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                            const gstAmount = Math.round(roomPrice * gstRate);
-                            return total + (Math.round(roomPrice + gstAmount) * room.selectedCount);
-                          }, 0)
+                      // Calculate total price including taxes
+                      const totalPrice = selectedRooms.reduce((total, room) => {
+                        const roomPrice = calculatePrice(room);
+                        const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                        const roomGstAmount = Math.round(roomPrice * roomGstRate);
+                        const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                        return total + (roomFinalPrice * room.selectedCount);
+                      }, 0);
+
+                      navigate(`/book/${propertyId}`, {
+                        state: {
+                          rooms: selectedRooms,
+                          dates: {
+                            checkIn: searchParamsState.checkIn,
+                            checkOut: searchParamsState.checkOut
+                          },
+                          guests: {
+                            adults: searchParamsState.adults,
+                            children: searchParamsState.children
+                          },
+                          price: {
+                            basePrice: selectedRooms.reduce((total, room) => {
+                              const roomPrice = calculatePrice(room);
+                              return total + (roomPrice * room.selectedCount);
+                            }, 0),
+                            gstAmount: selectedRooms.reduce((total, room) => {
+                              const roomPrice = calculatePrice(room);
+                              const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                              return total + (Math.round(roomPrice * roomGstRate) * room.selectedCount);
+                            }, 0),
+                            finalPrice: totalPrice
+                          }
                         }
-                      }
-                    });
-                  }}
-                >
-                  Reserve Selected Rooms
-                </motion.button>
+                      });
+                    }}
+                  >
+                    Reserve Selected Rooms
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
 
@@ -766,10 +875,7 @@ export default function PropertyDetails() {
                             className="w-48 border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                             onChange={(e) => {
                               const count = parseInt(e.target.value);
-                              setRoomSelections(prev => ({
-                                ...prev,
-                                [roomOption.room_id]: count
-                              }));
+                              handleRoomSelection(roomOption.room_id, count);
                               if (count > 0) {
                                 setSelectedRoom({ ...roomOption, selectedCount: count });
                               } else {
@@ -790,6 +896,16 @@ export default function PropertyDetails() {
                               );
                             })}
                           </motion.select>
+
+                          {/* Update debug information */}
+                          <div className="text-xs text-gray-500 mt-1">
+                            Selected rooms: {Object.entries(roomSelections)
+                              .filter(([_, count]) => count > 0)
+                              .map(([roomId, count]) => {
+                                const room = property.rooms.find(r => r.room_id === roomId);
+                                return `${room?.room_type?.split('_')[0] || 'Room'} (${count})`;
+                              }).join(', ')}
+                          </div>
 
                           {roomOption.rpa_number_of_rooms <= 3 && (
                             <motion.div
