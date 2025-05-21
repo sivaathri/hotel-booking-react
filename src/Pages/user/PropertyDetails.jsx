@@ -677,54 +677,68 @@ export default function PropertyDetails() {
 
                             {/* Room Features */}
                             <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                              {property.facilities?.air_conditioning === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <FaSnowflake className="text-gray-400" />
-                                  <span>Air conditioning</span>
-                                </div>
-                              )}
-                              {property.facilities?.free_wifi === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <FaWifi className="text-gray-400" />
-                                  <span>Free WiFi</span>
-                                </div>
-                              )}
-                              {property.facilities?.tv === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <MdTv className="text-gray-400" />
-                                  <span>TV</span>
-                                </div>
-                              )}
-                              {property.facilities?.refrigerator === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <MdPower className="text-gray-400" />
-                                  <span>Refrigerator</span>
-                                </div>
-                              )}
-                              {property.facilities?.dining_area === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <BiRestaurant className="text-gray-400" />
-                                  <span>Private kitchen & dining</span>
-                                </div>
-                              )}
-                              {property.facilities?.housekeeping === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <GiVacuumCleaner className="text-gray-400" />
-                                  <span>Housekeeping</span>
-                                </div>
-                              )}
-                              {property.facilities?.room_service_24hr === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <FaConciergeBell className="text-gray-400" />
-                                  <span>24/7 Room Service</span>
-                                </div>
-                              )}
-                              {property.facilities?.laundry_service === 1 && (
-                                <div className="flex items-center gap-2">
-                                  <MdLocalLaundryService className="text-gray-400" />
-                                  <span>Laundry Service</span>
-                                </div>
-                              )}
+                              {property.facilities && Object.entries(property.facilities)
+                                .filter(([_, value]) => value === 1)
+                                .slice(0, 6)
+                                .map(([facility, _]) => {
+                                  // Map facility keys to icons and labels
+                                  const facilityMap = {
+                                    gym: { icon: <FaHandHoldingHeart className="text-gray-400" />, label: 'Gym' },
+                                    swimming_pool: { icon: <FaSwimmingPool className="text-gray-400" />, label: 'Swimming Pool' },
+                                    spa: { icon: <FaHandHoldingHeart className="text-gray-400" />, label: 'Spa' },
+                                    restaurant: { icon: <FaUtensils className="text-gray-400" />, label: 'Restaurant' },
+                                    room_service_24hr: { icon: <FaConciergeBell className="text-gray-400" />, label: '24/7 Room Service' },
+                                    lounge: { icon: <FaBed className="text-gray-400" />, label: 'Lounge' },
+                                    steam_sauna: { icon: <FaSnowflake className="text-gray-400" />, label: 'Steam & Sauna' },
+                                    bar: { icon: <FaUtensils className="text-gray-400" />, label: 'Bar' },
+                                    free_parking: { icon: <FaParking className="text-gray-400" />, label: 'Free Parking' },
+                                    free_wifi: { icon: <FaWifi className="text-gray-400" />, label: 'Free WiFi' },
+                                    refrigerator: { icon: <MdPower className="text-gray-400" />, label: 'Refrigerator' },
+                                    laundry_service: { icon: <MdLocalLaundryService className="text-gray-400" />, label: 'Laundry Service' },
+                                    housekeeping: { icon: <GiVacuumCleaner className="text-gray-400" />, label: 'Housekeeping' },
+                                    air_conditioning: { icon: <FaSnowflake className="text-gray-400" />, label: 'Air Conditioning' },
+                                    power_backup: { icon: <MdPower className="text-gray-400" />, label: 'Power Backup' },
+                                    ev_charging: { icon: <MdPower className="text-gray-400" />, label: 'EV Charging' },
+                                    smoke_detector: { icon: <MdSecurity className="text-gray-400" />, label: 'Smoke Detector' },
+                                    umbrellas: { icon: <FaUmbrellaBeach className="text-gray-400" />, label: 'Umbrellas' },
+                                    elevator: { icon: <FaArrowUp className="text-gray-400" />, label: 'Elevator' },
+                                    paid_lan: { icon: <FaWifi className="text-gray-400" />, label: 'Paid LAN' },
+                                    dining_area: { icon: <FaUtensils className="text-gray-400" />, label: 'Dining Area' },
+                                    cafe_24hr: { icon: <FaUtensils className="text-gray-400" />, label: '24/7 Cafe' },
+                                    barbeque: { icon: <FaUtensils className="text-gray-400" />, label: 'Barbeque' },
+                                    bakery: { icon: <FaUtensils className="text-gray-400" />, label: 'Bakery' },
+                                    coffee_shop_24hr: { icon: <FaUtensils className="text-gray-400" />, label: '24/7 Coffee Shop' },
+                                    fire_extinguishers: { icon: <FaFirstAid className="text-gray-400" />, label: 'Fire Extinguishers' },
+                                    cctv: { icon: <FaVideo className="text-gray-400" />, label: 'CCTV Security' },
+                                    security_alarms: { icon: <MdSecurity className="text-gray-400" />, label: 'Security Alarms' },
+                                    reflexology: { icon: <FaHandHoldingHeart className="text-gray-400" />, label: 'Reflexology' },
+                                    first_aid: { icon: <FaFirstAid className="text-gray-400" />, label: 'First Aid' },
+                                    tv: { icon: <MdTv className="text-gray-400" />, label: 'TV' },
+                                    luggage_storage: { icon: <FaSuitcaseRolling className="text-gray-400" />, label: 'Luggage Storage' },
+                                    wake_up_call: { icon: <FaBell className="text-gray-400" />, label: 'Wake-up Call' },
+                                    concierge: { icon: <FaConciergeBell className="text-gray-400" />, label: 'Concierge' },
+                                    doctor_on_call: { icon: <FaFirstAid className="text-gray-400" />, label: 'Doctor on Call' },
+                                    wheelchair: { icon: <FaWheelchair className="text-gray-400" />, label: 'Wheelchair Access' },
+                                    luggage_assistance: { icon: <FaSuitcaseRolling className="text-gray-400" />, label: 'Luggage Assistance' },
+                                    pool_beach_towels: { icon: <FaUmbrellaBeach className="text-gray-400" />, label: 'Pool/Beach Towels' },
+                                    multilingual_staff: { icon: <FaUser className="text-gray-400" />, label: 'Multilingual Staff' },
+                                    massage: { icon: <FaHandHoldingHeart className="text-gray-400" />, label: 'Massage' },
+                                    printer: { icon: <MdPower className="text-gray-400" />, label: 'Printer' },
+                                    photocopying: { icon: <MdPower className="text-gray-400" />, label: 'Photocopying' },
+                                    conference_room: { icon: <MdMeetingRoom className="text-gray-400" />, label: 'Conference Room' }
+                                  };
+
+                                  const facilityInfo = facilityMap[facility];
+                                  if (facilityInfo) {
+                                    return (
+                                      <div key={facility} className="flex items-center gap-2">
+                                        {facilityInfo.icon}
+                                        <span>{facilityInfo.label}</span>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                })}
                               <div className="flex items-center gap-2">
                                 <FaRuler className="text-gray-400" />
                                 <span>Entire {property.property_type.toLowerCase()} {roomOption.room_type.includes("2BHK") ? "1000" : "1500"} m²</span>
