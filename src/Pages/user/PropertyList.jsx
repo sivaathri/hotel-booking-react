@@ -71,11 +71,40 @@ export default function PropertyList({ properties, loading, error }) {
     const numberOfChildren = parseInt(searchParams.get("children")) || 0;
     const childrenAges = JSON.parse(searchParams.get("childrenAges") || "[]");
     const totalGuests = numberOfAdults + numberOfChildren;
+    const checkIn = searchParams.get("checkIn");
+    const checkOut = searchParams.get("checkOut");
 
     // Start with base price
     let totalPrice = 0;
 
-    // Apply occupancy-based pricing adjustments
+    // First try to use guest_pricing if available
+    if (room?.guest_pricing && room.guest_pricing.length > 0) {
+      try {
+        // Find matching guest pricing for the current date and number of adults
+        const matchingPricing = room.guest_pricing.find(pricing => {
+          const pricingDate = new Date(pricing.pricing_date).toISOString().split('T')[0];
+          const searchDate = checkIn ? new Date(checkIn).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+          return pricingDate === searchDate && pricing.adults === numberOfAdults;
+        });
+
+        if (matchingPricing) {
+          totalPrice = Number(matchingPricing.price);
+          
+          // Add child pricing if there are children
+          if (numberOfChildren > 0) {
+            const childPricing = matchingPricing.child_price ? Number(matchingPricing.child_price) : 0;
+            totalPrice += childPricing * numberOfChildren;
+          }
+          
+          console.log("Using guest pricing:", totalPrice);
+          return totalPrice;
+        }
+      } catch (error) {
+        console.error("Error using guest pricing:", error);
+      }
+    }
+
+    // Fallback to occupancy_price_adjustments if guest_pricing not available or no match found
     if (room?.occupancy_price_adjustments) {
       try {
         let occupancyPricing;
@@ -102,7 +131,7 @@ export default function PropertyList({ properties, loading, error }) {
         if (applicablePricing) {
           totalPrice = Number(applicablePricing.adjustment);
           console.log(
-            "Applied price adjustment:",
+            "Applied occupancy price adjustment:",
             totalPrice,
             "for",
             numberOfAdults,
@@ -122,8 +151,8 @@ export default function PropertyList({ properties, loading, error }) {
       totalPrice = basePrice * numberOfAdults;
     }
 
-    // Add child pricing if there are children
-    if (numberOfChildren > 0) {
+    // Add child pricing if there are children and we're using occupancy pricing
+    if (numberOfChildren > 0 && !room?.guest_pricing) {
       if (room?.child_pricing) {
         try {
           // Parse the child pricing data
