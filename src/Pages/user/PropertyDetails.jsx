@@ -418,23 +418,30 @@ export default function PropertyDetails() {
     }
 
     return (
-      <motion.img
-        key={idx}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+      <div className="flex-1 h-full relative group" style={{ cursor: 'pointer' }} onClick={() => { setModalImages(images); setCurrentImageIdx(idx); }}>
+        <img
         src={imageUrl}
         alt={`${property.property_name} thumbnail ${idx + 1}`}
         className={`w-24 h-20 object-cover rounded cursor-pointer transition-all duration-300 ${selectedImage === idx ? 'ring-2 ring-blue-500' : 'hover:ring-2 hover:ring-blue-300'
           }`}
-        onClick={() => {
-          console.log('Selected thumbnail:', idx, imageUrl);
-          setSelectedImage(idx);
-        }}
         onError={(e) => {
           console.error('Thumbnail failed to load:', e.target.src);
           e.target.src = 'https://placehold.co/200x150?text=No+Image';
         }}
       />
+        {idx === 4 && images.length > 5 && (
+          <button
+            className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-semibold text-lg rounded-br-2xl transition hover:bg-black/70"
+            onClick={e => {
+              e.stopPropagation();
+              setModalImages(images);
+              setCurrentImageIdx(0);
+            }}
+          >
+            <span className="px-4 py-2 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
+          </button>
+        )}
+      </div>
     );
   };
 
@@ -480,53 +487,159 @@ export default function PropertyDetails() {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <div className="relative h-[400px] rounded-lg overflow-hidden mb-2 group">
-            {images[selectedImage] ? (
-              <>
-                {renderImage(images[selectedImage], selectedImage, true)}
-                {/* Left Arrow Button */}
-                <button
-                  onClick={() => {
-                    setSelectedImage((prev) => {
-                      const newIndex = prev === 0 ? images.length - 1 : prev - 1;
-                      console.log('Previous image:', newIndex);
-                      return newIndex;
-                    });
-                  }}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
-                  aria-label="Previous image"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                {/* Right Arrow Button */}
-                <button
-                  onClick={() => {
-                    setSelectedImage((prev) => {
-                      const newIndex = prev === images.length - 1 ? 0 : prev + 1;
-                      console.log('Next image:', newIndex);
-                      return newIndex;
-                    });
-                  }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-10"
-                  aria-label="Next image"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-                <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-black/10" />
-              </>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                <span className="text-gray-400">No image available</span>
+          {images.length === 1 && (
+            <div className="w-full max-w-3xl mx-auto h-[400px] rounded-2xl overflow-hidden">
+              <img
+                src={getImageUrl(images[0])}
+                alt={property.property_name + ' main photo'}
+                className="w-full h-full object-cover rounded-2xl cursor-pointer"
+                onClick={() => { setModalImages(images); setCurrentImageIdx(0); }}
+                onError={e => { e.target.src = 'https://placehold.co/600x400?text=No+Image'; }}
+              />
+            </div>
+          )}
+          {images.length === 2 && (
+            <div className="w-full max-w-3xl mx-auto grid grid-cols-2 gap-2 h-[400px] rounded-2xl overflow-hidden">
+              {images.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={getImageUrl(img)}
+                  alt={property.property_name + ' photo ' + (idx + 1)}
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() => { setModalImages(images); setCurrentImageIdx(idx); }}
+                  onError={e => { e.target.src = 'https://placehold.co/600x400?text=No+Image'; }}
+                />
+              ))}
+            </div>
+          )}
+          {images.length === 3 && (
+            <div className="w-full max-w-2xl mx-auto grid grid-cols-3 grid-rows-2 gap-2 h-[400px] rounded-2xl overflow-hidden">
+              {/* Large left image */}
+              <div className="row-span-2 col-span-2 relative cursor-pointer group" onClick={() => { setModalImages(images); setCurrentImageIdx(0); }}>
+                <img
+                  src={getImageUrl(images[0])}
+                  alt={property.property_name + ' main photo'}
+                  className="w-full h-full object-cover rounded-l-2xl group-hover:brightness-90 transition duration-200"
+                  onError={e => { e.target.src = 'https://placehold.co/600x400?text=No+Image'; }}
+                />
               </div>
+              {/* Two stacked right images */}
+              <div className="row-span-1 col-span-1 relative cursor-pointer group" onClick={() => { setModalImages(images); setCurrentImageIdx(1); }}>
+                <div className="flex-1 h-full relative group">
+                  <img
+                    src={getImageUrl(images[1])}
+                    alt={property.property_name + ' photo 2'}
+                    className="w-full h-full object-cover"
+                    onClick={() => { setModalImages(images); setCurrentImageIdx(1); }}
+                    style={{ cursor: 'pointer' }}
+                    onError={e => { e.target.src = 'https://placehold.co/200x150?text=No+Image'; }}
+                  />
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                </div>
+              </div>
+              <div className="row-span-1 col-span-1 relative cursor-pointer group" onClick={() => { setModalImages(images); setCurrentImageIdx(2); }}>
+                <img
+                  src={getImageUrl(images[2])}
+                  alt={property.property_name + ' photo 3'}
+                  className="w-full h-full object-cover rounded-br-2xl"
+                  onError={e => { e.target.src = 'https://placehold.co/200x150?text=No+Image'; }}
+                />
+              </div>
+            </div>
+          )}
+          {images.length === 4 && (
+            <div className="w-full max-w-4xl mx-auto grid grid-cols-2 grid-rows-2 gap-2 h-[400px] rounded-2xl overflow-hidden">
+              {images.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={getImageUrl(img)}
+                  alt={property.property_name + ' photo ' + (idx + 1)}
+                  className={`w-full h-full object-cover cursor-pointer ${idx === 0 ? 'rounded-tl-2xl' : ''} ${idx === 1 ? 'rounded-tr-2xl' : ''} ${idx === 2 ? 'rounded-bl-2xl' : ''} ${idx === 3 ? 'rounded-br-2xl' : ''}`}
+                  onClick={() => { setModalImages(images); setCurrentImageIdx(idx); }}
+                  onError={e => { e.target.src = 'https://placehold.co/600x400?text=No+Image'; }}
+                />
+              ))}
+            </div>
+          )}
+          {images.length >= 5 && (
+            <div className="w-full max-w-8xl mx-auto flex h-[520px] rounded-2xl overflow-hidden gap-2">
+              {/* Left: Large image */}
+              <div className="flex-1 h-full">
+                <img
+                  src={getImageUrl(images[0])}
+                  alt={property.property_name + ' main photo'}
+                  className="w-full h-full object-cover rounded-tl-2xl rounded-bl-2xl"
+                  onClick={() => { setModalImages(images); setCurrentImageIdx(0); }}
+                  style={{ cursor: 'pointer' }}
+                  onError={e => { e.target.src = 'https://placehold.co/600x400?text=No+Image'; }}
+                />
+              </div>
+              {/* Right: 2x2 grid */}
+              <div className="flex flex-col flex-1 h-full gap-2">
+                <div className="flex flex-1 gap-2">
+                  <div className="flex-1 h-full relative group">
+                    <img
+                      src={getImageUrl(images[1])}
+                      alt={property.property_name + ' photo 2'}
+                      className="w-full h-full object-cover"
+                      onClick={() => { setModalImages(images); setCurrentImageIdx(1); }}
+                      style={{ cursor: 'pointer' }}
+                      onError={e => { e.target.src = 'https://placehold.co/200x150?text=No+Image'; }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                  </div>
+                  <div className="flex-1 h-full relative group">
+                    <img
+                      src={getImageUrl(images[2])}
+                      alt={property.property_name + ' photo 3'}
+                      className="w-full h-full object-cover"
+                      onClick={() => { setModalImages(images); setCurrentImageIdx(2); }}
+                      style={{ cursor: 'pointer' }}
+                      onError={e => { e.target.src = 'https://placehold.co/200x150?text=No+Image'; }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                  </div>
+                </div>
+                <div className="flex flex-1 gap-2">
+                  <div className="flex-1 h-full relative group">
+                    <img
+                      src={getImageUrl(images[3])}
+                      alt={property.property_name + ' photo 4'}
+                      className="w-full h-full object-cover"
+                      onClick={() => { setModalImages(images); setCurrentImageIdx(3); }}
+                      style={{ cursor: 'pointer' }}
+                      onError={e => { e.target.src = 'https://placehold.co/200x150?text=No+Image'; }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                  </div>
+                  <div className="flex-1 h-full relative group">
+                    <img
+                      src={getImageUrl(images[4])}
+                      alt={property.property_name + ' photo 5'}
+                      className="w-full h-full object-cover rounded-br-2xl"
+                      onClick={() => { setModalImages(images); setCurrentImageIdx(4); }}
+                      style={{ cursor: 'pointer' }}
+                      onError={e => { e.target.src = 'https://placehold.co/200x150?text=No+Image'; }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-br-2xl"></div>
+                    {/* Show all photos overlay */}
+                    {images.length > 5 && (
+                <button
+                        className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-semibold text-lg rounded-br-2xl transition hover:bg-black/70"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setModalImages(images);
+                          setCurrentImageIdx(0);
+                        }}
+                      >
+                        <span className="px-4 py-2 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
+                </button>
             )}
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {images.map((img, idx) => renderImage(img, idx))}
           </div>
+              </div>
+            </div>
+          )}
         </motion.div>
         {/* Add this new Facilities Section at the bottom, before the closing tags */}
         <motion.div
@@ -570,8 +683,8 @@ export default function PropertyDetails() {
             }}
           />
         </motion.div>
-        
-        {/* Room Comparison Table */}
+
+          {/* Room Comparison Table */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
           <h2 className="text-2xl font-bold mb-6">Book this {property.property_type}</h2>
 
@@ -650,26 +763,26 @@ export default function PropertyDetails() {
             </motion.div>
 
             {/* Room Cards */}
-            {Array.isArray(property.rooms) && property.rooms
-              .filter(roomOption => {
-                const searchedAdults = parseInt(searchParamsState.adults) || 1;
-                const searchedChildren = parseInt(searchParamsState.children) || 0;
-                const totalSearchedGuests = searchedAdults + searchedChildren;
-                const roomCapacity = roomOption.total_capacity ||
-                  (roomOption.room_capacity_adults + roomOption.room_capacity_children);
-                return roomCapacity >= totalSearchedGuests;
-              })
-              .map((roomOption, index) => {
-                const roomPrice = calculatePrice(roomOption);
-                const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                const roomGstAmount = Math.round(roomPrice * roomGstRate);
-                const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
-                const currentSelection = roomSelections[roomOption.room_id] || 0;
-                const searchedAdults = parseInt(searchParamsState.adults) || 1;
-                const searchedChildren = parseInt(searchParamsState.children) || 0;
-                const totalSearchedGuests = searchedAdults + searchedChildren;
+                {Array.isArray(property.rooms) && property.rooms
+                  .filter(roomOption => {
+                    const searchedAdults = parseInt(searchParamsState.adults) || 1;
+                    const searchedChildren = parseInt(searchParamsState.children) || 0;
+                    const totalSearchedGuests = searchedAdults + searchedChildren;
+                    const roomCapacity = roomOption.total_capacity ||
+                      (roomOption.room_capacity_adults + roomOption.room_capacity_children);
+                    return roomCapacity >= totalSearchedGuests;
+                  })
+                  .map((roomOption, index) => {
+                    const roomPrice = calculatePrice(roomOption);
+                    const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                    const roomGstAmount = Math.round(roomPrice * roomGstRate);
+                    const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                    const currentSelection = roomSelections[roomOption.room_id] || 0;
+                    const searchedAdults = parseInt(searchParamsState.adults) || 1;
+                    const searchedChildren = parseInt(searchParamsState.children) || 0;
+                    const totalSearchedGuests = searchedAdults + searchedChildren;
 
-                return (
+                    return (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -681,25 +794,25 @@ export default function PropertyDetails() {
                       <div className="flex justify-between items-start">
                         {/* Left Column - Room Details */}
                         <div className="flex-1 space-y-4">
-                          <div>
+                            <div>
                             <motion.h3
                               whileHover={{ scale: 1.02 }}
                               className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-300"
                             >
-                              {roomOption.room_type.split('_')[0]} - {property.property_type}
-                              {roomOption.floor > 0 && ` - Floor ${roomOption.floor}`}
+                                {roomOption.room_type.split('_')[0]} - {property.property_type}
+                                {roomOption.floor > 0 && ` - Floor ${roomOption.floor}`}
                             </motion.h3>
-                            {totalSearchedGuests <= roomOption.total_capacity && (
+                              {totalSearchedGuests <= roomOption.total_capacity && (
                               <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="mt-2 inline-flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full"
                               >
                                 <FaCheck className="text-green-500" />
-                                Recommended for {totalSearchedGuests} {totalSearchedGuests === 1 ? 'guest' : 'guests'}
+                                  Recommended for {totalSearchedGuests} {totalSearchedGuests === 1 ? 'guest' : 'guests'}
                               </motion.div>
-                            )}
-                          </div>
+                              )}
+                            </div>
 
                           {/* Room Features Grid */}
                           <div className="grid grid-cols-2 gap-4">
@@ -707,7 +820,7 @@ export default function PropertyDetails() {
                               <div className="flex items-center gap-2 text-gray-600">
                                 <FaBed className="text-blue-500" />
                                 <span>{roomOption.room_type.split('_')[0]} Bedroom</span>
-                              </div>
+                                  </div>
                               <div className="flex items-center gap-2 text-gray-600">
                                 <FaUser className="text-blue-500" />
                                 <span>Max {roomOption.total_capacity} guests</span>
@@ -716,7 +829,7 @@ export default function PropertyDetails() {
                                 <FaRuler className="text-blue-500" />
                                 <span>{roomOption.room_type.includes("2BHK") ? "1000" : "1500"} m²</span>
                               </div>
-                            </div>
+                              </div>
                             <div className="space-y-3">
                               {property.facilities && Object.entries(property.facilities)
                                 .filter(([_, value]) => value === 1)
@@ -735,24 +848,24 @@ export default function PropertyDetails() {
                                       <div key={facility} className="flex items-center gap-2 text-gray-600">
                                         {facilityInfo.icon}
                                         <span>{facilityInfo.label}</span>
-                                      </div>
+                                </div>
                                     );
                                   }
                                   return null;
                                 })}
-                            </div>
-                          </div>
-                        </div>
+                                </div>
+                                </div>
+                                </div>
 
                         {/* Right Column - Price and Selection */}
                         <div className="ml-8 flex flex-col items-end space-y-4">
-                          <div className="text-right">
+                                <div className="text-right">
                             <div className="text-2xl font-bold text-gray-900">
                               ₹ {(roomPrice * (currentSelection || 1)).toLocaleString('en-IN')}
-                            </div>
+                                </div>
                             <div className="text-sm text-gray-500">
                               + ₹ {(roomGstAmount * (currentSelection || 1)).toLocaleString('en-IN')} taxes
-                            </div>
+                              </div>
                             {roomOption.free_cancellation_enabled === 1 && (
                               <div className="text-green-600 text-sm mt-1 flex items-center gap-1">
                                 <FaCheck />
@@ -801,23 +914,23 @@ export default function PropertyDetails() {
                               Only {roomOption.rpa_number_of_rooms} {roomOption.rpa_number_of_rooms === 1 ? 'room' : 'rooms'} left!
                             </motion.div>
                           )}
-                        </div>
-                      </div>
+                            </div>
+                          </div>
                     </div>
                   </motion.div>
-                );
-              })}
+                    );
+                  })}
 
             {/* No Rooms Available Message */}
-            {Array.isArray(property.rooms) &&
-              !property.rooms.some(roomOption => {
-                const searchedAdults = parseInt(searchParamsState.adults) || 1;
-                const searchedChildren = parseInt(searchParamsState.children) || 0;
-                const totalSearchedGuests = searchedAdults + searchedChildren;
-                const roomCapacity = roomOption.total_capacity ||
-                  (roomOption.room_capacity_adults + roomOption.room_capacity_children);
-                return roomCapacity >= totalSearchedGuests;
-              }) && (
+                {Array.isArray(property.rooms) &&
+                  !property.rooms.some(roomOption => {
+                    const searchedAdults = parseInt(searchParamsState.adults) || 1;
+                    const searchedChildren = parseInt(searchParamsState.children) || 0;
+                    const totalSearchedGuests = searchedAdults + searchedChildren;
+                    const roomCapacity = roomOption.total_capacity ||
+                      (roomOption.room_capacity_adults + roomOption.room_capacity_children);
+                    return roomCapacity >= totalSearchedGuests;
+                  }) && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -827,34 +940,12 @@ export default function PropertyDetails() {
                     <FaBed className="text-gray-400 text-4xl mx-auto" />
                     <h3 className="text-xl font-semibold text-gray-800">No apartments available for {parseInt(searchParamsState.adults) + parseInt(searchParamsState.children)} guests</h3>
                     <p className="text-gray-600">Please try modifying your search or contact us for alternative options</p>
-                  </div>
+                        </div>
                 </motion.div>
-              )}
+                  )}
           </div>
         </div>
 
-       
-
-        {/* Most Popular Facilities Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="w-2/3 bg-white rounded-lg shadow-sm p-6 mb-6 hover:shadow-md transition-all duration-300"
-        >
-          <h3 className="text-lg font-bold mb-4 hover:text-blue-600 transition-colors duration-300 font-sans">Most popular facilities</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-green-700">
-            {FACILITY_MAP.filter(fac => property.facilities?.[fac.key] === 1).map(fac => (
-              <motion.div
-                key={fac.key}
-                whileHover={{ scale: 1.05, x: 5 }}
-                className="flex items-center gap-2 hover:text-green-800 transition-colors duration-300"
-              >
-                {fac.icon} {fac.label}
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
         {/* Add this new Facilities Section at the bottom, before the closing tags */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
