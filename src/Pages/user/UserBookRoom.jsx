@@ -135,22 +135,26 @@ const UserBookRoom = () => {
               {rooms.map((room, index) => {
                 const roomPrice = calculateRoomPrice(room);
                 const roomTotalPrice = roomPrice * room.selectedCount;
+                const roomGstRate = roomTotalPrice <= 7500 ? 0.12 : 0.18;
+                const roomGstAmount = roomTotalPrice * roomGstRate;
                 console.log('Rendering room:', {
                   roomType: room.room_type,
                   roomPrice,
                   selectedCount: room.selectedCount,
-                  roomTotalPrice
+                  roomTotalPrice,
+                  roomGstAmount
                 });
                 return (
                   <div key={index} className="p-4 bg-gray-50 rounded-lg">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium">{room.room_type}</h3>
-                        <p className="text-sm text-gray-600">Quantity: {room.selectedCount}</p>
+                        <h3 className="font-medium">{room.room_type.split('_')[0]}</h3>
+                        <p className="text-sm text-gray-600">Room: {room.selectedCount}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-medium">{formatCurrency(roomTotalPrice)}</p>
                         <p className="text-sm text-gray-600">per room</p>
+                        <p className="text-sm text-gray-500">GST ({(roomGstRate * 100).toFixed(0)}%): {formatCurrency(roomGstAmount)}</p>
                       </div>
                     </div>
                   </div>
