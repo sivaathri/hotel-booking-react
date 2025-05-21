@@ -132,7 +132,7 @@ const UserBookRoom = () => {
   <>
       <Header />
       {/* Price Summary - Moved to top right */}
-      <div className="fixed top-24 right-8 w-96 z-10">
+      <div className="fixed top-28 right-8 w-96 z-10">
         <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 border-2 border-blue-100 shadow-xl">
           <div className="font-bold text-xl text-gray-800 mb-2">Price Summary</div>
           <div className="text-3xl font-bold text-blue-600 mb-1">{formatCurrency(finalPrice)}</div>
@@ -297,7 +297,7 @@ const UserBookRoom = () => {
         </div>
 
         {/* Main Section: Booking Form */}
-        <div className="md:col-span-2 bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="md:col-span-2 mr-28 bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <h1 className="text-2xl font-bold text-gray-800 mb-8 flex items-center">
             <FaUser className="w-6 h-6 mr-3 text-blue-500" />
             Enter your details
