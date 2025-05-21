@@ -570,51 +570,7 @@ export default function PropertyDetails() {
             }}
           />
         </motion.div>
-        {/* Add Guest Count Filter */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Filter by Guest Count</h2>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Adults:</label>
-                <select
-                  className="border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={searchParamsState.adults}
-                  onChange={(e) => {
-                    setSearchParamsState(prev => ({
-                      ...prev,
-                      adults: e.target.value
-                    }));
-                  }}
-                >
-                  {[...Array(10)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>{i + 1}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Children:</label>
-                <select
-                  className="border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={searchParamsState.children}
-                  onChange={(e) => {
-                    setSearchParamsState(prev => ({
-                      ...prev,
-                      children: e.target.value
-                    }));
-                  }}
-                >
-                  {[...Array(6)].map((_, i) => (
-                    <option key={i} value={i}>{i}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="text-sm text-gray-600">
-            Total Guests: {parseInt(searchParamsState.adults) + parseInt(searchParamsState.children)}
-          </div>
-        </div>
+        
         {/* Room Comparison Table */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
           <h2 className="text-2xl font-bold mb-6">Book this {property.property_type}</h2>
@@ -873,22 +829,32 @@ export default function PropertyDetails() {
                         {/* Number of Guests Column */}
                         <td className="py-6 px-6">
                           <div className="space-y-4">
-                            {JSON.parse(roomOption.occupancy_price_adjustments).map((price, index) => (
-                              <motion.div
-                                key={index}
-                                whileHover={{ scale: 1.02 }}
-                                className="flex items-center justify-between border-t pt-4"
-                              >
-                                <div className="flex items-center gap-1">
-                                  {[...Array(price.minGuests)].map((_, i) => (
-                                    <FaUser key={i} className="text-gray-600" />
-                                  ))}
-                                </div>
-                                <div className="text-right">
-                                  <div className="font-semibold">₹ {Math.round(price.adjustment)}</div>
-                                </div>
-                              </motion.div>
-                            ))}
+                            {JSON.parse(roomOption.occupancy_price_adjustments).map((price, index) => {
+                              const guestCount = price.minGuests;
+                              return (
+                                <motion.div
+                                  key={index}
+                                  whileHover={{ scale: 1.02 }}
+                                  className="flex items-center justify-between border-t pt-4"
+                                >
+                                  <div className="flex items-center gap-1">
+                                    {guestCount >= 5 ? (
+                                      <div className="flex items-center">
+                                        <FaUser className="text-gray-600" />
+                                        <span className="text-gray-600 ml-1">×{guestCount}</span>
+                                      </div>
+                                    ) : (
+                                      [...Array(guestCount)].map((_, i) => (
+                                        <FaUser key={i} className="text-gray-600" />
+                                      ))
+                                    )}
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="font-semibold">₹ {Math.round(price.adjustment)}</div>
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
 
                             <div className="text-sm text-gray-500 mt-2">
                               Max {roomOption.total_capacity} guests
