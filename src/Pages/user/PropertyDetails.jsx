@@ -777,23 +777,69 @@ export default function PropertyDetails() {
                         totalFinalPrice
                       });
 
-                      navigate(`/book/${propertyId}`, {
-                        state: {
-                          rooms: selectedRooms,
-                          dates: {
-                            checkIn: searchParamsState.checkIn,
-                            checkOut: searchParamsState.checkOut
-                          },
-                          guests: {
-                            adults: searchParamsState.adults,
-                            children: searchParamsState.children
-                          },
-                          price: {
-                            basePrice: totalBasePrice,
-                            gstAmount: totalGstAmount,
-                            finalPrice: totalFinalPrice
-                          }
+                      // Log property details before navigation
+                      console.log('Property details being passed:', {
+                        propertyName: property.property_name,
+                        propertyAddress: `${property.location?.address || ''}, ${property.location?.city || ''}, ${property.location?.state || ''}, ${property.location?.country || ''}`,
+                        facilities: property.facilities,
+                        amenities: property.amenities,
+                        rules: property.rules
+                      });
+
+                      // Validate property data before navigation
+                      if (!property.property_name || !property.location) {
+                        console.error('Missing critical property data:', property);
+                        return;
+                      }
+
+                      // Ensure we have all required property data
+                      const propertyDetails = {
+                        propertyName: property.property_name,
+                        propertyAddress: [
+                          property.location.address,
+                          property.location.city,
+                          property.location.state,
+                          property.location.country
+                        ].filter(Boolean).join(', '),
+                        facilities: property.facilities || {},
+                        amenities: property.amenities || [],
+                        rules: property.rules || {}
+                      };
+
+                      console.log('Property details prepared:', propertyDetails);
+
+                      const bookingState = {
+                        ...propertyDetails, // Spread property details first
+                        rooms: selectedRooms,
+                        dates: {
+                          checkIn: searchParamsState.checkIn,
+                          checkOut: searchParamsState.checkOut
+                        },
+                        guests: {
+                          adults: searchParamsState.adults,
+                          children: searchParamsState.children
+                        },
+                        price: {
+                          basePrice: totalBasePrice,
+                          gstAmount: totalGstAmount,
+                          finalPrice: totalFinalPrice
                         }
+                      };
+
+                      // Final validation of booking state
+                      const requiredFields = ['propertyName', 'propertyAddress', 'facilities', 'amenities', 'rules'];
+                      const missingFields = requiredFields.filter(field => !bookingState[field]);
+                      
+                      if (missingFields.length > 0) {
+                        console.error('Missing required fields in booking state:', missingFields);
+                        return;
+                      }
+
+                      console.log('Final booking state being passed:', bookingState);
+
+                      navigate(`/book/${propertyId}`, {
+                        state: bookingState,
+                        replace: true // Use replace to prevent back button issues
                       });
                     }}
                   >
