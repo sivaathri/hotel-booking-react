@@ -200,7 +200,7 @@ const UserBookRoom = () => {
     <>
       <Header />
       {/* Price Summary - Redesigned */}
-      <div className="fixed mt-6 right-9 w-96 z-10">
+      <div className="fixed mt-6  right-9 w-96 z-10">
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -248,7 +248,7 @@ const UserBookRoom = () => {
             </div>
             <div className="border-b border-gray-200 my-3"></div>
             <div className="flex items-center justify-between mb-3">
-              <div className="font-bold text-xl text-gray-800"> Total</div>
+              <div className="font-bold text-xl text-gray-800"> Total (INR)</div>
               <div className="text-2xl font-bold text-blue-600 ">
                 {formatCurrency(finalPrice)}
               </div>
