@@ -59,6 +59,23 @@ export default function PropertyList({ properties, loading, error }) {
   // Debug log to check properties data
   console.log("Properties data:", properties);
 
+  // Add function to calculate number of nights
+  const calculateNights = () => {
+    const checkIn = searchParams.get('checkIn');
+    const checkOut = searchParams.get('checkOut');
+    
+    if (!checkIn || !checkOut) return 1;
+    
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    
+    // Calculate difference in milliseconds and convert to days
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
+  };
+
   // Helper function to construct image URL
   const getImageUrl = (path) => {
     if (!path) return "https://placehold.co/400x320?text=No+Image";
@@ -74,88 +91,57 @@ export default function PropertyList({ properties, loading, error }) {
     const checkIn = searchParams.get("checkIn");
     const checkOut = searchParams.get("checkOut");
 
+    // Calculate total nights
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
     // Start with base price
     let totalPrice = 0;
 
     // First try to use guest_pricing if available
     if (room?.guest_pricing && room.guest_pricing.length > 0) {
       try {
-        // Find matching guest pricing for the current date and number of adults
-        const matchingPricing = room.guest_pricing.find(pricing => {
-          const pricingDate = new Date(pricing.pricing_date).toISOString().split('T')[0];
-          const searchDate = checkIn ? new Date(checkIn).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-          return pricingDate === searchDate && pricing.adults === numberOfAdults;
-        });
+        // Calculate price for each night
+        for (let i = 0; i < nights; i++) {
+          const currentDate = new Date(start);
+          currentDate.setDate(start.getDate() + i);
+          const dateString = currentDate.toISOString().split('T')[0];
 
-        if (matchingPricing) {
-          totalPrice = Number(matchingPricing.price);
-          
-          // Add child pricing if there are children
-          if (numberOfChildren > 0) {
-            const childPricing = matchingPricing.child_price ? Number(matchingPricing.child_price) : 0;
-            totalPrice += childPricing * numberOfChildren;
+          // Find matching guest pricing for this date and number of adults
+          const matchingPricing = room.guest_pricing.find(pricing => {
+            const pricingDate = new Date(pricing.pricing_date).toISOString().split('T')[0];
+            return pricingDate === dateString && pricing.adults === numberOfAdults;
+          });
+
+          if (matchingPricing) {
+            totalPrice += Number(matchingPricing.price);
+            
+            // Add child pricing if there are children
+            if (numberOfChildren > 0) {
+              const childPricing = matchingPricing.child_price ? Number(matchingPricing.child_price) : 0;
+              totalPrice += childPricing * numberOfChildren;
+            }
+          } else {
+            // If no specific pricing found for this date, use base price
+            totalPrice += basePrice;
           }
-          
-          console.log("Using guest pricing:", totalPrice);
-          return totalPrice;
         }
+        
+        console.log("Total price for all nights:", totalPrice);
+        return totalPrice;
       } catch (error) {
         console.error("Error using guest pricing:", error);
       }
     }
 
-    // Fallback to occupancy_price_adjustments if guest_pricing not available or no match found
-    if (room?.occupancy_price_adjustments) {
-      try {
-        let occupancyPricing;
-        try {
-          // Handle double-stringified JSON
-          occupancyPricing = JSON.parse(room.occupancy_price_adjustments);
-          if (typeof occupancyPricing === "string") {
-            occupancyPricing = JSON.parse(occupancyPricing);
-          }
-        } catch (e) {
-          console.error("Error parsing occupancy pricing:", e);
-          occupancyPricing = [];
-        }
+    // Fallback to base price * number of nights if no guest pricing available
+    totalPrice = basePrice * nights * numberOfAdults;
 
-        // Find the applicable pricing based on number of adults
-        // Sort by minGuests in descending order to get the highest applicable tier
-        const sortedPricing = occupancyPricing.sort(
-          (a, b) => b.minGuests - a.minGuests
-        );
-        const applicablePricing = sortedPricing.find(
-          (p) => numberOfAdults >= p.minGuests
-        );
-
-        if (applicablePricing) {
-          totalPrice = Number(applicablePricing.adjustment);
-          console.log(
-            "Applied occupancy price adjustment:",
-            totalPrice,
-            "for",
-            numberOfAdults,
-            "adults"
-          );
-        } else {
-          // If no specific pricing found, multiply base price by number of adults
-          totalPrice = basePrice * numberOfAdults;
-        }
-      } catch (error) {
-        console.error("Error calculating occupancy pricing:", error);
-        // Fallback to base price multiplication if there's an error
-        totalPrice = basePrice * numberOfAdults;
-      }
-    } else {
-      // If no occupancy pricing specified, multiply base price by number of adults
-      totalPrice = basePrice * numberOfAdults;
-    }
-
-    // Add child pricing if there are children and we're using occupancy pricing
-    if (numberOfChildren > 0 && !room?.guest_pricing) {
+    // Add child pricing if there are children
+    if (numberOfChildren > 0) {
       if (room?.child_pricing) {
         try {
-          // Parse the child pricing data
           let childPricing;
           try {
             childPricing = JSON.parse(room.child_pricing);
@@ -168,8 +154,6 @@ export default function PropertyList({ properties, loading, error }) {
           }
 
           let childPrice = 0;
-
-          // Calculate price for each child based on their actual age
           childrenAges.forEach((age) => {
             const applicablePricing = childPricing.find(
               (p) => age >= p.ageFrom && age <= p.ageTo
@@ -177,7 +161,6 @@ export default function PropertyList({ properties, loading, error }) {
             if (applicablePricing) {
               childPrice += Number(applicablePricing.price);
             } else {
-              // If no specific pricing found for age, use base price
               childPrice += basePrice;
             }
           });
@@ -309,7 +292,7 @@ export default function PropertyList({ properties, loading, error }) {
           ? getImageUrl(firstRoom.image_urls[0])
           : "https://placehold.co/400x320?text=No+Image";
         const adults = searchParams.get("adults") || "1";
-        const nights = 1;
+        const nights = calculateNights();
         return (
           <div
             key={property.property_id}
