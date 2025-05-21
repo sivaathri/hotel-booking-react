@@ -570,6 +570,51 @@ export default function PropertyDetails() {
             }}
           />
         </motion.div>
+        {/* Add Guest Count Filter */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Filter by Guest Count</h2>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Adults:</label>
+                <select
+                  className="border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={searchParamsState.adults}
+                  onChange={(e) => {
+                    setSearchParamsState(prev => ({
+                      ...prev,
+                      adults: e.target.value
+                    }));
+                  }}
+                >
+                  {[...Array(10)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Children:</label>
+                <select
+                  className="border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={searchParamsState.children}
+                  onChange={(e) => {
+                    setSearchParamsState(prev => ({
+                      ...prev,
+                      children: e.target.value
+                    }));
+                  }}
+                >
+                  {[...Array(6)].map((_, i) => (
+                    <option key={i} value={i}>{i}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="text-sm text-gray-600">
+            Total Guests: {parseInt(searchParamsState.adults) + parseInt(searchParamsState.children)}
+          </div>
+        </div>
         {/* Room Selection Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
           <h2 className="text-2xl font-bold mb-6">Book this  {property.property_type}</h2>
@@ -582,11 +627,66 @@ export default function PropertyDetails() {
                   <th className="py-4 px-6 text-left">Apartment type</th>
                   <th className="py-4 px-6 text-left">Number of guests</th>
                   <th className="py-4 px-6 text-left">Today's price</th>
-                  <th className="py-4 px-6 text-left">Your choices</th>
                   <th className="py-4 px-6 text-left">Select an  {property.property_type}</th>
                   <th className="py-4 px-6"></th>
                 </tr>
               </thead>
+              {/* Add Reserve Button at the top */}
+              <tr className="bg-gray-50">
+                <td colSpan="6" className="py-4 px-6">
+                  <div className="flex justify-end">
+                    <button
+                      className={`w-64 font-semibold py-3 px-6 rounded-lg transition-colors ${
+                        Object.values(roomSelections).some(count => count > 0)
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                          : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      }`}
+                      disabled={!Object.values(roomSelections).some(count => count > 0)}
+                      onClick={() => {
+                        const selectedRooms = Object.entries(roomSelections)
+                          .filter(([_, count]) => count > 0)
+                          .map(([roomId, count]) => {
+                            const room = property.rooms.find(r => r.room_id === roomId);
+                            return { ...room, selectedCount: count };
+                          });
+
+                        navigate(`/book/${propertyId}`, {
+                          state: {
+                            rooms: selectedRooms,
+                            dates: {
+                              checkIn: searchParamsState.checkIn,
+                              checkOut: searchParamsState.checkOut
+                            },
+                            guests: {
+                              adults: searchParamsState.adults,
+                              children: searchParamsState.children
+                            },
+                            price: {
+                              basePrice: selectedRooms.reduce((total, room) => {
+                                const roomPrice = calculatePrice(room);
+                                return total + (roomPrice * room.selectedCount);
+                              }, 0),
+                              gstAmount: selectedRooms.reduce((total, room) => {
+                                const roomPrice = calculatePrice(room);
+                                const gstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                                return total + (Math.round(roomPrice * gstRate) * room.selectedCount);
+                              }, 0),
+                              finalPrice: selectedRooms.reduce((total, room) => {
+                                const roomPrice = calculatePrice(room);
+                                const gstRate = roomPrice <= 7500 ? 0.12 : 0.18;
+                                const gstAmount = Math.round(roomPrice * gstRate);
+                                return total + (Math.round(roomPrice + gstAmount) * room.selectedCount);
+                              }, 0)
+                            }
+                          }
+                        });
+                      }}
+                    >
+                      Reserve Selected Rooms
+                    </button>
+                  </div>
+                </td>
+              </tr>
               <tbody className="divide-y divide-gray-200">
                 {Array.isArray(property.rooms) && property.rooms
                   .filter(roomOption => {
@@ -809,34 +909,6 @@ export default function PropertyDetails() {
                           </div>
                         </td>
 
-                        {/* Choices Column */}
-                        <td className="py-6 px-6">
-                          <div className="space-y-2">
-                            {roomOption.instant_payment_enabled === 1 && (
-                              <div className="flex items-center gap-2 text-green-600">
-                                <FaCheck className="text-sm" />
-                                <span>Instant booking available</span>
-                              </div>
-                            )}
-                            {roomOption.free_cancellation_enabled === 1 && (
-                              <div className="flex items-center gap-2 text-green-600">
-                                <FaCheck className="text-sm" />
-                                <span>Free cancellation available</span>
-                              </div>
-                            )}
-                            {roomOption.refundable2 === 1 && (
-                              <div className="flex items-center gap-2 text-green-600">
-                                <FaCheck className="text-sm" />
-                                <span>{roomOption.refund_percent2}% refund {roomOption.days_before2} days before check-in</span>
-                              </div>
-                            )}
-                            <div className="flex items-center gap-2 text-green-600">
-                              <FaCheck className="text-sm" />
-                              <span>No credit card needed</span>
-                            </div>
-                          </div>
-                        </td>
-
                         {/* Select Room Column */}
                         <td className="py-6 px-6">
                           <select
@@ -856,7 +928,6 @@ export default function PropertyDetails() {
                             value={currentSelection}
                           >
                             <option value="0">0</option>
-                            {console.log('rpa_number_of_rooms:', roomOption.rpa_number_of_rooms)}
                             {[...Array(roomOption.rpa_number_of_rooms)].map((_, i) => (
                               <option key={i + 1} value={i + 1}>{i + 1}</option>
                             ))}
@@ -868,43 +939,9 @@ export default function PropertyDetails() {
                           )}
                         </td>
 
-                        {/* Reserve Button Column */}
+                        {/* Remove Reserve Button Column */}
                         <td className="py-6 px-6">
-                          <div className="space-y-4">
-                            <button
-                              className={`w-full font-semibold py-2 px-6 rounded-lg transition-colors ${currentSelection > 0
-                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                }`}
-                              disabled={currentSelection === 0}
-                              onClick={() => {
-                                navigate(`/book/${propertyId}`, {
-                                  state: {
-                                    room: { ...roomOption, selectedCount: currentSelection },
-                                    dates: {
-                                      checkIn: searchParamsState.checkIn,
-                                      checkOut: searchParamsState.checkOut
-                                    },
-                                    guests: {
-                                      adults: searchParamsState.adults,
-                                      children: searchParamsState.children
-                                    },
-                                    price: {
-                                      basePrice: roomPrice,
-                                      gstAmount: roomGstAmount,
-                                      finalPrice: roomFinalPrice
-                                    }
-                                  }
-                                });
-                              }}
-                            >
-                              I'll reserve
-                            </button>
-                            <div className="text-sm text-gray-600">
-                              <div>• It only takes 2 minutes</div>
-                              <div>• Confirmation is immediate</div>
-                            </div>
-                          </div>
+                          {/* Remove the text lines */}
                         </td>
                       </tr>
                     );
