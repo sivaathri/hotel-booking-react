@@ -434,7 +434,17 @@ LEFT JOIN
                     ri.image_paths,
                     rpa.*,
                     rs.*,
-                     rpa.number_of_rooms as rpa_number_of_rooms  -- Explicitly select number_of_rooms from room_pricing_availability
+                    rpa.number_of_rooms as rpa_number_of_rooms,  -- Explicitly select number_of_rooms from room_pricing_availability
+                    rgpd.id as pricing_id,
+                    DATE_FORMAT(rgpd.pricing_date, '%Y-%m-%d') as pricing_date,
+                    rgpd.adults,
+                    rgpd.price,
+                    rgpd.currency,
+                    rgpd.child_age_from,
+                    rgpd.child_age_to,
+                    rgpd.child_price,
+                    DATE_FORMAT(rgpd.created_at, '%Y-%m-%d %H:%i:%s') as created_at,
+                    DATE_FORMAT(rgpd.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at
                 FROM basic_info bi
                 LEFT JOIN facilities_amenities fa ON bi.property_id = fa.property_id
                 LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
@@ -445,6 +455,7 @@ LEFT JOIN
                 LEFT JOIN room_pricing_availability rpa ON rpa.property_id = bi.property_id 
                     AND rpa.floor = rs.floor 
                     AND rpa.room_type = rs.room_type
+                LEFT JOIN room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id
                 WHERE bi.property_id = ?
             `;
 
