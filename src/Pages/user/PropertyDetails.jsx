@@ -246,70 +246,64 @@ export default function PropertyDetails() {
     const numberOfChildren = parseInt(searchParams.get('children')) || 0;
     const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
 
-    // Ensure base_price is a number
-    let price = parseFloat(roomData.base_price) || 0;
-    console.log('Initial base price:', price);
+    // Calculate total price for the entire stay
+    let totalPrice = 0;
+    const startDate = new Date(checkIn);
+    const endDate = new Date(checkOut);
+    
+    // Loop through each day of the stay
+    for (let date = new Date(startDate); date < endDate; date.setDate(date.getDate() + 1)) {
+      const currentDate = date.toISOString().split('T')[0];
+      
+      // Try to find specific pricing for this date
+      if (roomData.pricing_dates && Array.isArray(roomData.pricing_dates)) {
+        const datePricing = roomData.pricing_dates.find(pricing => 
+          pricing.pricing_date === currentDate && 
+          pricing.adults === numberOfAdults
+        );
 
-    // First try to use guest_pricing if available
-    if (roomData.guest_pricing && roomData.guest_pricing.length > 0) {
-      try {
-        // Find matching guest pricing for the current date and number of adults
-        const matchingPricing = roomData.guest_pricing.find(pricing => {
-          const pricingDate = new Date(pricing.pricing_date).toISOString().split('T')[0];
-          const searchDate = checkIn ? new Date(checkIn).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-          return pricingDate === searchDate && pricing.adults === numberOfAdults;
-        });
-
-        if (matchingPricing) {
-          price = Number(matchingPricing.price);
+        if (datePricing) {
+          // Use the specific date pricing
+          totalPrice += parseFloat(datePricing.price);
           
-          // Add child pricing if there are children
-          if (numberOfChildren > 0) {
-            const childPricing = matchingPricing.child_price ? Number(matchingPricing.child_price) : 0;
-            price += childPricing * numberOfChildren;
+          // Add child pricing if available
+          if (numberOfChildren > 0 && datePricing.child_price) {
+            totalPrice += parseFloat(datePricing.child_price) * numberOfChildren;
           }
-          
-          console.log('Using guest pricing:', price);
-          return price;
+          continue;
         }
-      } catch (error) {
-        console.error('Error using guest pricing:', error);
       }
-    }
 
-    // Fallback to occupancy_price_adjustments if guest_pricing not available or no match found
-    if (roomData.occupancy_price_adjustments) {
-      try {
-        let occupancyPricing = JSON.parse(roomData.occupancy_price_adjustments);
-        // Handle double-encoded JSON
-        if (typeof occupancyPricing === 'string') {
-          occupancyPricing = JSON.parse(occupancyPricing);
-        }
+      // If no specific pricing found, use base price
+      let price = parseFloat(roomData.base_price) || 0;
 
-        // Sort by minGuests in descending order to get the highest applicable price
-        const sortedPricing = occupancyPricing.sort((a, b) => b.minGuests - a.minGuests);
-        const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
-
-        if (applicablePricing) {
-          // If adjustment is a percentage, calculate accordingly
-          if (applicablePricing.type === 'percentage') {
-            price = price * (1 + parseFloat(applicablePricing.adjustment) / 100);
-          } else {
-            price = parseFloat(applicablePricing.adjustment);
+      // Apply occupancy adjustments if available
+      if (roomData.occupancy_price_adjustments) {
+        try {
+          let occupancyPricing = JSON.parse(roomData.occupancy_price_adjustments);
+          if (typeof occupancyPricing === 'string') {
+            occupancyPricing = JSON.parse(occupancyPricing);
           }
-          console.log('Applied occupancy adjustment:', price);
-        }
-      } catch (error) {
-        console.error('Error parsing occupancy pricing:', error);
-      }
-    }
 
-    // Add child pricing if there are children and we're using occupancy pricing
-    if (numberOfChildren > 0 && !roomData.guest_pricing) {
-      if (roomData.child_pricing) {
+          const sortedPricing = occupancyPricing.sort((a, b) => b.minGuests - a.minGuests);
+          const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
+
+          if (applicablePricing) {
+            if (applicablePricing.type === 'percentage') {
+              price = price * (1 + parseFloat(applicablePricing.adjustment) / 100);
+            } else {
+              price = parseFloat(applicablePricing.adjustment);
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing occupancy pricing:', error);
+        }
+      }
+
+      // Add child pricing if there are children
+      if (numberOfChildren > 0 && roomData.child_pricing) {
         try {
           let childPricing = JSON.parse(roomData.child_pricing);
-          // Handle double-encoded JSON
           if (typeof childPricing === 'string') {
             childPricing = JSON.parse(childPricing);
           }
@@ -326,17 +320,18 @@ export default function PropertyDetails() {
               } else {
                 price += childPrice;
               }
-              console.log('Added child price:', childPrice);
             }
           });
         } catch (error) {
           console.error('Error calculating child pricing:', error);
         }
       }
+
+      totalPrice += price;
     }
 
     // Ensure we return a valid number
-    return Math.max(0, price);
+    return Math.max(0, totalPrice);
   }, [searchParams]);
 
   // Calculate final prices
