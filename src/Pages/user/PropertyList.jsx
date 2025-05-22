@@ -108,8 +108,8 @@ export default function PropertyList({ properties, loading, error }) {
     let totalPrice = 0;
     let nightlyPrices = [];
 
-    // First try to use guest_pricing if available
-    if (room?.guest_pricing && room.guest_pricing.length > 0) {
+    // First try to use pricing_dates if available
+    if (room?.pricing_dates && room.pricing_dates.length > 0) {
       try {
         // Calculate price for each night (excluding checkout day)
         for (let i = 0; i < nights; i++) {
@@ -119,8 +119,8 @@ export default function PropertyList({ properties, loading, error }) {
 
           console.log(`\nProcessing night ${i + 1} for date: ${dateString}`);
 
-          // Find matching guest pricing for this date and number of adults
-          const matchingPricing = room.guest_pricing.find(pricing => {
+          // Find matching pricing for this date and number of adults
+          const matchingPricing = room.pricing_dates.find(pricing => {
             const pricingDate = new Date(pricing.pricing_date);
             const pricingDateString = pricingDate.toISOString().split('T')[0];
             console.log(`Checking pricing: ${pricingDateString} for ${pricing.adults} adults at ₹${pricing.price}`);
@@ -167,11 +167,11 @@ export default function PropertyList({ properties, loading, error }) {
           nightlyPrices
         };
       } catch (error) {
-        console.error("Error using guest pricing:", error);
+        console.error("Error using pricing dates:", error);
       }
     }
 
-    // Fallback to base price * number of nights if no guest pricing available
+    // Fallback to base price * number of nights if no pricing dates available
     totalPrice = basePrice * nights * numberOfAdults;
     const averagePricePerNight = totalPrice / nights;
 
