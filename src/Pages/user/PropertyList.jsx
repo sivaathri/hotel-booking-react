@@ -116,15 +116,15 @@ export default function PropertyList({ properties, loading, error }) {
 
           if (matchingPricing) {
             totalPrice += Number(matchingPricing.price);
-            
-            // Add child pricing if there are children
-            if (numberOfChildren > 0) {
-              const childPricing = matchingPricing.child_price ? Number(matchingPricing.child_price) : 0;
-              totalPrice += childPricing * numberOfChildren;
-            }
           } else {
-            // If no specific pricing found for this date, use base price
-            totalPrice += basePrice;
+            // If no exact match found, use base price * number of adults
+            totalPrice += basePrice * numberOfAdults;
+          }
+
+          // Add child pricing if there are children
+          if (numberOfChildren > 0) {
+            const childPricing = matchingPricing?.child_price ? Number(matchingPricing.child_price) : 0;
+            totalPrice += childPricing * numberOfChildren;
           }
         }
         

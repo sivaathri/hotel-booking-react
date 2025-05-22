@@ -303,6 +303,7 @@ CREATE TABLE room_pricing_availability (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (property_id) REFERENCES basic_info(property_id) ON DELETE CASCADE
+  
 );
 
 
