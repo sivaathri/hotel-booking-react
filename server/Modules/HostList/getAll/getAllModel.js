@@ -16,7 +16,17 @@ class GetAllInfo {
     ri.image_paths,            -- Explicitly select image_paths from room_images
     rpa.*,                     -- All columns from room_pricing_availability
     rs.*,                      -- All columns from room_setup
-    rpa.number_of_rooms as rpa_number_of_rooms  -- Explicitly select number_of_rooms from room_pricing_availability
+    rpa.number_of_rooms as rpa_number_of_rooms,  -- Explicitly select number_of_rooms from room_pricing_availability
+    rgpd.id as pricing_id,
+    DATE_FORMAT(rgpd.pricing_date, '%Y-%m-%d') as pricing_date,
+    rgpd.adults,
+    rgpd.price,
+    rgpd.currency,
+    rgpd.child_age_from,
+    rgpd.child_age_to,
+    rgpd.child_price,
+    DATE_FORMAT(rgpd.created_at, '%Y-%m-%d %H:%i:%s') as created_at,
+    DATE_FORMAT(rgpd.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at
 FROM 
     basic_info bi
 LEFT JOIN 
@@ -34,7 +44,9 @@ LEFT JOIN
 LEFT JOIN 
     room_pricing_availability rpa ON rpa.property_id = bi.property_id 
     AND rpa.floor = rs.floor 
-    AND rpa.room_type = rs.room_type;
+    AND rpa.room_type = rs.room_type
+LEFT JOIN
+    room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id;
             `;
 
             const [results] = await db.query(query, [userId]);
@@ -70,7 +82,8 @@ LEFT JOIN
                     refund_percent2: result.refund_percent2,
                     refundable3: result.refundable3,
                     days_before3: result.days_before3,
-                    refund_percent3: result.refund_percent3
+                    refund_percent3: result.refund_percent3,
+                    pricing_dates: []
                 };
 
                 if (!propertiesMap.has(result.property_id)) {
@@ -191,6 +204,26 @@ LEFT JOIN
                     if (existingRoomIndex === -1) {
                         // Room doesn't exist, add it
                         property.rooms.push(roomInfo);
+                    }
+                }
+
+                // Add pricing date if it exists
+                if (result.pricing_id) {
+                    const property = propertiesMap.get(result.property_id);
+                    const room = property.rooms.find(r => r.room_id === result.room_id);
+                    if (room) {
+                        room.pricing_dates.push({
+                            id: result.pricing_id,
+                            pricing_date: result.pricing_date,
+                            adults: result.adults,
+                            price: result.price,
+                            currency: result.currency,
+                            child_age_from: result.child_age_from,
+                            child_age_to: result.child_age_to,
+                            child_price: result.child_price,
+                            created_at: result.created_at,
+                            updated_at: result.updated_at
+                        });
                     }
                 }
             });
@@ -448,7 +481,8 @@ LEFT JOIN
                     refund_percent2: result.refund_percent2,
                     refundable3: result.refundable3,
                     days_before3: result.days_before3,
-                    refund_percent3: result.refund_percent3
+                    refund_percent3: result.refund_percent3,
+                    pricing_dates: []
                 };
 
                 if (!propertiesMap.has(result.property_id)) {
@@ -569,6 +603,26 @@ LEFT JOIN
                     if (existingRoomIndex === -1) {
                         // Room doesn't exist, add it
                         property.rooms.push(roomInfo);
+                    }
+                }
+
+                // Add pricing date if it exists
+                if (result.pricing_id) {
+                    const property = propertiesMap.get(result.property_id);
+                    const room = property.rooms.find(r => r.room_id === result.room_id);
+                    if (room) {
+                        room.pricing_dates.push({
+                            id: result.pricing_id,
+                            pricing_date: result.pricing_date,
+                            adults: result.adults,
+                            price: result.price,
+                            currency: result.currency,
+                            child_age_from: result.child_age_from,
+                            child_age_to: result.child_age_to,
+                            child_price: result.child_price,
+                            created_at: result.created_at,
+                            updated_at: result.updated_at
+                        });
                     }
                 }
             });
