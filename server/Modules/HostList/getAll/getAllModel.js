@@ -16,8 +16,7 @@ class GetAllInfo {
     ri.image_paths,            -- Explicitly select image_paths from room_images
     rpa.*,                     -- All columns from room_pricing_availability
     rs.*,                      -- All columns from room_setup
-    rpa.number_of_rooms as rpa_number_of_rooms,  -- Explicitly select number_of_rooms from room_pricing_availability
-    rgpd.*                     -- All columns from room_guest_pricing_dates
+    rpa.number_of_rooms as rpa_number_of_rooms  -- Explicitly select number_of_rooms from room_pricing_availability
 FROM 
     basic_info bi
 LEFT JOIN 
@@ -35,10 +34,7 @@ LEFT JOIN
 LEFT JOIN 
     room_pricing_availability rpa ON rpa.property_id = bi.property_id 
     AND rpa.floor = rs.floor 
-    AND rpa.room_type = rs.room_type
-LEFT JOIN
-    room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id
-    AND rgpd.room_type = rs.room_type;
+    AND rpa.room_type = rs.room_type;
             `;
 
             const [results] = await db.query(query, [userId]);
@@ -51,19 +47,6 @@ LEFT JOIN
             const propertiesMap = new Map();
 
             results.forEach(result => {
-                // Create a guest pricing entry if it exists
-                const guestPricingEntry = result.id ? {
-                    pricing_date: result.pricing_date,
-                    adults: result.adults,
-                    price: result.price,
-                    currency: result.currency,
-                    child_age_from: result.child_age_from,
-                    child_age_to: result.child_age_to,
-                    child_price: result.child_price,
-                    created_at: result.created_at,
-                    updated_at: result.updated_at
-                } : null;
-
                 const roomInfo = {
                     room_id: result.room_id,
                     image_urls: result.image_paths ? JSON.parse(result.image_paths) : [],
@@ -87,8 +70,7 @@ LEFT JOIN
                     refund_percent2: result.refund_percent2,
                     refundable3: result.refundable3,
                     days_before3: result.days_before3,
-                    refund_percent3: result.refund_percent3,
-                    guest_pricing: [] // Initialize as empty array
+                    refund_percent3: result.refund_percent3
                 };
 
                 if (!propertiesMap.has(result.property_id)) {
@@ -209,19 +191,6 @@ LEFT JOIN
                     if (existingRoomIndex === -1) {
                         // Room doesn't exist, add it
                         property.rooms.push(roomInfo);
-                    }
-                    
-                    // Add guest pricing entry to the room if it exists
-                    if (guestPricingEntry) {
-                        const room = property.rooms.find(r => r.room_id === result.room_id);
-                        if (room && !room.guest_pricing.some(p => 
-                            p.pricing_date === guestPricingEntry.pricing_date && 
-                            p.adults === guestPricingEntry.adults &&
-                            p.child_age_from === guestPricingEntry.child_age_from &&
-                            p.child_age_to === guestPricingEntry.child_age_to
-                        )) {
-                            room.guest_pricing.push(guestPricingEntry);
-                        }
                     }
                 }
             });
@@ -456,19 +425,6 @@ LEFT JOIN
             const propertiesMap = new Map();
 
             results.forEach(result => {
-                // Create a guest pricing entry if it exists
-                const guestPricingEntry = result.id ? {
-                    pricing_date: result.pricing_date,
-                    adults: result.adults,
-                    price: result.price,
-                    currency: result.currency,
-                    child_age_from: result.child_age_from,
-                    child_age_to: result.child_age_to,
-                    child_price: result.child_price,
-                    created_at: result.created_at,
-                    updated_at: result.updated_at
-                } : null;
-
                 const roomInfo = {
                     room_id: result.room_id,
                     image_urls: result.image_paths ? JSON.parse(result.image_paths) : [],
@@ -492,8 +448,7 @@ LEFT JOIN
                     refund_percent2: result.refund_percent2,
                     refundable3: result.refundable3,
                     days_before3: result.days_before3,
-                    refund_percent3: result.refund_percent3,
-                    guest_pricing: [] // Initialize as empty array
+                    refund_percent3: result.refund_percent3
                 };
 
                 if (!propertiesMap.has(result.property_id)) {
@@ -614,19 +569,6 @@ LEFT JOIN
                     if (existingRoomIndex === -1) {
                         // Room doesn't exist, add it
                         property.rooms.push(roomInfo);
-                    }
-                    
-                    // Add guest pricing entry to the room if it exists
-                    if (guestPricingEntry) {
-                        const room = property.rooms.find(r => r.room_id === result.room_id);
-                        if (room && !room.guest_pricing.some(p => 
-                            p.pricing_date === guestPricingEntry.pricing_date && 
-                            p.adults === guestPricingEntry.adults &&
-                            p.child_age_from === guestPricingEntry.child_age_from &&
-                            p.child_age_to === guestPricingEntry.child_age_to
-                        )) {
-                            room.guest_pricing.push(guestPricingEntry);
-                        }
                     }
                 }
             });

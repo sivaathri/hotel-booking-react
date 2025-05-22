@@ -91,45 +91,81 @@ export default function PropertyList({ properties, loading, error }) {
     const checkIn = searchParams.get("checkIn");
     const checkOut = searchParams.get("checkOut");
 
-    // Calculate total nights
+    // Calculate total nights (excluding checkout day)
     const start = new Date(checkIn);
     const end = new Date(checkOut);
     const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
 
+    console.log("Stay details:", {
+      checkIn,
+      checkOut,
+      nights,
+      numberOfAdults,
+      numberOfChildren
+    });
+
     // Start with base price
     let totalPrice = 0;
+    let nightlyPrices = [];
 
     // First try to use guest_pricing if available
     if (room?.guest_pricing && room.guest_pricing.length > 0) {
       try {
-        // Calculate price for each night
+        // Calculate price for each night (excluding checkout day)
         for (let i = 0; i < nights; i++) {
           const currentDate = new Date(start);
           currentDate.setDate(start.getDate() + i);
           const dateString = currentDate.toISOString().split('T')[0];
 
+          console.log(`\nProcessing night ${i + 1} for date: ${dateString}`);
+
           // Find matching guest pricing for this date and number of adults
           const matchingPricing = room.guest_pricing.find(pricing => {
-            const pricingDate = new Date(pricing.pricing_date).toISOString().split('T')[0];
-            return pricingDate === dateString && pricing.adults === numberOfAdults;
+            const pricingDate = new Date(pricing.pricing_date);
+            const pricingDateString = pricingDate.toISOString().split('T')[0];
+            console.log(`Checking pricing: ${pricingDateString} for ${pricing.adults} adults at ₹${pricing.price}`);
+            return pricingDateString === dateString && pricing.adults === numberOfAdults;
           });
 
           if (matchingPricing) {
-            totalPrice += Number(matchingPricing.price);
+            // Add the price for this specific night
+            const nightPrice = Number(matchingPricing.price);
+            totalPrice += nightPrice;
+            nightlyPrices.push(nightPrice);
+            console.log(`Found matching price for ${dateString}: ${nightPrice}`);
           } else {
             // If no exact match found, use base price * number of adults
-            totalPrice += basePrice * numberOfAdults;
+            const nightPrice = basePrice * numberOfAdults;
+            totalPrice += nightPrice;
+            nightlyPrices.push(nightPrice);
+            console.log(`No matching price found for ${dateString}, using base price: ${nightPrice}`);
           }
 
           // Add child pricing if there are children
           if (numberOfChildren > 0) {
             const childPricing = matchingPricing?.child_price ? Number(matchingPricing.child_price) : 0;
-            totalPrice += childPricing * numberOfChildren;
+            const childPrice = childPricing * numberOfChildren;
+            totalPrice += childPrice;
+            console.log(`Child price for ${dateString}: ${childPrice}`);
           }
         }
+
+        // Calculate average price per night
+        const averagePricePerNight = totalPrice / nights;
         
-        console.log("Total price for all nights:", totalPrice);
-        return totalPrice;
+        console.log("Price breakdown:", {
+          nightlyPrices,
+          totalPrice,
+          averagePricePerNight,
+          nights
+        });
+
+        return {
+          totalPrice,
+          averagePricePerNight,
+          nights,
+          nightlyPrices
+        };
       } catch (error) {
         console.error("Error using guest pricing:", error);
       }
@@ -137,49 +173,14 @@ export default function PropertyList({ properties, loading, error }) {
 
     // Fallback to base price * number of nights if no guest pricing available
     totalPrice = basePrice * nights * numberOfAdults;
+    const averagePricePerNight = totalPrice / nights;
 
-    // Add child pricing if there are children
-    if (numberOfChildren > 0) {
-      if (room?.child_pricing) {
-        try {
-          let childPricing;
-          try {
-            childPricing = JSON.parse(room.child_pricing);
-            if (typeof childPricing === "string") {
-              childPricing = JSON.parse(childPricing);
-            }
-          } catch (e) {
-            console.error("Error parsing child pricing:", e);
-            childPricing = [];
-          }
-
-          let childPrice = 0;
-          childrenAges.forEach((age) => {
-            const applicablePricing = childPricing.find(
-              (p) => age >= p.ageFrom && age <= p.ageTo
-            );
-            if (applicablePricing) {
-              childPrice += Number(applicablePricing.price);
-            } else {
-              childPrice += basePrice;
-            }
-          });
-
-          // Add child price to total
-          totalPrice += childPrice;
-          console.log("Child price:", childPrice);
-        } catch (error) {
-          console.error("Error calculating child pricing:", error);
-          // Fallback to base price multiplication if there's an error
-          totalPrice += basePrice * numberOfChildren;
-        }
-      } else {
-        // If no child pricing specified, multiply base price by number of children
-        totalPrice += basePrice * numberOfChildren;
-      }
-    }
-
-    return totalPrice;
+    return {
+      totalPrice,
+      averagePricePerNight,
+      nights,
+      nightlyPrices: Array(nights).fill(basePrice * numberOfAdults)
+    };
   };
 
   // Helper function to calculate GST
@@ -273,8 +274,8 @@ export default function PropertyList({ properties, loading, error }) {
 
         // Get the first room for initial pricing calculation
         const firstRoom = property.rooms?.[0] || {};
-        const price = calculatePrice(property, firstRoom);
-        const gst = calculateGST(price);
+        const priceDetails = calculatePrice(property, firstRoom);
+        const gst = calculateGST(priceDetails.totalPrice);
 
         // Get data from API response
         const reviews = property.reviews_count || 0;
@@ -535,19 +536,18 @@ export default function PropertyList({ properties, loading, error }) {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-gray-700">{ratingText}</span>
                   <span className="bg-orange-500 text-white font-bold px-3 py-1 rounded-2xl text-lg border border-white">
-  {rating}
-</span>
-
+                    {rating}
+                  </span>
                 </div>
                 <span className="text-xs text-gray-500 mb-2">
                   {reviews} reviews
                 </span>
 
-                <span className="text-2xl  font-bold text-gray-900 mb-1">
-                  ₹ {price.toLocaleString("en-IN")}
+                <span className="text-2xl font-bold text-gray-900 mb-1">
+                  ₹ {priceDetails.totalPrice.toLocaleString("en-IN")}
                 </span>
                 <span className="text-xs text-gray-500 mb-2">
-                  {nights} night, {adults} adults
+                  {priceDetails.nights} nights, {adults} adults
                 </span>
                 <span className="text-sm text-gray-500 mb-1">
                   + ₹ {gst.amount.toLocaleString("en-IN")} taxes and charges
