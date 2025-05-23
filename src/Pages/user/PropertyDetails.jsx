@@ -330,8 +330,8 @@ export default function PropertyDetails() {
       totalPrice += price;
     }
 
-    // Ensure we return a valid number
-    return Math.max(0, totalPrice);
+    // Ensure we return a valid number and multiply by 10 to match PropertyList.jsx
+    return Math.max(0, totalPrice * 10);
   }, [searchParams]);
 
   // Calculate final prices
