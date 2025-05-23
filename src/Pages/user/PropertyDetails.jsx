@@ -246,92 +246,112 @@ export default function PropertyDetails() {
     const numberOfChildren = parseInt(searchParams.get('children')) || 0;
     const childrenAges = JSON.parse(searchParams.get('childrenAges') || '[]');
 
-    // Calculate total price for the entire stay
+    // Calculate total nights (excluding checkout day)
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+    console.log("Stay details:", {
+      checkIn,
+      checkOut,
+      nights,
+      numberOfAdults,
+      numberOfChildren
+    });
+
+    // Start with base price
     let totalPrice = 0;
-    const startDate = new Date(checkIn);
-    const endDate = new Date(checkOut);
-    
-    // Loop through each day of the stay
-    for (let date = new Date(startDate); date < endDate; date.setDate(date.getDate() + 1)) {
-      const currentDate = date.toISOString().split('T')[0];
-      
-      // Try to find specific pricing for this date
-      if (roomData.pricing_dates && Array.isArray(roomData.pricing_dates)) {
-        const datePricing = roomData.pricing_dates.find(pricing => 
-          pricing.pricing_date === currentDate && 
-          pricing.adults === numberOfAdults
-        );
+    let nightlyPrices = [];
 
-        if (datePricing) {
-          // Use the specific date pricing
-          totalPrice += parseFloat(datePricing.price);
-          
-          // Add child pricing if available
-          if (numberOfChildren > 0 && datePricing.child_price) {
-            totalPrice += parseFloat(datePricing.child_price) * numberOfChildren;
-          }
-          continue;
-        }
-      }
+    // First try to use pricing_dates if available
+    if (roomData.pricing_dates && roomData.pricing_dates.length > 0) {
+      try {
+        // Calculate price for each night (excluding checkout day)
+        for (let i = 0; i < nights; i++) {
+          const currentDate = new Date(start);
+          currentDate.setDate(start.getDate() + i);
+          const dateString = currentDate.toISOString().split('T')[0];
 
-      // If no specific pricing found, use base price
-      let price = parseFloat(roomData.base_price) || 0;
+          console.log(`\nProcessing night ${i + 1} for date: ${dateString}`);
 
-      // Apply occupancy adjustments if available
-      if (roomData.occupancy_price_adjustments) {
-        try {
-          let occupancyPricing = JSON.parse(roomData.occupancy_price_adjustments);
-          if (typeof occupancyPricing === 'string') {
-            occupancyPricing = JSON.parse(occupancyPricing);
-          }
-
-          const sortedPricing = occupancyPricing.sort((a, b) => b.minGuests - a.minGuests);
-          const applicablePricing = sortedPricing.find(p => numberOfAdults >= p.minGuests);
-
-          if (applicablePricing) {
-            if (applicablePricing.type === 'percentage') {
-              price = price * (1 + parseFloat(applicablePricing.adjustment) / 100);
-            } else {
-              price = parseFloat(applicablePricing.adjustment);
-            }
-          }
-        } catch (error) {
-          console.error('Error parsing occupancy pricing:', error);
-        }
-      }
-
-      // Add child pricing if there are children
-      if (numberOfChildren > 0 && roomData.child_pricing) {
-        try {
-          let childPricing = JSON.parse(roomData.child_pricing);
-          if (typeof childPricing === 'string') {
-            childPricing = JSON.parse(childPricing);
-          }
-
-          childrenAges.forEach(age => {
-            const applicablePricing = childPricing.find(p =>
-              age >= p.ageFrom && age <= p.ageTo
-            );
-
-            if (applicablePricing) {
-              const childPrice = parseFloat(applicablePricing.price);
-              if (applicablePricing.type === 'percentage') {
-                price += (price * childPrice) / 100;
-              } else {
-                price += childPrice;
-              }
-            }
+          // Find matching pricing for this date and number of adults
+          const matchingPricing = roomData.pricing_dates.find(pricing => {
+            const pricingDate = new Date(pricing.pricing_date);
+            const pricingDateString = pricingDate.toISOString().split('T')[0];
+            console.log(`Checking pricing: ${pricingDateString} for ${pricing.adults} adults at ₹${pricing.price}`);
+            return pricingDateString === dateString && pricing.adults === numberOfAdults;
           });
-        } catch (error) {
-          console.error('Error calculating child pricing:', error);
-        }
-      }
 
-      totalPrice += price;
+          if (matchingPricing) {
+            // Add the price for this specific night
+            const nightPrice = Number(matchingPricing.price);
+            totalPrice += nightPrice;
+            nightlyPrices.push(nightPrice);
+            console.log(`Found matching price for ${dateString}: ${nightPrice}`);
+          } else {
+            // If no exact match found, use base price * number of adults
+            const nightPrice = roomData.base_price * numberOfAdults;
+            totalPrice += nightPrice;
+            nightlyPrices.push(nightPrice);
+            console.log(`No matching price found for ${dateString}, using base price: ${nightPrice}`);
+          }
+
+          // Add child pricing if there are children
+          if (numberOfChildren > 0) {
+            const childPricing = matchingPricing?.child_price ? Number(matchingPricing.child_price) : 0;
+            const childPrice = childPricing * numberOfChildren;
+            totalPrice += childPrice;
+            console.log(`Child price for ${dateString}: ${childPrice}`);
+          }
+        }
+
+        // Calculate average price per night
+        const averagePricePerNight = totalPrice / nights;
+        
+        console.log("Price breakdown:", {
+          nightlyPrices,
+          totalPrice,
+          averagePricePerNight,
+          nights
+        });
+
+        return totalPrice;
+      } catch (error) {
+        console.error("Error using pricing dates:", error);
+      }
     }
 
-    // Ensure we return a valid number and multiply by 10 to match PropertyList.jsx
-    return Math.max( totalPrice);
+    // Fallback to base price * number of nights if no pricing dates available
+    totalPrice = roomData.base_price * nights * numberOfAdults;
+
+    // Add child pricing if there are children
+    if (numberOfChildren > 0 && roomData.child_pricing) {
+      try {
+        let childPricing = JSON.parse(roomData.child_pricing);
+        if (typeof childPricing === 'string') {
+          childPricing = JSON.parse(childPricing);
+        }
+
+        childrenAges.forEach(age => {
+          const applicablePricing = childPricing.find(p =>
+            age >= p.ageFrom && age <= p.ageTo
+          );
+
+          if (applicablePricing) {
+            const childPrice = parseFloat(applicablePricing.price);
+            if (applicablePricing.type === 'percentage') {
+              totalPrice += (totalPrice * childPrice) / 100;
+            } else {
+              totalPrice += childPrice * nights;
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error calculating child pricing:', error);
+      }
+    }
+
+    return totalPrice;
   }, [searchParams]);
 
   // Calculate final prices
@@ -339,6 +359,18 @@ export default function PropertyDetails() {
   const gstRate = basePrice <= 7500 ? 0.12 : 0.18;
   const gstAmount = Math.round(basePrice * gstRate);
   const finalPrice = Math.round(basePrice + gstAmount);
+
+  // Add helper function to calculate GST
+  const calculateGST = (price) => {
+    const numericPrice = Number(price) || 0;
+    const gstRate = numericPrice <= 7500 ? 0.12 : 0.18;
+    const gstAmount = numericPrice * gstRate;
+    return {
+      rate: gstRate * 100,
+      amount: Math.round(gstAmount),
+      total: Math.round(numericPrice + gstAmount),
+    };
+  };
 
   // Add scroll handler for rules modal
   const handleRulesModalScroll = useCallback(() => {
@@ -425,22 +457,20 @@ export default function PropertyDetails() {
           }
           
           const roomPrice = calculatePrice(room);
-          const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-          const roomGstAmount = Math.round(roomPrice * roomGstRate);
-          const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+          const gst = calculateGST(roomPrice);
           
           console.log('Room price details:', {
             roomId,
             roomType: room.room_type,
             roomPrice,
-            roomGstRate,
-            roomGstAmount,
-            roomFinalPrice,
+            gstRate: gst.rate,
+            gstAmount: gst.amount,
+            finalPrice: gst.total,
             count,
-            subtotal: roomFinalPrice * count
+            subtotal: gst.total * count
           });
           
-          return total + (roomFinalPrice * count);
+          return total + (gst.total * count);
         }, 0);
       
       console.log('Final calculated total:', total);
@@ -450,7 +480,7 @@ export default function PropertyDetails() {
     if (property?.rooms) {
       calculateTotal();
     }
-  }, [roomSelections, property]);
+  }, [roomSelections, property, calculatePrice]);
 
   // Update the room selection handler
   const handleRoomSelection = (roomId, count) => {
@@ -1007,157 +1037,155 @@ export default function PropertyDetails() {
                   })
                   .map((roomOption, index) => {
                     const roomPrice = calculatePrice(roomOption);
-                    const roomGstRate = roomPrice <= 7500 ? 0.12 : 0.18;
-                    const roomGstAmount = Math.round(roomPrice * roomGstRate);
-                    const roomFinalPrice = Math.round(roomPrice + roomGstAmount);
+                    const gst = calculateGST(roomPrice);
                     const currentSelection = roomSelections[roomOption.room_id] || 0;
                     const searchedAdults = parseInt(searchParamsState.adults) || 1;
                     const searchedChildren = parseInt(searchParamsState.children) || 0;
                     const totalSearchedGuests = searchedAdults + searchedChildren;
 
                     return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-white rounded-xl border border-gray-200 hover:border-blue-200 transition-all duration-300 overflow-hidden"
-                  >
-                    <div className="p-6">
-                      <div className="flex justify-between items-start">
-                        {/* Left Column - Room Details */}
-                        <div className="flex-1 space-y-4">
-                            <div>
-                            <motion.h3
-                              whileHover={{ scale: 1.02 }}
-                              className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-300"
-                            >
-                                {roomOption.room_type.split('_')[0]} - {property.property_type}
-                                {roomOption.floor > 0 && ` - Floor ${roomOption.floor}`}
-                            </motion.h3>
-                              {totalSearchedGuests <= roomOption.total_capacity && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="mt-2 inline-flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full"
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white rounded-xl border border-gray-200 hover:border-blue-200 transition-all duration-300 overflow-hidden"
+                      >
+                        <div className="p-6">
+                          <div className="flex justify-between items-start">
+                            {/* Left Column - Room Details */}
+                            <div className="flex-1 space-y-4">
+                              <div>
+                                <motion.h3
+                                  whileHover={{ scale: 1.02 }}
+                                  className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-300"
+                                >
+                                  {roomOption.room_type.split('_')[0]} - {property.property_type}
+                                  {roomOption.floor > 0 && ` - Floor ${roomOption.floor}`}
+                                </motion.h3>
+                                {totalSearchedGuests <= roomOption.total_capacity && (
+                                  <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="mt-2 inline-flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full"
+                                  >
+                                    <FaCheck className="text-green-500" />
+                                    Recommended for {totalSearchedGuests} {totalSearchedGuests === 1 ? 'guest' : 'guests'}
+                                  </motion.div>
+                                )}
+                              </div>
+
+                              {/* Room Features Grid */}
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <FaBed className="text-blue-500" />
+                                    <span>{roomOption.room_type.split('_')[0]} Bedroom</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <FaUser className="text-blue-500" />
+                                    <span>Max {roomOption.total_capacity} guests</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <FaRuler className="text-blue-500" />
+                                    <span>{roomOption.room_type.includes("2BHK") ? "1000" : "1500"} m²</span>
+                                  </div>
+                                </div>
+                                <div className="space-y-3">
+                                  {property.facilities && Object.entries(property.facilities)
+                                    .filter(([_, value]) => value === 1)
+                                    .slice(0, 3)
+                                    .map(([facility, _]) => {
+                                      const facilityMap = {
+                                        free_wifi: { icon: <FaWifi className="text-blue-500" />, label: 'Free WiFi' },
+                                        air_conditioning: { icon: <FaSnowflake className="text-blue-500" />, label: 'Air Conditioning' },
+                                        tv: { icon: <MdTv className="text-blue-500" />, label: 'TV' },
+                                      };
+
+                                      const facilityInfo = facilityMap[facility];
+                                      if (facilityInfo) {
+                                        return (
+                                          <div key={facility} className="flex items-center gap-2 text-gray-600">
+                                            {facilityInfo.icon}
+                                            <span>{facilityInfo.label}</span>
+                                          </div>
+                                        );
+                                      }
+                                      return null;
+                                    })}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Right Column - Price and Selection */}
+                            <div className="ml-8 flex flex-col items-end space-y-4">
+                              <div className="text-right">
+                                <div className="text-2xl font-bold text-gray-900">
+                                  ₹ {(roomPrice * (currentSelection || 1)).toLocaleString('en-IN')}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  + ₹ {(gst.amount * (currentSelection || 1)).toLocaleString('en-IN')} taxes
+                                </div>
+                                {roomOption.free_cancellation_enabled === 1 && (
+                                  <div className="text-green-600 text-sm mt-1 flex items-center gap-1">
+                                    <FaCheck />
+                                    Free cancellation
+                                  </div>
+                                )}
+                              </div>
+
+                              <motion.select
+                                whileHover={{ scale: 1.02 }}
+                                className="w-48 border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                                onChange={(e) => {
+                                  const count = parseInt(e.target.value);
+                                  handleRoomSelection(roomOption.room_id, count);
+                                  if (count > 0) {
+                                    setSelectedRoom({ ...roomOption, selectedCount: count });
+                                  } else {
+                                    setSelectedRoom(null);
+                                  }
+                                }}
+                                value={currentSelection}
                               >
-                                <FaCheck className="text-green-500" />
-                                  Recommended for {totalSearchedGuests} {totalSearchedGuests === 1 ? 'guest' : 'guests'}
-                              </motion.div>
+                                <option value="0">Select rooms</option>
+                                {[...Array(roomOption.rpa_number_of_rooms)].map((_, i) => {
+                                  const numberOfRooms = i + 1;
+                                  const roomPrice = calculatePrice(roomOption);
+                                  const gst = calculateGST(roomPrice);
+                                  const totalPrice = gst.total * numberOfRooms;
+                                  return (
+                                    <option key={i + 1} value={i + 1}>
+                                      {numberOfRooms} room{numberOfRooms > 1 ? 's' : ''} - ₹{totalPrice.toLocaleString('en-IN')}
+                                    </option>
+                                  );
+                                })}
+                              </motion.select>
+
+                              {/* Update debug information */}
+                              <div className="text-xs text-gray-500 mt-1">
+                                Selected rooms: {Object.entries(roomSelections)
+                                  .filter(([_, count]) => count > 0)
+                                  .map(([roomId, count]) => {
+                                    const room = property.rooms.find(r => r.room_id === roomId);
+                                    return `${room?.room_type?.split('_')[0] || 'Room'} (${count})`;
+                                  }).join(', ')}
+                              </div>
+
+                              {roomOption.rpa_number_of_rooms <= 3 && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="text-red-600 text-sm font-medium flex items-center gap-1"
+                                >
+                                  <FaBell className="text-red-500" />
+                                  Only {roomOption.rpa_number_of_rooms} {roomOption.rpa_number_of_rooms === 1 ? 'room' : 'rooms'} left!
+                                </motion.div>
                               )}
                             </div>
-
-                          {/* Room Features Grid */}
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <FaBed className="text-blue-500" />
-                                <span>{roomOption.room_type.split('_')[0]} Bedroom</span>
-                                  </div>
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <FaUser className="text-blue-500" />
-                                <span>Max {roomOption.total_capacity} guests</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <FaRuler className="text-blue-500" />
-                                <span>{roomOption.room_type.includes("2BHK") ? "1000" : "1500"} m²</span>
-                              </div>
-                              </div>
-                            <div className="space-y-3">
-                              {property.facilities && Object.entries(property.facilities)
-                                .filter(([_, value]) => value === 1)
-                                .slice(0, 3)
-                                .map(([facility, _]) => {
-                                  const facilityMap = {
-                                    free_wifi: { icon: <FaWifi className="text-blue-500" />, label: 'Free WiFi' },
-                                    air_conditioning: { icon: <FaSnowflake className="text-blue-500" />, label: 'Air Conditioning' },
-                                    tv: { icon: <MdTv className="text-blue-500" />, label: 'TV' },
-                                    // ... (keep other facility mappings)
-                                  };
-
-                                  const facilityInfo = facilityMap[facility];
-                                  if (facilityInfo) {
-                                    return (
-                                      <div key={facility} className="flex items-center gap-2 text-gray-600">
-                                        {facilityInfo.icon}
-                                        <span>{facilityInfo.label}</span>
-                                </div>
-                                    );
-                                  }
-                                  return null;
-                                })}
-                                </div>
-                                </div>
-                                </div>
-
-                        {/* Right Column - Price and Selection */}
-                        <div className="ml-8 flex flex-col items-end space-y-4">
-                                <div className="text-right">
-                            <div className="text-2xl font-bold text-gray-900">
-                              ₹ {(roomPrice * (currentSelection || 1)).toLocaleString('en-IN')}
-                                </div>
-                            <div className="text-sm text-gray-500">
-                              + ₹ {(roomGstAmount * (currentSelection || 1)).toLocaleString('en-IN')} taxes
-                              </div>
-                            {roomOption.free_cancellation_enabled === 1 && (
-                              <div className="text-green-600 text-sm mt-1 flex items-center gap-1">
-                                <FaCheck />
-                                Free cancellation
-                              </div>
-                            )}
                           </div>
-
-                          <motion.select
-                            whileHover={{ scale: 1.02 }}
-                            className="w-48 border rounded-lg p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-                            onChange={(e) => {
-                              const count = parseInt(e.target.value);
-                              handleRoomSelection(roomOption.room_id, count);
-                              if (count > 0) {
-                                setSelectedRoom({ ...roomOption, selectedCount: count });
-                              } else {
-                                setSelectedRoom(null);
-                              }
-                            }}
-                            value={currentSelection}
-                          >
-                            <option value="0">Select rooms</option>
-                            {[...Array(roomOption.rpa_number_of_rooms)].map((_, i) => {
-                              const numberOfRooms = i + 1;
-                              const roomPrice = calculatePrice(roomOption);
-                              const totalPrice = roomPrice * numberOfRooms;
-                              return (
-                                <option key={i + 1} value={i + 1}>
-                                  {numberOfRooms} room{numberOfRooms > 1 ? 's' : ''} - ₹{totalPrice.toLocaleString('en-IN')}
-                                </option>
-                              );
-                            })}
-                          </motion.select>
-
-                          {/* Update debug information */}
-                          <div className="text-xs text-gray-500 mt-1">
-                            Selected rooms: {Object.entries(roomSelections)
-                              .filter(([_, count]) => count > 0)
-                              .map(([roomId, count]) => {
-                                const room = property.rooms.find(r => r.room_id === roomId);
-                                return `${room?.room_type?.split('_')[0] || 'Room'} (${count})`;
-                              }).join(', ')}
-                          </div>
-
-                          {roomOption.rpa_number_of_rooms <= 3 && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="text-red-600 text-sm font-medium flex items-center gap-1"
-                            >
-                              <FaBell className="text-red-500" />
-                              Only {roomOption.rpa_number_of_rooms} {roomOption.rpa_number_of_rooms === 1 ? 'room' : 'rooms'} left!
-                            </motion.div>
-                          )}
-                            </div>
-                          </div>
-                    </div>
-                  </motion.div>
+                        </div>
+                      </motion.div>
                     );
                   })}
 
