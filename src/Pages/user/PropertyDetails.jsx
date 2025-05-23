@@ -1548,7 +1548,7 @@ export default function PropertyDetails() {
                         </div>
                       </div>
                       <p className="mt-2 text-gray-700">
-                        Excellent stay! The staff was very friendly and the facilities were top-notch. Would definitely recommend this property to others.
+                        Excellent stay! The staff was very friendly and the facilities  were top-notch. Would definitely recommend this property to others.
                       </p>
                     </div>
                   </div>
