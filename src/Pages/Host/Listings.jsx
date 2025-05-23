@@ -19,7 +19,7 @@ const Listings = () => {
       if (!user?.id) return;
       
       try {
-        const response = await axios.get(`http://localhost:3000/api/getall/${user.id}`, {
+        const response = await axios.get(`${API_URL}/getall/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
