@@ -1153,7 +1153,7 @@ export default function PropertyDetails() {
                                   const numberOfRooms = i + 1;
                                   const roomPrice = calculatePrice(roomOption);
                                   const gst = calculateGST(roomPrice);
-                                  const totalPrice = gst.total * numberOfRooms;
+                                  const totalPrice = roomPrice * numberOfRooms;
                                   return (
                                     <option key={i + 1} value={i + 1}>
                                       {numberOfRooms} room{numberOfRooms > 1 ? 's' : ''} - ₹{totalPrice.toLocaleString('en-IN')}
