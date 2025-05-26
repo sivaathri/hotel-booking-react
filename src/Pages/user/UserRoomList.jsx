@@ -291,7 +291,7 @@ export default function UserRoomList() {
       
       </div>
       {/* Carousel End */}
-      <div className='mt-2'>
+      <div className='mt-2 relative z-[999]'>
       <HomeSearchBar />
       </div>
    
