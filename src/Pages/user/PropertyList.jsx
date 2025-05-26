@@ -202,9 +202,14 @@ export default function PropertyList({ properties, loading, error }) {
     return type.split("_")[0] || "Double Room";
   };
 
-  // Add function to check if room is available for selected dates
+  // Add function to check if room is available for selected dates and calculate remaining rooms
   const isRoomAvailable = (room, checkIn, checkOut) => {
-    if (!room.bookings || !room.bookings.length) return true;
+    if (!room.bookings || !room.bookings.length) {
+      return {
+        isAvailable: true,
+        remainingRooms: room.number_of_rooms || 1
+      };
+    }
     
     const requestedStart = new Date(checkIn);
     const requestedEnd = new Date(checkOut);
@@ -222,7 +227,7 @@ export default function PropertyList({ properties, loading, error }) {
       );
     });
     
-    // If there's an overlap, check if there are enough rooms available
+    // If there's an overlap, calculate remaining rooms
     if (hasOverlap) {
       const totalRooms = room.number_of_rooms || 1;
       const bookedRooms = room.bookings.reduce((total, booking) => {
@@ -232,10 +237,17 @@ export default function PropertyList({ properties, loading, error }) {
         return total;
       }, 0);
       
-      return bookedRooms < totalRooms;
+      const remainingRooms = totalRooms - bookedRooms;
+      return {
+        isAvailable: remainingRooms > 0,
+        remainingRooms: remainingRooms
+      };
     }
     
-    return true;
+    return {
+      isAvailable: true,
+      remainingRooms: room.number_of_rooms || 1
+    };
   };
 
   if (loading) {
@@ -304,9 +316,14 @@ export default function PropertyList({ properties, loading, error }) {
     <div className="w-full lg:w-4/5">
       {properties.map((property) => {
         // Filter out rooms that are not available for the selected dates
-        const availableRooms = property.rooms?.filter(room => 
-          isRoomAvailable(room, searchParams.get('checkIn'), searchParams.get('checkOut'))
-        ) || [];
+        const availableRooms = property.rooms?.map(room => {
+          const availability = isRoomAvailable(room, searchParams.get('checkIn'), searchParams.get('checkOut'));
+          return {
+            ...room,
+            rpa_number_of_rooms: availability.remainingRooms,
+            isAvailable: availability.isAvailable
+          };
+        }).filter(room => room.isAvailable) || [];
         
         // Skip this property if no rooms are available
         if (availableRooms.length === 0) return null;
