@@ -157,6 +157,40 @@ const mockReviews = {
   ],
 };
 
+// Add function to calculate available rooms based on bookings
+const calculateAvailableRooms = (room, checkIn, checkOut) => {
+  // If no bookings, all rooms are available
+  if (!room.bookings || !room.bookings.length) {
+    return room.rpa_number_of_rooms || 0;
+  }
+  
+  const requestedStart = new Date(checkIn);
+  const requestedEnd = new Date(checkOut);
+  
+  // Calculate total rooms and booked rooms for the requested dates
+  const totalRooms = room.rpa_number_of_rooms || 0;
+  let bookedRooms = 0;
+  
+  // Check each booking for date overlap
+  room.bookings.forEach(booking => {
+    const bookingStart = new Date(booking.check_in_date);
+    const bookingEnd = new Date(booking.check_out_date);
+    
+    // Check if booking overlaps with requested dates
+    const hasOverlap = (
+      (requestedStart >= bookingStart && requestedStart < bookingEnd) ||
+      (requestedEnd > bookingStart && requestedEnd <= bookingEnd) ||
+      (requestedStart <= bookingStart && requestedEnd >= bookingEnd)
+    );
+    
+    if (hasOverlap) {
+      bookedRooms += (booking.number_of_rooms_Book || 1);
+    }
+  });
+  
+  return Math.max(0, totalRooms - bookedRooms);
+};
+
 export default function PropertyDetails() {
   const { propertyId } = useParams();
   const location = useLocation();
@@ -1150,7 +1184,7 @@ export default function PropertyDetails() {
                                 value={currentSelection}
                               >
                                 <option value="0">Select rooms</option>
-                                {[...Array(roomOption.rpa_number_of_rooms)].map((_, i) => {
+                                {[...Array(calculateAvailableRooms(roomOption, searchParamsState.checkIn, searchParamsState.checkOut))].map((_, i) => {
                                   const numberOfRooms = i + 1;
                                   const roomPrice = calculatePrice(roomOption);
                                   const gst = calculateGST(roomPrice);

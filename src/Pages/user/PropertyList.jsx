@@ -204,49 +204,44 @@ export default function PropertyList({ properties, loading, error }) {
 
   // Add function to check if room is available for selected dates and calculate remaining rooms
   const isRoomAvailable = (room, checkIn, checkOut) => {
+    // If no bookings, all rooms are available
     if (!room.bookings || !room.bookings.length) {
       return {
         isAvailable: true,
-        remainingRooms: room.number_of_rooms || 1
+        remainingRooms: room.rpa_number_of_rooms || 1
       };
     }
     
     const requestedStart = new Date(checkIn);
     const requestedEnd = new Date(checkOut);
     
-    // Check if any booking overlaps with the requested dates
-    const hasOverlap = room.bookings.some(booking => {
+    // Calculate total rooms and booked rooms for the requested dates
+    const totalRooms = room.rpa_number_of_rooms || 1;
+    let bookedRooms = 0;
+    
+    // Check each booking for date overlap
+    room.bookings.forEach(booking => {
       const bookingStart = new Date(booking.check_in_date);
       const bookingEnd = new Date(booking.check_out_date);
       
-      // Check if the booking overlaps with the requested dates
-      return (
+      // Check if booking overlaps with requested dates
+      const hasOverlap = (
         (requestedStart >= bookingStart && requestedStart < bookingEnd) ||
         (requestedEnd > bookingStart && requestedEnd <= bookingEnd) ||
         (requestedStart <= bookingStart && requestedEnd >= bookingEnd)
       );
+      
+      if (hasOverlap) {
+        bookedRooms += (booking.number_of_rooms_Book || 1);
+      }
     });
     
-    // If there's an overlap, calculate remaining rooms
-    if (hasOverlap) {
-      const totalRooms = room.number_of_rooms || 1;
-      const bookedRooms = room.bookings.reduce((total, booking) => {
-        if (booking.check_in_date <= checkOut && booking.check_out_date >= checkIn) {
-          return total + (booking.number_of_rooms_Book || 1);
-        }
-        return total;
-      }, 0);
-      
-      const remainingRooms = totalRooms - bookedRooms;
-      return {
-        isAvailable: remainingRooms > 0,
-        remainingRooms: remainingRooms
-      };
-    }
+    const remainingRooms = totalRooms - bookedRooms;
     
+    // Room is available if there are any remaining rooms
     return {
-      isAvailable: true,
-      remainingRooms: room.number_of_rooms || 1
+      isAvailable: remainingRooms > 0,
+      remainingRooms: remainingRooms
     };
   };
 
@@ -344,7 +339,7 @@ export default function PropertyList({ properties, loading, error }) {
         const breakfastIncluded = firstRoom.breakfast_included ?? false;
         const freeCancellation = firstRoom.free_cancellation_enabled === 1;
         const instantPayment = firstRoom.instant_payment_enabled === 1;
-        const urgencyMsg = "Only 3 rooms left at this price on our site";
+        const urgencyMsg = firstRoom.rpa_number_of_rooms <= 2 ? `Only ${firstRoom.rpa_number_of_rooms} rooms left at this price` : "";
         const tag = property.property_type || "";
         const bedType = firstRoom.bed_type || "1 single bed";
         const city = property.location?.city || "";
