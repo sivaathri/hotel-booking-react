@@ -301,9 +301,9 @@ const UserBookRoom = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition-shadow shadow-md"
+            className="w-full py-3 bg-orange-600 text-white rounded-lg font-semibold text-lg hover:bg-orange-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition-shadow shadow-md"
           >
-            Confirm Booking
+          Continue
           </button>
         </form>
       </div>
