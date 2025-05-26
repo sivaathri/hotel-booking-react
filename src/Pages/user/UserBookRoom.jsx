@@ -69,7 +69,7 @@ const UserBookRoom = () => {
     return (
       <>
         <Header />
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center  justify-center min-h-screen">
           <motion.div
             className="rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
             animate={{ rotate: 360 }}
@@ -133,7 +133,7 @@ const UserBookRoom = () => {
       <Header />
 
       {/* Price Summary */}
-      <div className="fixed top-24 right-[400px] w-[450px] z-10 font-inter">
+      <div className="fixed top-40 right-[300px] w-[450px] z-10 font-inter">
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -207,7 +207,7 @@ const UserBookRoom = () => {
       </div>
 
       {/* Booking Form */}
-      <div className="max-w-xl mt-20 mr-20 p-8 bg-white rounded-2xl shadow-lg border border-gray-200 font-inter">
+      <div className="max-w-xl mt-20 ml-60 mr-20 p-8 bg-white rounded-2xl shadow-lg border border-gray-200 font-inter">
         <h2 className="flex items-center gap-3 text-2xl font-semibold mb-4">
           <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
             1
@@ -295,28 +295,6 @@ const UserBookRoom = () => {
               className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
-          </div>
-
-          {/* Country */}
-          <div className="mb-6">
-            <label
-              htmlFor="country"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Country/Region
-            </label>
-            <select
-              id="country"
-              name="country"
-              value={form.country}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="India">India</option>
-              <option value="USA">United States</option>
-              <option value="UK">United Kingdom</option>
-              {/* Add more countries as needed */}
-            </select>
           </div>
 
           {/* Checkboxes */}
