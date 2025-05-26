@@ -139,7 +139,7 @@ const UserBookRoom = () => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white rounded-3xl p-6 border border-blue-100 shadow-lg hover:shadow-2xl transition-shadow duration-300"
+          className="bg-white p-6 border border-blue-100 shadow-lg hover:shadow-2xl transition-shadow duration-300"
         >
           <div className="space-y-6 text-gray-700">
             {/* Property Info */}
@@ -208,7 +208,7 @@ const UserBookRoom = () => {
       </div>
 
       {/* Booking Form */}
-      <div className="max-w-xl mt-20  ml-60 mr-20 p-8 bg-white rounded-2xl shadow-lg border border-gray-200 font-inter">
+      <div className="max-w-xl mt-20  ml-60 mr-20 p-8 bg-white  shadow-lg border border-gray-200 font-inter">
         <h2 className="flex items-center gap-3 text-2xl font-semibold mb-4">
           <span className="bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
             1
