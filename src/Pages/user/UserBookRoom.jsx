@@ -297,46 +297,7 @@ const UserBookRoom = () => {
             />
           </div>
 
-          {/* Checkboxes */}
-          <div className="space-y-4 mb-8">
-            <label className="inline-flex items-center gap-3">
-              <input
-                type="checkbox"
-                name="paperless"
-                checked={form.paperless}
-                onChange={handleInputChange}
-                className="form-checkbox h-5 w-5 text-blue-600 rounded"
-              />
-              <span className="text-gray-700 text-sm">
-                I want a paperless booking experience
-              </span>
-            </label>
-            <label className="inline-flex items-center gap-3">
-              <input
-                type="checkbox"
-                name="mainGuest"
-                checked={form.mainGuest}
-                onChange={handleInputChange}
-                className="form-checkbox h-5 w-5 text-blue-600 rounded"
-              />
-              <span className="text-gray-700 text-sm">
-                I am the main guest
-              </span>
-            </label>
-            <label className="inline-flex items-center gap-3">
-              <input
-                type="checkbox"
-                name="travelingForWork"
-                checked={form.travelingForWork}
-                onChange={handleInputChange}
-                className="form-checkbox h-5 w-5 text-blue-600 rounded"
-              />
-              <span className="text-gray-700 text-sm">
-                Traveling for work
-              </span>
-            </label>
-          </div>
-
+        
           {/* Submit Button */}
           <button
             type="submit"
