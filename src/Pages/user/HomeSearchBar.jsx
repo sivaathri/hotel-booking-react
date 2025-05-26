@@ -147,7 +147,7 @@ export default function HomeSearchBar() {
   };
 
   return (
-    <div className={`w-full transition-all duration-300 z-50 mb-5 `}>
+    <div className={`w-full transition-all duration-300 z-[100] mb-5 `}>
       <div className="w-full max-w-6xl mx-auto px-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -208,7 +208,7 @@ export default function HomeSearchBar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full mt-2 left-0 bg-white rounded-2xl shadow-lg p-4 z-50 w-[400px]"
+                  className="absolute top-full mt-2 left-0 bg-white rounded-2xl shadow-lg p-4 z-[999] w-[400px]"
                 >
                   <div className="mb-3">
                     <div className="flex justify-between items-center">
@@ -400,7 +400,7 @@ export default function HomeSearchBar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full  right-0 mt-4 w-80 bg-white rounded-2xl shadow-lg p-4 z-50"
+                    className="absolute top-full  right-0 mt-4 w-80 bg-white rounded-2xl shadow-lg p-4 z-[999]"
                   >
                     {['adults', 'children'].map(type => (
                       <div key={type} className="flex justify-between items-center mb-2">
