@@ -6,6 +6,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import Header from "./Header";
+import Paymentheader from "./payment Header/Paymentheader";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -130,7 +131,7 @@ const UserBookRoom = () => {
 
   return (
     <>
-      <Header />
+    <Paymentheader/>
 
       {/* Price Summary */}
       <div className="fixed top-40 right-[300px] w-[450px] z-10 font-inter">
