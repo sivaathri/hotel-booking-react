@@ -26,7 +26,22 @@ class GetAllInfo {
     rgpd.child_age_to,
     rgpd.child_price,
     DATE_FORMAT(rgpd.created_at, '%Y-%m-%d %H:%i:%s') as created_at,
-    DATE_FORMAT(rgpd.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at
+    DATE_FORMAT(rgpd.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at,
+    rb.booking_id,
+    rb.user_id as booking_user_id,
+    rb.room_number,
+    rb.number_of_rooms_Book,
+    rb.adults as booking_adults,
+    rb.children as booking_children,
+    DATE_FORMAT(rb.check_in_date, '%Y-%m-%d') as check_in_date,
+    DATE_FORMAT(rb.check_out_date, '%Y-%m-%d') as check_out_date,
+    rb.total_price,
+    rb.payment_status,
+    rb.payment_method,
+    rb.instant_payment,
+    rb.free_cancellation,
+    DATE_FORMAT(rb.created_at, '%Y-%m-%d %H:%i:%s') as booking_created_at,
+    DATE_FORMAT(rb.updated_at, '%Y-%m-%d %H:%i:%s') as booking_updated_at
 FROM 
     basic_info bi
 LEFT JOIN 
@@ -46,7 +61,9 @@ LEFT JOIN
     AND rpa.floor = rs.floor 
     AND rpa.room_type = rs.room_type
 LEFT JOIN
-    room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id;
+    room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id
+LEFT JOIN
+    room_bookings rb ON rb.property_id = bi.property_id AND rb.room_number = rpa.id;
             `;
 
             const [results] = await db.query(query, [userId]);
@@ -83,8 +100,30 @@ LEFT JOIN
                     refundable3: result.refundable3,
                     days_before3: result.days_before3,
                     refund_percent3: result.refund_percent3,
-                    pricing_dates: []
+                    pricing_dates: [],
+                    bookings: []
                 };
+
+                // Add booking information if it exists
+                if (result.booking_id) {
+                    roomInfo.bookings.push({
+                        booking_id: result.booking_id,
+                        user_id: result.booking_user_id,
+                        room_number: result.room_number,
+                        number_of_rooms_Book: result.number_of_rooms_Book,
+                        adults: result.booking_adults,
+                        children: result.booking_children,
+                        check_in_date: result.check_in_date,
+                        check_out_date: result.check_out_date,
+                        total_price: result.total_price,
+                        payment_status: result.payment_status,
+                        payment_method: result.payment_method,
+                        instant_payment: result.instant_payment,
+                        free_cancellation: result.free_cancellation,
+                        created_at: result.booking_created_at,
+                        updated_at: result.booking_updated_at
+                    });
+                }
 
                 if (!propertiesMap.has(result.property_id)) {
                     propertiesMap.set(result.property_id, {
@@ -246,7 +285,22 @@ LEFT JOIN
                     pr.*,
                     ri.image_paths,
                     rpa.*,
-                    rs.*
+                    rs.*,
+                    rb.booking_id,
+                    rb.user_id as booking_user_id,
+                    rb.room_number,
+                    rb.number_of_rooms_Book,
+                    rb.adults as booking_adults,
+                    rb.children as booking_children,
+                    DATE_FORMAT(rb.check_in_date, '%Y-%m-%d') as check_in_date,
+                    DATE_FORMAT(rb.check_out_date, '%Y-%m-%d') as check_out_date,
+                    rb.total_price,
+                    rb.payment_status,
+                    rb.payment_method,
+                    rb.instant_payment,
+                    rb.free_cancellation,
+                    DATE_FORMAT(rb.created_at, '%Y-%m-%d %H:%i:%s') as booking_created_at,
+                    DATE_FORMAT(rb.updated_at, '%Y-%m-%d %H:%i:%s') as booking_updated_at
                 FROM basic_info bi
                 LEFT JOIN facilities_amenities fa ON bi.property_id = fa.property_id
                 LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
@@ -257,6 +311,7 @@ LEFT JOIN
                 LEFT JOIN room_pricing_availability rpa ON rpa.property_id = bi.property_id 
                     AND rpa.floor = rs.floor 
                     AND rpa.room_type = rs.room_type
+                LEFT JOIN room_bookings rb ON rb.property_id = bi.property_id AND rb.room_number = rpa.id
                 WHERE bi.user_id = ?
             `;
 
@@ -387,7 +442,8 @@ LEFT JOIN
                             refund_percent2: result.refund_percent2,
                             refundable3: result.refundable3,
                             days_before3: result.days_before3,
-                            refund_percent3: result.refund_percent3
+                            refund_percent3: result.refund_percent3,
+                            bookings: []
                         },
                         room_setup: {
                             room_id: result.room_id,
@@ -412,6 +468,28 @@ LEFT JOIN
                             created_at: result.created_at,
                             updated_at: result.updated_at
                         }
+                    });
+                }
+
+                // Add booking information if it exists
+                if (result.booking_id) {
+                    const property = propertiesMap.get(result.property_id);
+                    property.room.bookings.push({
+                        booking_id: result.booking_id,
+                        user_id: result.booking_user_id,
+                        room_number: result.room_number,
+                        number_of_rooms_Book: result.number_of_rooms_Book,
+                        adults: result.booking_adults,
+                        children: result.booking_children,
+                        check_in_date: result.check_in_date,
+                        check_out_date: result.check_out_date,
+                        total_price: result.total_price,
+                        payment_status: result.payment_status,
+                        payment_method: result.payment_method,
+                        instant_payment: result.instant_payment,
+                        free_cancellation: result.free_cancellation,
+                        created_at: result.booking_created_at,
+                        updated_at: result.booking_updated_at
                     });
                 }
             });
@@ -444,7 +522,22 @@ LEFT JOIN
                     rgpd.child_age_to,
                     rgpd.child_price,
                     DATE_FORMAT(rgpd.created_at, '%Y-%m-%d %H:%i:%s') as created_at,
-                    DATE_FORMAT(rgpd.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at
+                    DATE_FORMAT(rgpd.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at,
+                    rb.booking_id,
+                    rb.user_id as booking_user_id,
+                    rb.room_number,
+                    rb.number_of_rooms_Book,
+                    rb.adults as booking_adults,
+                    rb.children as booking_children,
+                    DATE_FORMAT(rb.check_in_date, '%Y-%m-%d') as check_in_date,
+                    DATE_FORMAT(rb.check_out_date, '%Y-%m-%d') as check_out_date,
+                    rb.total_price,
+                    rb.payment_status,
+                    rb.payment_method,
+                    rb.instant_payment,
+                    rb.free_cancellation,
+                    DATE_FORMAT(rb.created_at, '%Y-%m-%d %H:%i:%s') as booking_created_at,
+                    DATE_FORMAT(rb.updated_at, '%Y-%m-%d %H:%i:%s') as booking_updated_at
                 FROM basic_info bi
                 LEFT JOIN facilities_amenities fa ON bi.property_id = fa.property_id
                 LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
@@ -456,6 +549,7 @@ LEFT JOIN
                     AND rpa.floor = rs.floor 
                     AND rpa.room_type = rs.room_type
                 LEFT JOIN room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id
+                LEFT JOIN room_bookings rb ON rb.property_id = bi.property_id AND rb.room_number = rpa.id
                 WHERE bi.property_id = ?
             `;
 
@@ -493,8 +587,30 @@ LEFT JOIN
                     refundable3: result.refundable3,
                     days_before3: result.days_before3,
                     refund_percent3: result.refund_percent3,
-                    pricing_dates: []
+                    pricing_dates: [],
+                    bookings: []
                 };
+
+                // Add booking information if it exists
+                if (result.booking_id) {
+                    roomInfo.bookings.push({
+                        booking_id: result.booking_id,
+                        user_id: result.booking_user_id,
+                        room_number: result.room_number,
+                        number_of_rooms_Book: result.number_of_rooms_Book,
+                        adults: result.booking_adults,
+                        children: result.booking_children,
+                        check_in_date: result.check_in_date,
+                        check_out_date: result.check_out_date,
+                        total_price: result.total_price,
+                        payment_status: result.payment_status,
+                        payment_method: result.payment_method,
+                        instant_payment: result.instant_payment,
+                        free_cancellation: result.free_cancellation,
+                        created_at: result.booking_created_at,
+                        updated_at: result.booking_updated_at
+                    });
+                }
 
                 if (!propertiesMap.has(result.property_id)) {
                     propertiesMap.set(result.property_id, {
