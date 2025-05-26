@@ -249,7 +249,8 @@ const UserBookRoom = () => {
                 {formatDate(dates.checkIn)} – {formatDate(dates.checkOut)}
               </span>
 
-              <span className="text-gray-400">|</span>
+              <div className="w-px h-6 bg-gray-300 mx-2"></div>
+
 
               <span className="font-bold">
               {totalSelectedRooms} {totalSelectedRooms === 1 ? "room" : "rooms"}
