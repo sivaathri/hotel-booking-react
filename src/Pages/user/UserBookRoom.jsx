@@ -209,7 +209,8 @@ const UserBookRoom = () => {
     <>
       <Header />
       {/* Price Summary - Redesigned */}
-      <div className="fixed mt-6 right-9 w-96 z-10 font-inter">
+      <div className="fixed mt-6 right-9 w-[450px] z-10 font-inter">
+
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
