@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import HomeSearchBar from './HomeSearchBar';
 import DOMPurify from 'dompurify';
-
+// import { API_URL } from '../../config/api.config';
 // Add API URL constant
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -28,8 +28,9 @@ const sanitizeHTML = (html) => {
 const getImageUrl = (path) => {
   if (!path) return 'https://placehold.co/600x400?text=No+Image';
   return `${API_URL}/assets/${path}`;
-};
 
+};
+console.log("API_URL",API_URL)
 const FACILITY_MAP = [
   { key: 'room_service_24hr', label: 'Room service', icon: <FaConciergeBell /> },
   { key: 'free_wifi', label: 'Free WiFi', icon: <FaWifi /> },
@@ -1153,7 +1154,7 @@ export default function PropertyDetails() {
                                   const numberOfRooms = i + 1;
                                   const roomPrice = calculatePrice(roomOption);
                                   const gst = calculateGST(roomPrice);
-                                  const totalPrice = gst.total * numberOfRooms;
+                                  const totalPrice = roomPrice * numberOfRooms;
                                   return (
                                     <option key={i + 1} value={i + 1}>
                                       {numberOfRooms} room{numberOfRooms > 1 ? 's' : ''} - ₹{totalPrice.toLocaleString('en-IN')}
