@@ -159,7 +159,7 @@ const UserBookRoom = () => {
 
             {/* Dates & Guests */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700">
-              <FaCalendarCheck className="text-blue-500 text-lg" />
+              <FaCalendarCheck className="text-orange-500 text-lg" />
               <span className="font-medium">
                 {formatDate(dates.checkIn)} – {formatDate(dates.checkOut)}
               </span>
@@ -193,7 +193,7 @@ const UserBookRoom = () => {
             {/* Total */}
             <div className="flex items-center justify-between">
               <div className="text-lg font-bold text-gray-800">Total (INR)</div>
-              <div className="text-3xl font-extrabold text-blue-600">
+              <div className="text-3xl font-extrabold text-orange-600">
                 {formatCurrency(finalPrice)}
               </div>
             </div>
