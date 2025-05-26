@@ -208,7 +208,7 @@ const UserBookRoom = () => {
       </div>
 
       {/* Booking Form */}
-      <div className="max-w-xl mt-20 ml-60 mr-20 p-8 bg-white rounded-2xl shadow-lg border border-gray-200 font-inter">
+      <div className="max-w-xl mt-20  ml-60 mr-20 p-8 bg-white rounded-2xl shadow-lg border border-gray-200 font-inter">
         <h2 className="flex items-center gap-3 text-2xl font-semibold mb-4">
           <span className="bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
             1
