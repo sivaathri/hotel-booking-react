@@ -128,6 +128,9 @@ const UserBookRoom = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+const handleSubmit = (e) => {
+  e.preventDefault();
+};
 
   return (
     <>
@@ -219,7 +222,7 @@ const UserBookRoom = () => {
           We will use these details to share your booking information
         </p>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           {/* Full Name */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -289,7 +292,7 @@ const UserBookRoom = () => {
             <input
               type="tel"
               id="phone"
-              name="phone"
+              name="phone" 
               value={form.phone}
               onChange={handleInputChange}
               placeholder="+91"
@@ -304,9 +307,10 @@ const UserBookRoom = () => {
             type="submit"
             className="w-full py-3 bg-orange-600 text-white rounded-lg font-semibold text-lg hover:bg-orange-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition-shadow shadow-md"
           >
-          Continue
+         Book Now 
           </button>
         </form>
+        
       </div>
     </>
   );
