@@ -202,6 +202,42 @@ export default function PropertyList({ properties, loading, error }) {
     return type.split("_")[0] || "Double Room";
   };
 
+  // Add function to check if room is available for selected dates
+  const isRoomAvailable = (room, checkIn, checkOut) => {
+    if (!room.bookings || !room.bookings.length) return true;
+    
+    const requestedStart = new Date(checkIn);
+    const requestedEnd = new Date(checkOut);
+    
+    // Check if any booking overlaps with the requested dates
+    const hasOverlap = room.bookings.some(booking => {
+      const bookingStart = new Date(booking.check_in_date);
+      const bookingEnd = new Date(booking.check_out_date);
+      
+      // Check if the booking overlaps with the requested dates
+      return (
+        (requestedStart >= bookingStart && requestedStart < bookingEnd) ||
+        (requestedEnd > bookingStart && requestedEnd <= bookingEnd) ||
+        (requestedStart <= bookingStart && requestedEnd >= bookingEnd)
+      );
+    });
+    
+    // If there's an overlap, check if there are enough rooms available
+    if (hasOverlap) {
+      const totalRooms = room.number_of_rooms || 1;
+      const bookedRooms = room.bookings.reduce((total, booking) => {
+        if (booking.check_in_date <= checkOut && booking.check_out_date >= checkIn) {
+          return total + (booking.number_of_rooms_Book || 1);
+        }
+        return total;
+      }, 0);
+      
+      return bookedRooms < totalRooms;
+    }
+    
+    return true;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -267,13 +303,20 @@ export default function PropertyList({ properties, loading, error }) {
   return (
     <div className="w-full lg:w-4/5">
       {properties.map((property) => {
-        // Get all unique room types
-        const roomTypes =
-          property.rooms?.map((room) => cleanRoomType(room.room_type)) || [];
+        // Filter out rooms that are not available for the selected dates
+        const availableRooms = property.rooms?.filter(room => 
+          isRoomAvailable(room, searchParams.get('checkIn'), searchParams.get('checkOut'))
+        ) || [];
+        
+        // Skip this property if no rooms are available
+        if (availableRooms.length === 0) return null;
+        
+        // Get all unique room types from available rooms
+        const roomTypes = availableRooms.map((room) => cleanRoomType(room.room_type));
         const uniqueRoomTypes = [...new Set(roomTypes)];
 
-        // Get the first room for initial pricing calculation
-        const firstRoom = property.rooms?.[0] || {};
+        // Get the first available room for initial pricing calculation
+        const firstRoom = availableRooms[0] || {};
         const priceDetails = calculatePrice(property, firstRoom);
         const gst = calculateGST(priceDetails.totalPrice);
 
