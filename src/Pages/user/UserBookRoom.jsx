@@ -209,7 +209,7 @@ const UserBookRoom = () => {
       {/* Booking Form */}
       <div className="max-w-xl mt-20 ml-60 mr-20 p-8 bg-white rounded-2xl shadow-lg border border-gray-200 font-inter">
         <h2 className="flex items-center gap-3 text-2xl font-semibold mb-4">
-          <span className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+          <span className="bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
             1
           </span>
           Enter your details
@@ -291,7 +291,7 @@ const UserBookRoom = () => {
               name="phone"
               value={form.phone}
               onChange={handleInputChange}
-              placeholder="+91 9876543210"
+              placeholder="+91"
               className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
