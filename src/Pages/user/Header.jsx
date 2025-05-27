@@ -358,10 +358,6 @@ const Header = () => {
                       </button>
                       {/* Left Panel: Orange Gradient, Logo, Welcome Text */}
                       <div className="w-1/2 h-full flex flex-col justify-center items-center bg-gradient-to-br from-yellow-400 to-orange-500 relative overflow-hidden">
-                        {/* Wavy SVG Edge */}
-                        <svg className="absolute right-0 top-0 h-full w-16 text-white" viewBox="0 0 100 500" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                          <path d="M100,0 Q60,250 100,500 L0,500 L0,0 Z" fill="white" />
-                        </svg>
                         {/* Logo */}
                         <div className="z-10 mb-6">
                           <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -374,7 +370,7 @@ const Header = () => {
                         <p className="z-10 text-white text-center max-w-xs">Sign up or sign in to continue your journey. Enjoy exclusive features and offers!</p>
                       </div>
                       {/* Right Panel: Form */}
-                      <div className="w-1/2 h-full bg-white flex flex-col justify-center items-center p-0 overflow-auto">
+                      <div className="w-1/2 h-full bg-white flex flex-col justify-center items-center p-4 overflow-auto">
                         <h3 className="text-2xl font-bold mb-6 text-gray-800">Create your account</h3>
                         <SignupForm setSigninOpen={setSigninOpen} setSignupOpen={(value) => {
                           setSignupOpen(value);
@@ -389,7 +385,7 @@ const Header = () => {
 
                 {isSigninOpen && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[999]">
-                    <div className="relative w-[800px] h-[500px] mx-auto overflow-hidden rounded-2xl shadow-2xl flex">
+                    <div className="relative w-[800px] h-[420px] mx-auto overflow-hidden rounded-2xl shadow-2xl flex">
                       {/* Close Button */}
                       <button
                         onClick={() => setSigninOpen(false)}
@@ -400,10 +396,6 @@ const Header = () => {
                       </button>
                       {/* Left Panel: Orange Gradient, Logo, Welcome Text */}
                       <div className="w-1/2 h-full flex flex-col justify-center items-center bg-gradient-to-br from-yellow-400 to-orange-500 relative overflow-hidden">
-                        {/* Wavy SVG Edge */}
-                        <svg className="absolute right-0 top-0 h-full w-16 text-white" viewBox="0 0 100 500" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                          <path d="M100,0 Q60,250 100,500 L0,500 L0,0 Z" fill="white" />
-                        </svg>
                         {/* Logo */}
                         <div className="z-10 mb-6">
                           <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -416,7 +408,7 @@ const Header = () => {
                         <p className="z-10 text-white text-center max-w-xs">Sign up or sign in to continue your journey. Enjoy exclusive features and offers!</p>
                       </div>
                       {/* Right Panel: Form */}
-                      <div className="w-1/2 h-full bg-white flex flex-col justify-center items-center p-0 overflow-auto">
+                      <div className="w-1/2 h-full bg-white flex flex-col justify-center items-center p-4 overflow-auto">
                         <h3 className="text-2xl font-bold mb-6 text-gray-800">Sign in to your account</h3>
                         <SignIn setSigninOpen={(value) => {
                           setSigninOpen(value);
