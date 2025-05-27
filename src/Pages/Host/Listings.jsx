@@ -200,7 +200,7 @@ const Listings = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteProperty(property.id);
+                          handleDeleteProperty(property.property_id);
                         }}
                         className="p-2 bg-white rounded-full shadow-sm hover:shadow-md transition hover:text-red-500"
                       >
@@ -318,7 +318,10 @@ const Listings = () => {
                           <FiEdit2 className="text-gray-600" />
                         </button>
                         <button
-                          onClick={() => handleDeleteProperty(property.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteProperty(property.property_id);
+                          }}
                           className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition hover:text-red-500"
                         >
                           <FiTrash2 className="text-gray-600" />

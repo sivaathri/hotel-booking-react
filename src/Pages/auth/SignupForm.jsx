@@ -236,11 +236,11 @@ function SignupForm({ setSignupOpen }) {
   };
 
   return (
-    <form className="space-y-6 w-full max-w-sm" onSubmit={handleSubmit}>
-      <div className="space-y-4">
+    <form className="space-y-4 w-full max-w-xs" onSubmit={handleSubmit}>
+      <div className="space-y-3">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FaUser className="h-5 w-5 text-gray-400" />
+          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+            <FaUser className="h-4 w-4 text-gray-400" />
           </div>
           <input
             type="text"
@@ -248,13 +248,13 @@ function SignupForm({ setSignupOpen }) {
             placeholder="Username"
             value={formData.username}
             onChange={handleInputChange}
-            className="appearance-none rounded-lg relative block w-full pl-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+            className="appearance-none rounded-md block w-full pl-8 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-xs text-sm"
             required
           />
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FaEnvelope className="h-5 w-5 text-gray-400" />
+          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+            <FaEnvelope className="h-4 w-4 text-gray-400" />
           </div>
           <input
             type="email"
@@ -262,13 +262,13 @@ function SignupForm({ setSignupOpen }) {
             placeholder="Email address"
             value={formData.email}
             onChange={handleInputChange}
-            className="appearance-none rounded-lg relative block w-full pl-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+            className="appearance-none rounded-md block w-full pl-8 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-xs text-sm"
             required
           />
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FaLock className="h-5 w-5 text-gray-400" />
+          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+            <FaLock className="h-4 w-4 text-gray-400" />
           </div>
           <input
             type={passwordVisible ? "text" : "password"}
@@ -276,20 +276,20 @@ function SignupForm({ setSignupOpen }) {
             placeholder="Password"
             value={formData.password}
             onChange={handleInputChange}
-            className="appearance-none rounded-lg relative block w-full pl-10 pr-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+            className="appearance-none rounded-md block w-full pl-8 pr-8 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-xs text-sm"
             required
           />
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out focus:outline-none"
+            className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
           >
-            {passwordVisible ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+            {passwordVisible ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
           </button>
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FaMobile className="h-5 w-5 text-gray-400" />
+          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+            <FaMobile className="h-4 w-4 text-gray-400" />
           </div>
           <input
             type="text"
@@ -297,16 +297,16 @@ function SignupForm({ setSignupOpen }) {
             placeholder="Mobile Number"
             value={formData.mobile}
             onChange={handleInputChange}
-            className="appearance-none rounded-lg relative block w-full pl-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+            className="appearance-none rounded-md block w-full pl-8 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-xs text-sm"
             required
           />
         </div>
       </div>
       {error && (
-        <div className="rounded-md bg-red-50 p-4">
+        <div className="rounded bg-red-50 p-2 text-xs">
           <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">{error}</h3>
+            <div className="ml-2">
+              <h3 className="font-medium text-red-800">{error}</h3>
             </div>
           </div>
         </div>
@@ -315,11 +315,11 @@ function SignupForm({ setSignupOpen }) {
         <button
           type="submit"
           disabled={loading}
-          className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex justify-center py-2 px-2 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <div className="flex items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -330,13 +330,13 @@ function SignupForm({ setSignupOpen }) {
           )}
         </button>
       </div>
-      <div className="text-center">
-        <p className="text-sm text-gray-600">
+      <div className="text-center text-xs">
+        <p className="text-gray-600">
           Already have an account?{' '}
           <button
             type="button"
             onClick={() => setSignupOpen(false)}
-            className="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out"
+            className="font-medium text-blue-600 hover:text-blue-500"
           >
             Sign in
           </button>
@@ -346,7 +346,7 @@ function SignupForm({ setSignupOpen }) {
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300"></div>
         </div>
-        <div className="relative flex justify-center text-sm">
+        <div className="relative flex justify-center text-xs">
           <span className="px-2 bg-white text-gray-500">Or continue with</span>
         </div>
       </div>
