@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
+import HostHeader from '../HostHeader';
 
 const Calender = () => {
   const [selectedRange, setSelectedRange] = useState('28 May 2025 - 27 Jun 2025');
@@ -65,6 +66,7 @@ const Calender = () => {
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
+      <HostHeader />
       <div className="border-b border-gray-200">
         <div className="p-4">
           <div className="flex items-center justify-between">
