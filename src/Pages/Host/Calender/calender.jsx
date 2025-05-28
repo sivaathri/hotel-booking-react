@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, HelpCircle, X } from 'lucide-react';
 import HostHeader from '../HostHeader';
 
 const Calender = () => {
   const [selectedRange, setSelectedRange] = useState('28 May 2025 - 27 Jun 2025');
   const [viewType, setViewType] = useState('List view');
+  const [showPricingPopup, setShowPricingPopup] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [pricingMode, setPricingMode] = useState('custom');
+  const [guestPricing, setGuestPricing] = useState({
+    6: { price: 0, enabled: true },
+    5: { price: 1000, enabled: true },
+    4: { price: 2000, enabled: true },
+    3: { price: 3000, enabled: true },
+    2: { price: 4000, enabled: true },
+    1: { price: 5000, enabled: true }
+  });
 
   // Calendar data structure
   const mayDates = [
@@ -192,7 +203,10 @@ const Calender = () => {
               <div className="flex bg-blue-50">
                 <div className="w-48 p-3">
                   <div className="text-sm text-blue-600">▼ {room.rate}</div>
-                  <div className="text-xs text-blue-600">▼ ✎ Edit</div>
+                  <div className="text-xs text-blue-600 cursor-pointer" onClick={() => {
+                    setSelectedRoom(room);
+                    setShowPricingPopup(true);
+                  }}>▼ ✎ Edit</div>
                 </div>
                 <div className="flex">
                   {room.pricing.map((pricing, index) => (
@@ -207,27 +221,117 @@ const Calender = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="bg-blue-900 text-white p-6 mt-8">
-        <div className="flex items-center justify-between max-w-6xl mx-auto">
-          <div className="flex space-x-8">
-            <a href="#" className="text-white hover:text-blue-200">About Us</a>
-            <a href="#" className="text-white hover:text-blue-200">Privacy and Cookie Statements</a>
-            <a href="#" className="text-white hover:text-blue-200">FAQs</a>
-          </div>
-          <div className="flex space-x-4">
-            <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
-              Add new property
-            </button>
-            <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
-              Share your feedback
-            </button>
+      {/* Pricing per Guest Popup */}
+      {showPricingPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-[500px] shadow-xl">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">Edit pricing per guest</h2>
+              <button onClick={() => setShowPricingPopup(false)} className="text-gray-500 hover:text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-4">
+                <div className="text-sm font-medium mb-2">Standard Rate</div>
+                <div className="flex space-x-4 mb-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="pricingMode"
+                      value="recommended"
+                      checked={pricingMode === 'recommended'}
+                      onChange={(e) => setPricingMode(e.target.value)}
+                      className="mr-2"
+                    />
+                    Recommended
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="pricingMode"
+                      value="custom"
+                      checked={pricingMode === 'custom'}
+                      onChange={(e) => setPricingMode(e.target.value)}
+                      className="mr-2"
+                    />
+                    Custom
+                  </label>
+                </div>
+
+                <p className="text-sm text-gray-600 mb-4">
+                  Your prices can change depending on how many guests stay at your place. You can
+                  set a fixed discount per person, a percentage discount and even decide which
+                  amount of guests pay a different price.
+                </p>
+
+                <div className="space-y-4">
+                  {Object.entries(guestPricing).map(([guests, data]) => (
+                    <div key={guests} className="flex items-center justify-between">
+                      <div className="w-24">{guests} guests</div>
+                      <div className="flex-1">
+                        {guests === '6' ? (
+                          <div className="text-sm">Normal price</div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <div className="text-sm">Normal price reduced by</div>
+                            <input
+                              type="number"
+                              value={data.price}
+                              onChange={(e) => setGuestPricing(prev => ({
+                                ...prev,
+                                [guests]: { ...data, price: parseInt(e.target.value) || 0 }
+                              }))}
+                              className="border rounded px-2 py-1 w-24"
+                            />
+                            <select className="border rounded px-2 py-1">
+                              <option>INR</option>
+                            </select>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="text-sm">On</div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={data.enabled}
+                            onChange={() => setGuestPricing(prev => ({
+                              ...prev,
+                              [guests]: { ...data, enabled: !data.enabled }
+                            }))}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4 mt-6">
+                <button
+                  onClick={() => setShowPricingPopup(false)}
+                  className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Save pricing logic here
+                    setShowPricingPopup(false);
+                  }}
+                  className="px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="text-center mt-4 text-blue-200">
-          © Copyright 2025
-        </div>
-      </div>
+      )}
     </div>
   );
 };
