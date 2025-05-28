@@ -1,10 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { ChevronLeft, ChevronRight, HelpCircle, X } from 'lucide-react';
 import HostHeader from '../HostHeader';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import axios from 'axios';
 
+import { API_URL } from '../../../config/api.config';
+import { getAuthToken } from '../../../utils/getAuthToken';
+import { useUser } from '../../../context/UserContext';
 const Calender = () => {
+  const { user } = useUser();
+    const token = getAuthToken();
+      const [propertydetails, setpropertydetails] = useState([]);
+      useEffect(() => {
+        const fetchPropertyDetails = async () => {
+          if (!user?.id) return;
+          
+          try {
+            const response = await axios.get(`${API_URL}/getall/${user.id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            // Handle the nested data structure
+            if (response.data.success && response.data.data) {
+              // Convert the single property object to an array if it's not already
+              const propertyData = Array.isArray(response.data.data) 
+                ? response.data.data 
+                : [response.data.data];
+                
+              // Parse the image_paths string to array if it exists
+              const propertiesWithParsedImages = propertyData.map(property => ({
+                ...property,
+                images: property.image_paths ? JSON.parse(property.image_paths) : []
+              }));
+              
+              setpropertydetails(propertiesWithParsedImages);
+              console.log('Property Details:', propertiesWithParsedImages);
+            }
+          } catch (error) {
+            console.error('Error fetching property details:', error);
+          }
+        };
+    
+        fetchPropertyDetails();
+      }, [token, user?.id]);
+
+
   const [startDate, setStartDate] = useState(new Date('2025-05-28'));
   const [endDate, setEndDate] = useState(new Date('2025-06-27'));
   const [selectedRange, setSelectedRange] = useState('28 May 2025 - 27 Jun 2025');
