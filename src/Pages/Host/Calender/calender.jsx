@@ -1,569 +1,235 @@
-import React, { useState, useEffect, useRef } from 'react';
-import HostHeader from '../HostHeader';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Users, X, Settings, Home } from 'lucide-react';
-import moment from 'moment';
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
 
 const Calender = () => {
-    const [currentDate, setCurrentDate] = useState(moment());
-    const [selectedDates, setSelectedDates] = useState([]);
-    const [priceAdjustments, setPriceAdjustments] = useState({});
-    const [showPriceModal, setShowPriceModal] = useState(false);
-    const [selectedDateForPrice, setSelectedDateForPrice] = useState(null);
-    const [showCalendar, setShowCalendar] = useState(false);
-    const [occupancy, setOccupancy] = useState({
-        adults: 2,
-        children: 0,
-        rooms: 1
-    });
-    const [showOccupancyModal, setShowOccupancyModal] = useState(false);
-    const [showOccupancySettingsModal, setShowOccupancySettingsModal] = useState(false);
-    const [showRoomSettingsModal, setShowRoomSettingsModal] = useState(false);
-    const calendarRef = useRef(null);
+  const [selectedRange, setSelectedRange] = useState('28 May 2025 - 27 Jun 2025');
+  const [viewType, setViewType] = useState('List view');
 
-    // Room and pricing data
-    const [selectedRoom, setSelectedRoom] = useState(null);
-    const [rooms, setRooms] = useState([
-        {
-            id: 1,
-            name: "2BHK",
-            basePrice: 7500,
-            occupancyAdjustments: [
-                { minGuests: 1, maxGuests: 3, adjustment: 3000 },
-                { minGuests: 1, maxGuests: 4, adjustment: 4000 },
-                { minGuests: 1, maxGuests: 6, adjustment: 6000 }
-            ]
-        }
-    ]);
+  // Calendar data structure
+  const mayDates = [
+    { date: 28, day: 'Wed' },
+    { date: 29, day: 'Thu' },
+    { date: 30, day: 'Fri' },
+    { date: 31, day: 'Sat' }
+  ];
 
-    // Calculate total price based on occupancy and room
-    const calculateTotalPrice = (date) => {
-        if (!selectedRoom) return 0;
-        
-        const totalGuests = occupancy.adults + occupancy.children;
-        let price = selectedRoom.basePrice;
+  const juneDates = [
+    { date: 1, day: 'Sun' },
+    { date: 2, day: 'Mon' },
+    { date: 3, day: 'Tue' },
+    { date: 4, day: 'Wed' },
+    { date: 5, day: 'Thu' },
+    { date: 6, day: 'Fri' },
+    { date: 7, day: 'Sat' },
+    { date: 8, day: 'Sun' },
+    { date: 9, day: 'Mon' },
+    { date: 10, day: 'Tue' },
+    { date: 11, day: 'Wed' },
+    { date: 12, day: 'Thu' },
+    { date: 13, day: 'Fri' },
+    { date: 14, day: 'Sat' },
+    { date: 15, day: 'Sun' },
+    { date: 16, day: 'Mon' },
+    { date: 17, day: 'Tue' },
+    { date: 18, day: 'Wed' },
+    { date: 19, day: 'Thu' },
+    { date: 20, day: 'Fri' },
+    { date: 21, day: 'Sat' },
+    { date: 22, day: 'Sun' }
+  ];
 
-        // Find applicable occupancy adjustment
-        const adjustment = selectedRoom.occupancyAdjustments.find(adj => 
-            totalGuests >= adj.minGuests && totalGuests <= adj.maxGuests
-        );
+  const allDates = [...mayDates, ...juneDates];
 
-        if (adjustment) {
-            price = adjustment.adjustment;
-        }
+  // Room data
+  const rooms = [
+    {
+      id: '1381220102',
+      name: '3 BHK',
+      status: 'Bookable',
+      roomsToSell: 2,
+      netBooked: '',
+      rate: 'Standard Rate',
+      pricing: Array(26).fill({ price: 'INR 6000', available: 2 })
+    },
+    {
+      id: '1381220101',
+      name: '2 BHK',
+      status: 'Bookable',
+      roomsToSell: 1,
+      netBooked: '',
+      rate: 'Standard Rate',
+      pricing: Array(26).fill({ price: 'INR 4000', available: 1 })
+    }
+  ];
 
-        // Add any date-specific price adjustments
-        const dateStr = date.format('YYYY-MM-DD');
-        if (priceAdjustments[dateStr]) {
-            price = parseInt(priceAdjustments[dateStr]);
-        }
-
-        return price;
-    };
-
-    const handleRoomChange = (roomId) => {
-        const room = rooms.find(r => r.id === roomId);
-        setSelectedRoom(room);
-    };
-
-    const handleRoomSettingsChange = (roomId, field, value) => {
-        setRooms(prevRooms => 
-            prevRooms.map(room => 
-                room.id === roomId 
-                    ? { ...room, [field]: value }
-                    : room
-            )
-        );
-    };
-
-    const handleOccupancyAdjustmentChange = (roomId, index, field, value) => {
-        setRooms(prevRooms => 
-            prevRooms.map(room => {
-                if (room.id === roomId) {
-                    const newAdjustments = [...room.occupancyAdjustments];
-                    newAdjustments[index] = {
-                        ...newAdjustments[index],
-                        [field]: parseInt(value)
-                    };
-                    return { ...room, occupancyAdjustments: newAdjustments };
-                }
-                return room;
-            })
-        );
-    };
-
-    const addOccupancyAdjustment = (roomId) => {
-        setRooms(prevRooms => 
-            prevRooms.map(room => {
-                if (room.id === roomId) {
-                    return {
-                        ...room,
-                        occupancyAdjustments: [
-                            ...room.occupancyAdjustments,
-                            { minGuests: 1, maxGuests: 2, adjustment: 0 }
-                        ]
-                    };
-                }
-                return room;
-            })
-        );
-    };
-
-    const removeOccupancyAdjustment = (roomId, index) => {
-        setRooms(prevRooms => 
-            prevRooms.map(room => {
-                if (room.id === roomId) {
-                    return {
-                        ...room,
-                        occupancyAdjustments: room.occupancyAdjustments.filter((_, i) => i !== index)
-                    };
-                }
-                return room;
-            })
-        );
-    };
-
-    const renderRoomSettingsModal = () => (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold">Room Price Settings</h3>
-                    <button
-                        onClick={() => setShowRoomSettingsModal(false)}
-                        className="text-gray-500 hover:text-gray-700"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div className="space-y-6">
-                    {rooms.map(room => (
-                        <div key={room.id} className="border rounded-lg p-4">
-                            <div className="flex justify-between items-center mb-4">
-                                <h4 className="font-medium text-lg">{room.name}</h4>
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Base Price (₹)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={room.basePrice}
-                                    onChange={(e) => handleRoomSettingsChange(room.id, 'basePrice', parseInt(e.target.value))}
-                                    className="w-full p-2 border rounded"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <h4 className="font-medium">Occupancy Adjustments</h4>
-                                    <button
-                                        onClick={() => addOccupancyAdjustment(room.id)}
-                                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                    >
-                                        Add Adjustment
-                                    </button>
-                                </div>
-
-                                {room.occupancyAdjustments.map((adjustment, index) => (
-                                    <div key={index} className="flex items-center space-x-4 p-4 border rounded">
-                                        <div className="flex-1">
-                                            <label className="block text-sm text-gray-600 mb-1">Min Guests</label>
-                                            <input
-                                                type="number"
-                                                value={adjustment.minGuests}
-                                                onChange={(e) => handleOccupancyAdjustmentChange(room.id, index, 'minGuests', e.target.value)}
-                                                className="w-full p-2 border rounded"
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <label className="block text-sm text-gray-600 mb-1">Max Guests</label>
-                                            <input
-                                                type="number"
-                                                value={adjustment.maxGuests}
-                                                onChange={(e) => handleOccupancyAdjustmentChange(room.id, index, 'maxGuests', e.target.value)}
-                                                className="w-full p-2 border rounded"
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <label className="block text-sm text-gray-600 mb-1">Price (₹)</label>
-                                            <input
-                                                type="number"
-                                                value={adjustment.adjustment}
-                                                onChange={(e) => handleOccupancyAdjustmentChange(room.id, index, 'adjustment', e.target.value)}
-                                                className="w-full p-2 border rounded"
-                                            />
-                                        </div>
-                                        <button
-                                            onClick={() => removeOccupancyAdjustment(room.id, index)}
-                                            className="p-2 text-red-600 hover:text-red-800"
-                                        >
-                                            <X className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="mt-6 flex justify-end space-x-2">
-                    <button
-                        onClick={() => setShowRoomSettingsModal(false)}
-                        className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => setShowRoomSettingsModal(false)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Save Changes
-                    </button>
-                </div>
+  return (
+    <div className="bg-white min-h-screen">
+      {/* Header */}
+      <div className="border-b border-gray-200">
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-xl font-semibold text-gray-900">Calendar</h1>
             </div>
-        </div>
-    );
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-                setShowCalendar(false);
-                setShowOccupancyModal(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const handleOccupancyChange = (type, value) => {
-        setOccupancy(prev => ({
-            ...prev,
-            [type]: Math.max(0, value)
-        }));
-    };
-
-    const renderOccupancyModal = () => (
-        <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-50">
-            <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">Adults</h3>
-                    <div className="flex items-center space-x-3">
-                        <button
-                            onClick={() => handleOccupancyChange('adults', occupancy.adults - 1)}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                        >
-                            -
-                        </button>
-                        <span>{occupancy.adults}</span>
-                        <button
-                            onClick={() => handleOccupancyChange('adults', occupancy.adults + 1)}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                        >
-                            +
-                        </button>
-                    </div>
-                </div>
-                <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">Children</h3>
-                    <div className="flex items-center space-x-3">
-                        <button
-                            onClick={() => handleOccupancyChange('children', occupancy.children - 1)}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                        >
-                            -
-                        </button>
-                        <span>{occupancy.children}</span>
-                        <button
-                            onClick={() => handleOccupancyChange('children', occupancy.children + 1)}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                        >
-                            +
-                        </button>
-                    </div>
-                </div>
-                <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">Rooms</h3>
-                    <div className="flex items-center space-x-3">
-                        <button
-                            onClick={() => handleOccupancyChange('rooms', occupancy.rooms - 1)}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                        >
-                            -
-                        </button>
-                        <span>{occupancy.rooms}</span>
-                        <button
-                            onClick={() => handleOccupancyChange('rooms', occupancy.rooms + 1)}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                        >
-                            +
-                        </button>
-                    </div>
-                </div>
+            <div className="flex items-center space-x-2">
+              <HelpCircle className="w-5 h-5 text-gray-400" />
+              <span className="text-red-500 font-bold">1</span>
             </div>
-        </div>
-    );
-
-    const renderCalendar = () => (
-        <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-50">
-            <div className="flex justify-between items-center mb-4">
-                <button
-                    onClick={handlePrevMonth}
-                    className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                    <ChevronLeft className="w-5 h-5" />
-                </button>
-                <span className="text-lg font-medium">
-                    {currentDate.format('MMMM YYYY')}
+          </div>
+          
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center space-x-4">
+              <select className="border border-gray-300 rounded px-3 py-1 text-sm">
+                <option>All rooms</option>
+              </select>
+              
+              <div className="flex items-center space-x-2">
+                <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
+                  XML (not editable)
                 </span>
-                <button
-                    onClick={handleNextMonth}
-                    className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                    <ChevronRight className="w-5 h-5" />
+                <span className="text-sm text-gray-600">
+                  Last sync: 27 May 2025, 13:08
+                </span>
+                <button className="text-blue-600 text-sm hover:underline">
+                  Learn more
                 </button>
+              </div>
             </div>
-
-            <div className="grid grid-cols-7 gap-px bg-gray-200">
-                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                    <div key={day} className="bg-gray-50 p-2 text-center text-sm font-medium text-gray-900">
-                        {day}
-                    </div>
-                ))}
-                {renderCalendarDays()}
+            
+            <select className="border border-gray-300 rounded px-3 py-1 text-sm">
+              <option>List view</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium">{selectedRange}</span>
+              <div className="flex items-center space-x-2">
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span className="text-sm">Pricing per guest</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span className="text-sm">Restrictions</span>
+                </label>
+              </div>
             </div>
+          </div>
         </div>
-    );
+      </div>
 
-    const daysInMonth = currentDate.daysInMonth();
-    const firstDayOfMonth = moment(currentDate).startOf('month').day();
-    const lastDayOfMonth = moment(currentDate).endOf('month').day();
-
-    const handlePrevMonth = () => {
-        setCurrentDate(moment(currentDate).subtract(1, 'month'));
-    };
-
-    const handleNextMonth = () => {
-        setCurrentDate(moment(currentDate).add(1, 'month'));
-    };
-
-    const handleDateClick = (date) => {
-        if (selectedDates.length === 0 || selectedDates.length === 2) {
-            setSelectedDates([date]);
-        } else {
-            const [startDate] = selectedDates;
-            if (moment(date).isBefore(startDate)) {
-                setSelectedDates([date]);
-            } else {
-                setSelectedDates([startDate, date]);
-            }
-        }
-    };
-
-    const handlePriceAdjustment = (date, price) => {
-        setPriceAdjustments(prev => ({
-            ...prev,
-            [date]: price
-        }));
-        setShowPriceModal(false);
-    };
-
-    const renderCalendarDays = () => {
-        const days = [];
-        const today = moment();
-
-        // Add empty cells for days before the first day of the month
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            days.push(<div key={`empty-${i}`} className="h-24 border border-gray-200"></div>);
-        }
-
-        // Add days of the month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = moment(currentDate).date(day);
-            const isSelected = selectedDates.some(selectedDate => 
-                moment(selectedDate).isSame(date, 'day')
-            );
-            const isInRange = selectedDates.length === 2 && 
-                date.isBetween(selectedDates[0], selectedDates[1], 'day', '[]');
-            const isPast = date.isBefore(today, 'day');
-            const price = calculateTotalPrice(date);
-
-            days.push(
-                <div
-                    key={day}
-                    onClick={() => !isPast && handleDateClick(date)}
-                    className={`h-24 border border-gray-200 p-2 cursor-pointer relative
-                        ${isPast ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-blue-50'}
-                        ${isSelected ? 'bg-blue-500 text-white' : ''}
-                        ${isInRange && !isSelected ? 'bg-blue-100' : ''}
-                    `}
-                >
-                    <div className="flex justify-between items-start">
-                        <span className="text-sm">{day}</span>
-                        <div className="flex flex-col items-end">
-                            <span className="text-xs bg-green-100 text-green-800 px-1 rounded mb-1">
-                                ₹{price}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                                {occupancy.adults + occupancy.children} guests
-                            </span>
-                        </div>
-                    </div>
-                    {!isPast && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedDateForPrice(date);
-                                setShowPriceModal(true);
-                            }}
-                            className="absolute bottom-1 right-1 text-xs text-blue-600 hover:text-blue-800"
-                        >
-                            Set Price
-                        </button>
-                    )}
+      {/* Calendar Grid */}
+      <div className="overflow-x-auto">
+        <div className="min-w-full">
+          {/* Month Headers */}
+          <div className="flex bg-gray-50 border-b">
+            <div className="w-48 p-3 font-medium text-gray-700">May 2025</div>
+            <div className="flex">
+              {mayDates.map((date, index) => (
+                <div key={`may-${index}`} className="w-16 p-2 text-center border-l border-gray-200">
+                  <div className="text-xs text-gray-600">{date.day}</div>
+                  <div className="text-sm font-medium">{date.date}</div>
                 </div>
-            );
-        }
-
-        // Add empty cells for days after the last day of the month
-        for (let i = lastDayOfMonth; i < 6; i++) {
-            days.push(<div key={`empty-end-${i}`} className="h-24 border border-gray-200"></div>);
-        }
-
-        return days;
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <HostHeader />
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-semibold text-gray-900">Calendar & Pricing</h2>
-                        <div className="flex items-center space-x-4">
-                            <select
-                                value={selectedRoom?.id || ''}
-                                onChange={(e) => handleRoomChange(parseInt(e.target.value))}
-                                className="p-2 border rounded"
-                            >
-                                <option value="">Select Room</option>
-                                {rooms.map(room => (
-                                    <option key={room.id} value={room.id}>
-                                        {room.name} - ₹{room.basePrice}
-                                    </option>
-                                ))}
-                            </select>
-                            <button
-                                onClick={() => setShowRoomSettingsModal(true)}
-                                className="p-2 text-blue-600 hover:text-blue-800"
-                                title="Manage Room Prices"
-                            >
-                                <Home className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Booking.com style search bar */}
-                    <div className="relative" ref={calendarRef}>
-                        <div className="flex items-center space-x-4 bg-white border border-gray-300 rounded-lg p-4">
-                            <div className="flex-1 relative">
-                                <div
-                                    className="flex items-center space-x-2 cursor-pointer"
-                                    onClick={() => setShowCalendar(!showCalendar)}
-                                >
-                                    <CalendarIcon className="w-5 h-5 text-blue-600" />
-                                    <div>
-                                        <div className="text-sm text-gray-500">Dates</div>
-                                        <div className="text-sm font-medium">
-                                            {selectedDates.length === 2
-                                                ? `${moment(selectedDates[0]).format('MMM D')} - ${moment(selectedDates[1]).format('MMM D')}`
-                                                : 'Select dates'}
-                                        </div>
-                                    </div>
-                                </div>
-                                {showCalendar && renderCalendar()}
-                            </div>
-
-                            <div className="flex-1 relative">
-                                <div
-                                    className="flex items-center space-x-2 cursor-pointer"
-                                    onClick={() => setShowOccupancyModal(!showOccupancyModal)}
-                                >
-                                    <Users className="w-5 h-5 text-blue-600" />
-                                    <div>
-                                        <div className="text-sm text-gray-500">Guests</div>
-                                        <div className="text-sm font-medium">
-                                            {`${occupancy.adults} adults · ${occupancy.children} children · ${occupancy.rooms} room`}
-                                        </div>
-                                    </div>
-                                </div>
-                                {showOccupancyModal && renderOccupancyModal()}
-                            </div>
-
-                            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                                Search
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Calendar Grid */}
-                    <div className="mt-8 grid grid-cols-7 gap-px bg-gray-200">
-                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                            <div key={day} className="bg-gray-50 p-2 text-center text-sm font-medium text-gray-900">
-                                {day}
-                            </div>
-                        ))}
-                        {renderCalendarDays()}
-                    </div>
-                </div>
+              ))}
             </div>
-
-            {/* Price Adjustment Modal */}
-            {showPriceModal && selectedDateForPrice && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-96">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold">
-                                Set Price for {selectedDateForPrice.format('MMMM D, YYYY')}
-                            </h3>
-                            <button
-                                onClick={() => setShowPriceModal(false)}
-                                className="text-gray-500 hover:text-gray-700"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-                        <input
-                            type="number"
-                            placeholder="Enter price adjustment"
-                            className="w-full p-2 border rounded mb-4"
-                            onChange={(e) => handlePriceAdjustment(
-                                selectedDateForPrice.format('YYYY-MM-DD'),
-                                e.target.value
-                            )}
-                        />
-                        <div className="flex justify-end space-x-2">
-                            <button
-                                onClick={() => setShowPriceModal(false)}
-                                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => setShowPriceModal(false)}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </div>
+            <div className="w-48 p-3 font-medium text-gray-700 border-l-2 border-gray-300">Jun 2025</div>
+            <div className="flex">
+              {juneDates.map((date, index) => (
+                <div key={`jun-${index}`} className="w-16 p-2 text-center border-l border-gray-200">
+                  <div className="text-xs text-gray-600">{date.day}</div>
+                  <div className="text-sm font-medium">{date.date}</div>
                 </div>
-            )}
+              ))}
+            </div>
+          </div>
 
-            {showRoomSettingsModal && renderRoomSettingsModal()}
+          {/* Room Rows */}
+          {rooms.map((room, roomIndex) => (
+            <div key={room.id} className="border-b border-gray-200">
+              {/* Room Header */}
+              <div className="flex items-center bg-gray-50">
+                <div className="w-48 p-4">
+                  <div className="font-medium text-gray-900">{room.name}</div>
+                  <div className="text-xs text-gray-500">(Room ID: {room.id})</div>
+                </div>
+                <div className="flex-1 h-16"></div>
+              </div>
+              
+              {/* Room Status Row */}
+              <div className="flex">
+                <div className="w-48 p-3 text-sm text-gray-600">Room status</div>
+                <div className="flex-1 bg-green-100">
+                  <div className="p-3 text-sm font-medium text-green-800">Bookable</div>
+                </div>
+              </div>
+              
+              {/* Rooms to Sell Row */}
+              <div className="flex">
+                <div className="w-48 p-3 text-sm text-gray-600">Rooms to sell</div>
+                <div className="flex">
+                  {allDates.map((_, index) => (
+                    <div key={index} className="w-16 p-2 text-center border-l border-gray-200">
+                      <div className="text-sm">{room.roomsToSell}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Net Booked Row */}
+              <div className="flex">
+                <div className="w-48 p-3 text-sm text-gray-600">Net booked</div>
+                <div className="flex">
+                  {allDates.map((_, index) => (
+                    <div key={index} className="w-16 p-2 text-center border-l border-gray-200">
+                      <div className="text-sm"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Rate Row */}
+              <div className="flex bg-blue-50">
+                <div className="w-48 p-3">
+                  <div className="text-sm text-blue-600">▼ {room.rate}</div>
+                  <div className="text-xs text-blue-600">▼ ✎ Edit</div>
+                </div>
+                <div className="flex">
+                  {room.pricing.map((pricing, index) => (
+                    <div key={index} className="w-16 p-2 text-center border-l border-gray-200">
+                      <div className="text-xs text-gray-600">{pricing.price}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-    );
+      </div>
+
+      {/* Footer */}
+      <div className="bg-blue-900 text-white p-6 mt-8">
+        <div className="flex items-center justify-between max-w-6xl mx-auto">
+          <div className="flex space-x-8">
+            <a href="#" className="text-white hover:text-blue-200">About Us</a>
+            <a href="#" className="text-white hover:text-blue-200">Privacy and Cookie Statements</a>
+            <a href="#" className="text-white hover:text-blue-200">FAQs</a>
+          </div>
+          <div className="flex space-x-4">
+            <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+              Add new property
+            </button>
+            <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+              Share your feedback
+            </button>
+          </div>
+        </div>
+        <div className="text-center mt-4 text-blue-200">
+          © Copyright 2025
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Calender;
