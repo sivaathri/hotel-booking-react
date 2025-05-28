@@ -73,10 +73,10 @@ const Calender = () => {
             <div className="flex items-center space-x-4">
               <h1 className="text-xl font-semibold text-gray-900">Calendar</h1>
             </div>
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
               <HelpCircle className="w-5 h-5 text-gray-400" />
               <span className="text-red-500 font-bold">1</span>
-            </div>
+            </div> */}
           </div>
           
           <div className="flex items-center justify-between mt-4">
@@ -86,15 +86,13 @@ const Calender = () => {
               </select>
               
               <div className="flex items-center space-x-2">
-                <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
-                  XML (not editable)
-                </span>
+              
                 <span className="text-sm text-gray-600">
                   Last sync: 27 May 2025, 13:08
                 </span>
-                <button className="text-blue-600 text-sm hover:underline">
+                {/* <button className="text-blue-600 text-sm hover:underline">
                   Learn more
-                </button>
+                </button> */}
               </div>
             </div>
             
