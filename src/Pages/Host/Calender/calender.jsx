@@ -80,13 +80,15 @@ const Calender = () => {
 
   const renderCalendarHeader = () => {
     return (
-      <div className="flex mt-2">
-        <div className="w-64 flex-shrink-0"></div>
+      <div className="flex">
+        <div className="w-48 flex-shrink-0 p-2">
+          <div className="text-sm font-medium">May 2025</div>
+        </div>
         <div className="flex-1 flex">
           {allDates.map((date, index) => (
-            <div key={index} className="flex-1 text-center text-xs border-l border-gray-200 py-1">
-              <div>{date.day}</div>
-              <div>{date.date}</div>
+            <div key={index} className="flex-1 text-center border-l border-gray-200">
+              <div className="text-xs text-gray-600">{date.day}</div>
+              <div className="text-xs">{date.date}</div>
             </div>
           ))}
         </div>
@@ -96,24 +98,39 @@ const Calender = () => {
 
   const renderRoom = (room) => {
     return (
-      <div className="flex border-t border-gray-200">
-        <div className="w-64 flex-shrink-0 p-2">
-          <div className="font-medium">{room.name}</div>
-          <div className="text-xs text-gray-500">Room ID: {room.id}</div>
-          <div className="mt-1">
-            <div className={`inline-block px-2 py-0.5 text-xs rounded ${room.status === 'Bookable' ? 'bg-green-50 text-green-700' : ''}`}>
-              {room.status}
+      <div>
+        <div className="flex">
+          <div className="w-48 flex-shrink-0 p-2">
+            <div className="font-medium">{room.name}</div>
+            <div className="text-xs text-gray-500">Room ID: {room.id}</div>
+          </div>
+        </div>
+        <div className="flex">
+          <div className="w-48 flex-shrink-0 p-2">
+            <div className="text-xs">Rooms to sell</div>
+          </div>
+          <div className="flex-1 flex">
+            {room.pricing.map((price, index) => (
+              <div key={index} className="flex-1 text-center border-l border-gray-200">
+                <div className="text-xs">{room.roomsToSell}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex border-t border-gray-200">
+          <div className="w-48 flex-shrink-0 p-2">
+            <div className="flex items-center space-x-2">
+              <span className="h-2 w-2 rounded-full bg-green-500"></span>
+              <span className="text-xs">Standard Rate</span>
             </div>
           </div>
-          <div className="text-xs mt-1">Rooms to sell: {room.roomsToSell}</div>
-        </div>
-        <div className="flex-1 flex">
-          {room.pricing.map((price, index) => (
-            <div key={index} className="flex-1 text-center text-xs border-l border-gray-200 py-1">
-              <div>{price.available}</div>
-              <div className="text-gray-500">{price.price}</div>
-            </div>
-          ))}
+          <div className="flex-1 flex">
+            {room.pricing.map((price, index) => (
+              <div key={index} className="flex-1 text-center border-l border-gray-200">
+                <div className="text-xs">INR {room.name === '3 BHK' ? '6000' : '4000'}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
