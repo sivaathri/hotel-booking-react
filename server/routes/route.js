@@ -16,6 +16,8 @@ const property = require ('../Modules/HostList/propertiesRules/propertiesRoutes'
 const amenitiesRoutes = require('../Modules/HostList/amenities/routes');
 const roomPricingRoutes = require('../Modules/HostList/RoomPricing/RoomPricingroutes')
 const propertyDetailsRoutes = require('../Modules/HostList/PropertyDetails/PropertyDetailsRoutes');
+const CalenderRoutes = require('../Modules/HostCalender/CalenderRoutes');
+
 // API Routes
 router.use('/auth', userRoutes)
 router.use('/basicInfo', basicInfoRoutes)
@@ -28,7 +30,7 @@ router.use('/amenities', amenitiesRoutes)
 router.use('/roomPricing', roomPricingRoutes)
 router.use('/propertyDetails', propertyDetailsRoutes)
 
-
+router.use('/calender', CalenderRoutes)
 
 
 
