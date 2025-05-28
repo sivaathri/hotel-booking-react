@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, HelpCircle, X } from 'lucide-react';
 import HostHeader from '../HostHeader';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Calender = () => {
+  const [startDate, setStartDate] = useState(new Date('2025-05-28'));
+  const [endDate, setEndDate] = useState(new Date('2025-06-27'));
   const [selectedRange, setSelectedRange] = useState('28 May 2025 - 27 Jun 2025');
   const [viewType, setViewType] = useState('List view');
   const [showPricingPopup, setShowPricingPopup] = useState(false);
@@ -74,60 +78,93 @@ const Calender = () => {
     }
   ];
 
+  const renderCalendarHeader = () => {
+    return (
+      <div className="flex mt-2">
+        <div className="w-64 flex-shrink-0"></div>
+        <div className="flex-1 flex">
+          {allDates.map((date, index) => (
+            <div key={index} className="flex-1 text-center text-xs border-l border-gray-200 py-1">
+              <div>{date.day}</div>
+              <div>{date.date}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderRoom = (room) => {
+    return (
+      <div className="flex border-t border-gray-200">
+        <div className="w-64 flex-shrink-0 p-2">
+          <div className="font-medium">{room.name}</div>
+          <div className="text-xs text-gray-500">Room ID: {room.id}</div>
+          <div className="mt-1">
+            <div className={`inline-block px-2 py-0.5 text-xs rounded ${room.status === 'Bookable' ? 'bg-green-50 text-green-700' : ''}`}>
+              {room.status}
+            </div>
+          </div>
+          <div className="text-xs mt-1">Rooms to sell: {room.roomsToSell}</div>
+        </div>
+        <div className="flex-1 flex">
+          {room.pricing.map((price, index) => (
+            <div key={index} className="flex-1 text-center text-xs border-l border-gray-200 py-1">
+              <div>{price.available}</div>
+              <div className="text-gray-500">{price.price}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="bg-white min-h-screen">
-      {/* Header */}
       <HostHeader />
-      <div className="border-b border-gray-200">
-        <div className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold text-gray-900">Calendar</h1>
-            </div>
-            {/* <div className="flex items-center space-x-2">
-              <HelpCircle className="w-5 h-5 text-gray-400" />
-              <span className="text-red-500 font-bold">1</span>
-            </div> */}
-          </div>
-          
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center space-x-4">
-              <select className="border border-gray-300 rounded px-3 py-1 text-sm">
-                <option>All rooms</option>
-              </select>
-              
-              <div className="flex items-center space-x-2">
-              
-                <span className="text-sm text-gray-600">
-                  Last sync: 27 May 2025, 13:08
-                </span>
-                {/* <button className="text-blue-600 text-sm hover:underline">
-                  Learn more
-                </button> */}
-              </div>
-            </div>
-            
-            <select className="border border-gray-300 rounded px-3 py-1 text-sm">
-              <option>List view</option>
-            </select>
-          </div>
-          
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium">{selectedRange}</span>
-              <div className="flex items-center space-x-2">
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span className="text-sm">Pricing per guest</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span className="text-sm">Restrictions</span>
-                </label>
-              </div>
-            </div>
+      <div className="p-4">
+        {/* Top Controls */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-semibold text-gray-900">Calendar</h1>
           </div>
         </div>
+
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4">
+            <select className="border border-gray-300 rounded px-3 py-1 text-sm">
+              <option>All rooms</option>
+            </select>
+            <span className="text-sm text-gray-600">
+              Last sync: 27 May 2025, 13:08
+            </span>
+          </div>
+          <select className="border border-gray-300 rounded px-3 py-1 text-sm">
+            <option>List view</option>
+          </select>
+        </div>
+          
+          <div className="flex items-center space-x-4 mb-4">
+            <DatePicker
+              selected={startDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setStartDate(start);
+                setEndDate(end);
+                if (start && end) {
+                  const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                  const formattedEnd = end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                  setSelectedRange(`${formattedStart} - ${formattedEnd}`);
+                }
+              }}
+              startDate={startDate}
+              endDate={endDate}
+              selectsRange
+              dateFormat="dd MMM yyyy - dd MMM yyyy"
+              className="border border-gray-300 rounded px-3 py-1 text-sm w-64"
+              placeholderText="Select date range"
+            />
+          </div>
       </div>
 
       {/* Calendar Grid */}
@@ -168,13 +205,13 @@ const Calender = () => {
               </div>
               
               {/* Room Status Row */}
-              <div className="flex">
+              {/* <div className="flex">
                 <div className="w-48 p-3 text-sm text-gray-600">Room status</div>
                 <div className="flex-1 bg-green-100">
                   <div className="p-3 text-sm font-medium text-green-800">Bookable</div>
                 </div>
               </div>
-              
+               */}
               {/* Rooms to Sell Row */}
               <div className="flex">
                 <div className="w-48 p-3 text-sm text-gray-600">Rooms to sell</div>
@@ -188,7 +225,7 @@ const Calender = () => {
               </div>
               
               {/* Net Booked Row */}
-              <div className="flex">
+              {/* <div className="flex">
                 <div className="w-48 p-3 text-sm text-gray-600">Net booked</div>
                 <div className="flex">
                   {allDates.map((_, index) => (
@@ -198,7 +235,7 @@ const Calender = () => {
                   ))}
                 </div>
               </div>
-              
+               */}
               {/* Rate Row */}
               <div className="flex bg-blue-50">
                 <div className="w-48 p-3">
