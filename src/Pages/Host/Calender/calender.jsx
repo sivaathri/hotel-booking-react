@@ -212,16 +212,17 @@ const Calender = () => {
         {console.log('propertydetails:', propertydetails)}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
-            <select className="border border-gray-300 rounded px-3 py-1 text-sm" defaultValue="all">
-              <option value="all">All rooms</option>
-              {Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms) && 
-                propertydetails[0].rooms.map((room) => (
-                  <option key={room.room_id} value={room.room_id}>
-                    {room.room_type}
-                  </option>
-                ))
-              }
-            </select>
+          <select className="border border-gray-300 rounded px-3 py-1 text-sm" defaultValue="all">
+  <option value="all">All rooms</option>
+  {Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms) && 
+    propertydetails[0].rooms.map((room) => (
+      <option key={room.room_id} value={room.room_id}>
+        {room.room_type.split('_')[0]}
+      </option>
+    ))
+  }
+</select>
+
             <span className="text-sm text-gray-600">
               Last sync: 27 May 2025, 13:08
             </span>
