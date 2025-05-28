@@ -62,6 +62,7 @@ const Calender = () => {
     2: { price: 4000, enabled: true },
     1: { price: 5000, enabled: true }
   });
+  const [selectedRoomType, setSelectedRoomType] = useState('all');
 
   // Calendar data structure
   const mayDates = [
@@ -98,28 +99,6 @@ const Calender = () => {
 
   const allDates = [...mayDates, ...juneDates];
 
-  // Room data
-  const rooms = [
-    {
-      id: '1381220102',
-      name: '3 BHK',
-      status: 'Bookable',
-      roomsToSell: 2,
-      netBooked: '',
-      rate: 'Standard Rate',
-      pricing: Array(26).fill({ price: 'INR 6000', available: 2 })
-    },
-    {
-      id: '1381220101',
-      name: '2 BHK',
-      status: 'Bookable',
-      roomsToSell: 1,
-      netBooked: '',
-      rate: 'Standard Rate',
-      pricing: Array(26).fill({ price: 'INR 4000', available: 1 })
-    }
-  ];
-
   // Helper to generate all dates between startDate and endDate (inclusive)
   function getDateRangeArray(start, end) {
     if (!start || !end) return [];
@@ -139,6 +118,24 @@ const Calender = () => {
   }
 
   const selectedDates = (startDate && endDate) ? getDateRangeArray(startDate, endDate) : [];
+
+  // Room data
+  const rooms = Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms)
+    ? propertydetails[0].rooms
+        .filter(room => {
+          if (selectedRoomType === 'all') return true;
+          return room.room_type && room.room_type.split('_')[0] === selectedRoomType;
+        })
+        .map(room => ({
+          id: room.room_id,
+          name: room.room_type ? room.room_type.split('_')[0] : '',
+          status: 'Bookable',
+          roomsToSell: room.rpa_number_of_rooms || room.number_of_rooms || 0,
+          netBooked: '',
+          rate: 'Standard Rate',
+          pricing: Array(selectedDates.length).fill({ price: room.base_price ? `INR ${parseFloat(room.base_price)}` : '', available: room.rpa_number_of_rooms || room.number_of_rooms || 0 })
+        }))
+    : [];
 
   // const renderCalendarHeader = () => {
   //   return (
@@ -212,16 +209,21 @@ const Calender = () => {
         {console.log('propertydetails:', propertydetails)}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
-          <select className="border border-gray-300 rounded px-3 py-1 text-sm" defaultValue="all">
-  <option value="all">All rooms</option>
-  {Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms) && 
-    propertydetails[0].rooms.map((room) => (
-      <option key={room.room_id} value={room.room_id}>
-        {room.room_type.split('_')[0]}
-      </option>
-    ))
-  }
-</select>
+            <select
+              className="border border-gray-300 rounded px-3 py-1 text-sm"
+              value={selectedRoomType}
+              onChange={e => setSelectedRoomType(e.target.value)}
+            >
+              <option value="all">All rooms</option>
+              {Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms) &&
+                [...new Set(propertydetails[0].rooms
+                  .filter(room => room.room_type)
+                  .map(room => room.room_type.split('_')[0]))]
+                  .map(roomType => (
+                    <option key={roomType} value={roomType}>{roomType}</option>
+                  ))
+              }
+            </select>
 
             <span className="text-sm text-gray-600">
               Last sync: 27 May 2025, 13:08
