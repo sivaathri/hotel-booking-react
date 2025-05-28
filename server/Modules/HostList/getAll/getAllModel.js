@@ -277,30 +277,40 @@ LEFT JOIN
     static async getCombinedInfoById(id) {
         try {
             const query = `
-                SELECT 
-                    bi.*,
-                    fa.*,
-                    ld.*,
-                    pd.*,
-                    pr.*,
-                    ri.image_paths,
-                    rpa.*,
-                    rs.*,
-                    rb.booking_id,
-                    rb.user_id as booking_user_id,
-                    rb.room_number,
-                    rb.number_of_rooms_Book,
-                    rb.adults as booking_adults,
-                    rb.children as booking_children,
-                    DATE_FORMAT(rb.check_in_date, '%Y-%m-%d') as check_in_date,
-                    DATE_FORMAT(rb.check_out_date, '%Y-%m-%d') as check_out_date,
-                    rb.total_price,
-                    rb.payment_status,
-                    rb.payment_method,
-                    rb.instant_payment,
-                    rb.free_cancellation,
-                    DATE_FORMAT(rb.created_at, '%Y-%m-%d %H:%i:%s') as booking_created_at,
-                    DATE_FORMAT(rb.updated_at, '%Y-%m-%d %H:%i:%s') as booking_updated_at
+                SELECT
+        bi.*,
+        fa.*,
+        ld.*,
+        pd.*,
+        pr.*,
+        ri.image_paths,
+        rpa.*,
+        rs.*,
+        rgpd.id as pricing_id,
+        DATE_FORMAT(rgpd.pricing_date, '%Y-%m-%d') as pricing_date,
+        rgpd.adults,
+        rgpd.price,
+        rgpd.currency,
+        rgpd.child_age_from,
+        rgpd.child_age_to,
+        rgpd.child_price,
+        DATE_FORMAT(rgpd.created_at, '%Y-%m-%d %H:%i:%s') as created_at_pricing,
+        DATE_FORMAT(rgpd.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at_pricing,
+        rb.booking_id,
+        rb.user_id as booking_user_id,
+        rb.room_number,
+        rb.number_of_rooms_Book,
+        rb.adults as booking_adults,
+        rb.children as booking_children,
+        DATE_FORMAT(rb.check_in_date, '%Y-%m-%d') as check_in_date,
+        DATE_FORMAT(rb.check_out_date, '%Y-%m-%d') as check_out_date,
+        rb.total_price,
+        rb.payment_status,
+        rb.payment_method,
+        rb.instant_payment,
+        rb.free_cancellation,
+        DATE_FORMAT(rb.created_at, '%Y-%m-%d %H:%i:%s') as booking_created_at,
+        DATE_FORMAT(rb.updated_at, '%Y-%m-%d %H:%i:%s') as booking_updated_at
                 FROM basic_info bi
                 LEFT JOIN facilities_amenities fa ON bi.property_id = fa.property_id
                 LEFT JOIN location_details ld ON bi.property_id = ld.property_id AND bi.user_id = ld.user_id
@@ -308,25 +318,27 @@ LEFT JOIN
                 LEFT JOIN property_rules pr ON bi.property_id = pr.property_id AND bi.user_id = pr.user_id
                 LEFT JOIN room_setup rs ON bi.property_id = rs.property_id AND bi.user_id = rs.user_id
                 LEFT JOIN room_images ri ON ri.property_id = bi.property_id AND ri.room_id = rs.room_id
-                LEFT JOIN room_pricing_availability rpa ON rpa.property_id = bi.property_id 
-                    AND rpa.floor = rs.floor 
+                LEFT JOIN room_pricing_availability rpa ON rpa.property_id = bi.property_id
+                    AND rpa.floor = rs.floor
                     AND rpa.room_type = rs.room_type
+                LEFT JOIN room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id
                 LEFT JOIN room_bookings rb ON rb.property_id = bi.property_id AND rb.room_number = rpa.id
                 WHERE bi.user_id = ?
             `;
-
+    
             const [results] = await db.query(query, [id]);
-
+    
             if (!results || results.length === 0) {
-                return null;
+                return null; // Or return an empty array if that makes more sense for your application
             }
-
-            // Group results by property_id
+    
             const propertiesMap = new Map();
-
+    
             results.forEach(result => {
-                if (!propertiesMap.has(result.property_id)) {
-                    propertiesMap.set(result.property_id, {
+                let property = propertiesMap.get(result.property_id);
+    
+                if (!property) {
+                    property = {
                         property_id: result.property_id,
                         user_id: result.user_id,
                         property_name: result.property_name,
@@ -419,62 +431,79 @@ LEFT JOIN
                             cot_cost: result.cot_cost,
                             rule_description: result.rule_description
                         },
-                        room: {
-                            room_id: result.room_id,
-                            image_urls: result.image_paths ? JSON.parse(result.image_paths) : [],
-                            floor: result.floor,
-                            room_type: result.room_type,
-                            rpa_number_of_rooms: result.rpa_number_of_rooms,
-                            number_of_rooms: result.number_of_rooms,
-                            total_capacity: result.total_capacity,
-                            room_capacity_adults: result.room_capacity_adults,
-                            room_capacity_children: result.room_capacity_children,
-                            base_price: result.base_price,
-                            occupancy_price_adjustments: result.occupancy_price_adjustments,
-                            child_pricing: result.child_pricing,
-                            instant_payment_enabled: result.instant_payment_enabled,
-                            free_cancellation_enabled: result.free_cancellation_enabled,
-                            refundable1: result.refundable1,
-                            days_before1: result.days_before1,
-                            refund_percent1: result.refund_percent1,
-                            refundable2: result.refundable2,
-                            days_before2: result.days_before2,
-                            refund_percent2: result.refund_percent2,
-                            refundable3: result.refundable3,
-                            days_before3: result.days_before3,
-                            refund_percent3: result.refund_percent3,
-                            bookings: []
-                        },
-                        room_setup: {
-                            room_id: result.room_id,
-                            floor: result.floor,
-                            room_type: result.room_type,
-                            number_of_rooms: result.number_of_rooms,
-                            created_at: result.created_at,
-                            updated_at: result.updated_at
-                        },
+                        rooms: [], // Initialize rooms array
                         property_details: {
                             description: result.description,
                             nearest_beach_distance: result.nearest_beach_distance,
                             nearest_railway_station_distance: result.nearest_railway_station_distance,
                             nearest_airport_distance: result.nearest_airport_distance,
                             nearest_bus_stand_distance: result.nearest_bus_stand_distance,
-                            can_book_married_couples: result.can_book_married_couples,
-                            can_book_families: result.can_book_families,
-                            can_book_solo_travelers: result.can_book_solo_travelers,
-                            can_book_friends: result.can_book_friends,
-                            instant_booking: result.instant_booking,
-                            manual_approval: result.manual_approval,
+                            // These fields are already in rules, consider if they are needed here too
+                            // can_book_married_couples: result.can_book_married_couples,
+                            // can_book_families: result.can_book_families,
+                            // can_book_solo_travelers: result.can_book_solo_travelers,
+                            // can_book_friends: result.can_book_friends,
+                            // instant_booking: result.instant_booking,
+                            // manual_approval: result.manual_approval,
                             created_at: result.created_at,
                             updated_at: result.updated_at
                         }
+                    };
+                    propertiesMap.set(result.property_id, property);
+                }
+    
+                // Find or create the room
+                let roomInfo = property.rooms.find(room => room.room_id === result.room_id);
+                if (!roomInfo) {
+                    roomInfo = {
+                        room_id: result.room_id,
+                        image_urls: result.image_paths ? JSON.parse(result.image_paths) : [],
+                        floor: result.floor,
+                        room_type: result.room_type,
+                        number_of_rooms: result.number_of_rooms, // From room_setup
+                        rpa_number_of_rooms: result.number_of_rooms, // From room_pricing_availability (if needed)
+                        total_capacity: result.total_capacity,
+                        room_capacity_adults: result.room_capacity_adults,
+                        room_capacity_children: result.room_capacity_children,
+                        base_price: result.base_price,
+                        occupancy_price_adjustments: result.occupancy_price_adjustments,
+                        child_pricing: result.child_pricing,
+                        instant_payment_enabled: result.instant_payment_enabled,
+                        free_cancellation_enabled: result.free_cancellation_enabled,
+                        refundable1: result.refundable1,
+                        days_before1: result.days_before1,
+                        refund_percent1: result.refund_percent1,
+                        refundable2: result.refundable2,
+                        days_before2: result.days_before2,
+                        refund_percent2: result.refund_percent2,
+                        refundable3: result.refundable3,
+                        days_before3: result.days_before3,
+                        refund_percent3: result.refund_percent3,
+                        pricing_dates: [], // Initialize pricing_dates array
+                        bookings: [] // Initialize bookings array
+                    };
+                    property.rooms.push(roomInfo);
+                }
+    
+                // Add pricing date if it exists and hasn't been added for this room already
+                if (result.pricing_id && !roomInfo.pricing_dates.some(p => p.id === result.pricing_id)) {
+                    roomInfo.pricing_dates.push({
+                        id: result.pricing_id,
+                        pricing_date: result.pricing_date,
+                        adults: result.adults,
+                        price: result.price,
+                        currency: result.currency,
+                        child_age_from: result.child_age_from,
+                        child_age_to: result.child_age_to,
+                        child_price: result.child_price,
+                        created_at: result.created_at_pricing,
+                        updated_at: result.updated_at_pricing
                     });
                 }
-
-                // Add booking information if it exists
-                if (result.booking_id) {
-                    const property = propertiesMap.get(result.property_id);
-                    property.room.bookings.push({
+    
+                // Add booking information if it exists and hasn't been added for this room already
+                if (result.booking_id && !roomInfo.bookings.some(b => b.booking_id === result.booking_id)) {
+                    roomInfo.bookings.push({
                         booking_id: result.booking_id,
                         user_id: result.booking_user_id,
                         room_number: result.room_number,
@@ -493,7 +522,14 @@ LEFT JOIN
                     });
                 }
             });
-
+    
+            // Since you're querying by a single user_id, it's likely you'll get
+            // one or more properties owned by that user. The current structure
+            // assumes one property per user for the output. If a user can own
+            // multiple properties, you'd return `Array.from(propertiesMap.values())`.
+            // If you specifically want to return only one property (e.g., the first one found),
+            // then adjust accordingly. For now, I'll assume you want all properties
+            // owned by the user, each with its rooms.
             return Array.from(propertiesMap.values());
         } catch (error) {
             console.error('Error getting combined info by ID:', error);
