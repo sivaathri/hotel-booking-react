@@ -475,7 +475,7 @@ const CreateNewListing = () => {
             user_id: user.id,
             floor: room.floor,
             room_type: room.bhk,
-            number_of_rooms: 1, // Assuming 1 room per entry
+            number_of_rooms: parseInt(room.numberOfRooms) || 1, // Use the actual number of rooms value
            
           },
           {
