@@ -97,7 +97,7 @@ const PropertyCard = ({ property }) => (
 );
 
 const HostUserDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('Reservation');
   const navigate = useNavigate();
 
   const stats = [
@@ -189,7 +189,7 @@ const HostUserDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm mb-8">
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
-              {['overview', 'properties', 'bookings', 'analytics'].map((tab) => (
+              {['Reservation', 'properties', 'bookings', 'analytics'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -206,7 +206,7 @@ const HostUserDashboard = () => {
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'overview' && (
+        {activeTab === 'Reservation' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl shadow-sm p-6">
@@ -268,7 +268,7 @@ const HostUserDashboard = () => {
         {activeTab === 'analytics' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">Revenue Overview</h2>
+              <h2 className="text-lg font-semibold mb-4">Revenue Reservation</h2>
               <div className="h-64 flex items-center justify-center text-gray-500">
                 Revenue Chart Placeholder
               </div>
