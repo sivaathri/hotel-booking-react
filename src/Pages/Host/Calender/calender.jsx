@@ -78,6 +78,26 @@ const Calender = () => {
     }
   ];
 
+  // Helper to generate all dates between startDate and endDate (inclusive)
+  function getDateRangeArray(start, end) {
+    if (!start || !end) return [];
+    const arr = [];
+    let dt = new Date(start);
+    while (dt <= end) {
+      arr.push({
+        date: dt.getDate(),
+        day: dt.toLocaleDateString('en-GB', { weekday: 'short' }),
+        month: dt.getMonth(),
+        year: dt.getFullYear(),
+        full: new Date(dt)
+      });
+      dt.setDate(dt.getDate() + 1);
+    }
+    return arr;
+  }
+
+  const selectedDates = (startDate && endDate) ? getDateRangeArray(startDate, endDate) : [];
+
   // const renderCalendarHeader = () => {
   //   return (
   //     <div className="flex">
@@ -171,13 +191,22 @@ const Calender = () => {
                 if (start && end) {
                   const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                   const formattedEnd = end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                  setSelectedRange(`${formattedStart} - ${formattedEnd}`);
+                  if (formattedStart === formattedEnd) {
+                    setSelectedRange(formattedStart);
+                  } else {
+                    setSelectedRange(`${formattedStart} - ${formattedEnd}`);
+                  }
+                } else if (start) {
+                  const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                  setSelectedRange(formattedStart);
+                } else {
+                  setSelectedRange('');
                 }
               }}
               startDate={startDate}
               endDate={endDate}
               selectsRange
-              dateFormat="dd MMM yyyy - dd MMM yyyy"
+              dateFormat="dd MMM yyyy"
               className="border border-gray-300 rounded px-3 py-1 text-sm w-64"
               placeholderText="Select date range"
             />
@@ -186,93 +215,63 @@ const Calender = () => {
 
       {/* Calendar Grid */}
       <div className="overflow-x-auto">
-        <div className="min-w-full">
-          {/* Month Headers */}
-          <div className="flex bg-gray-50 border-b">
-            <div className="w-48 p-3 font-medium text-gray-700">May 2025</div>
-            <div className="flex">
-              {mayDates.map((date, index) => (
-                <div key={`may-${index}`} className="w-16 p-2 text-center border-l border-gray-200">
-                  <div className="text-xs text-gray-600">{date.day}</div>
-                  <div className="text-sm font-medium">{date.date}</div>
-                </div>
-              ))}
-            </div>
-            <div className="w-48 p-3 font-medium text-gray-700 border-l-2 border-gray-300">Jun 2025</div>
-            <div className="flex">
-              {juneDates.map((date, index) => (
-                <div key={`jun-${index}`} className="w-16 p-2 text-center border-l border-gray-200">
-                  <div className="text-xs text-gray-600">{date.day}</div>
-                  <div className="text-sm font-medium">{date.date}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Room Rows */}
-          {rooms.map((room, roomIndex) => (
-            <div key={room.id} className="border-b border-gray-200">
-              {/* Room Header */}
-              <div className="flex items-center bg-gray-50">
-                <div className="w-48 p-4">
-                  <div className="font-medium text-gray-900">{room.name}</div>
-                  <div className="text-xs text-gray-500">(Room ID: {room.id})</div>
-                </div>
-                <div className="flex-1 h-16"></div>
-              </div>
-              
-              {/* Room Status Row */}
-              {/* <div className="flex">
-                <div className="w-48 p-3 text-sm text-gray-600">Room status</div>
-                <div className="flex-1 bg-green-100">
-                  <div className="p-3 text-sm font-medium text-green-800">Bookable</div>
-                </div>
-              </div>
-               */}
-              {/* Rooms to Sell Row */}
-              <div className="flex">
-                <div className="w-48 p-3 text-sm text-gray-600">Rooms to sell</div>
-                <div className="flex">
-                  {allDates.map((_, index) => (
-                    <div key={index} className="w-16 p-2 text-center border-l border-gray-200">
+        <table className="min-w-full border-separate border-spacing-0">
+          {/* Table Head: Date Headers */}
+          {selectedDates.length > 0 && (
+            <thead>
+              <tr className="bg-gray-50 border-b">
+                <th className="w-48 p-3 font-medium text-gray-700 text-left align-bottom">{selectedDates[0].full.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</th>
+                {selectedDates.map((date, index) => (
+                  <th key={index} className="w-16 p-2 text-center border-l border-gray-200 font-normal align-bottom">
+                    <div className="text-xs text-gray-600">{date.day}</div>
+                    <div className="text-sm font-medium">{date.date}</div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          )}
+          <tbody>
+            {/* Room Rows */}
+            {rooms.map((room, roomIndex) => (
+              <React.Fragment key={room.id}>
+                {/* Room Header Row */}
+                <tr className="bg-gray-50">
+                  <td className="w-48 p-4 font-medium text-gray-900 align-middle border-b border-gray-200">
+                    {room.name}
+                    <div className="text-xs text-gray-500">(Room ID: {room.id})</div>
+                  </td>
+                  {selectedDates.map((_, index) => (
+                    <td key={index} className="h-8 border-b border-gray-200"></td>
+                  ))}
+                </tr>
+                {/* Rooms to Sell Row */}
+                <tr>
+                  <td className="w-48 p-3 text-sm text-gray-600 align-middle">Rooms to sell</td>
+                  {selectedDates.map((_, index) => (
+                    <td key={index} className="w-16 p-2 text-center border-l border-gray-200 align-middle">
                       <div className="text-sm">{room.roomsToSell}</div>
-                    </div>
+                    </td>
                   ))}
-                </div>
-              </div>
-              
-              {/* Net Booked Row */}
-              {/* <div className="flex">
-                <div className="w-48 p-3 text-sm text-gray-600">Net booked</div>
-                <div className="flex">
-                  {allDates.map((_, index) => (
-                    <div key={index} className="w-16 p-2 text-center border-l border-gray-200">
-                      <div className="text-sm"></div>
-                    </div>
+                </tr>
+                {/* Rate Row */}
+                <tr className="bg-blue-50">
+                  <td className="w-48 p-3 align-middle">
+                    <div className="text-sm text-blue-600">▼ {room.rate}</div>
+                    <div className="text-xs text-blue-600 cursor-pointer" onClick={() => {
+                      setSelectedRoom(room);
+                      setShowPricingPopup(true);
+                    }}>▼ ✎ Edit</div>
+                  </td>
+                  {selectedDates.map((_, index) => (
+                    <td key={index} className="w-16 p-2 text-center border-l border-gray-200 align-middle">
+                      <div className="text-xs text-gray-600">{room.pricing[0].price}</div>
+                    </td>
                   ))}
-                </div>
-              </div>
-               */}
-              {/* Rate Row */}
-              <div className="flex bg-blue-50">
-                <div className="w-48 p-3">
-                  <div className="text-sm text-blue-600">▼ {room.rate}</div>
-                  <div className="text-xs text-blue-600 cursor-pointer" onClick={() => {
-                    setSelectedRoom(room);
-                    setShowPricingPopup(true);
-                  }}>▼ ✎ Edit</div>
-                </div>
-                <div className="flex">
-                  {room.pricing.map((pricing, index) => (
-                    <div key={index} className="w-16 p-2 text-center border-l border-gray-200">
-                      <div className="text-xs text-gray-600">{pricing.price}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                </tr>
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Pricing per Guest Popup */}
