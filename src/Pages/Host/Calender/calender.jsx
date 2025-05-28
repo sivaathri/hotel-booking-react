@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,useEffect } from 'react';
 import { ChevronLeft, ChevronRight, HelpCircle, X } from 'lucide-react';
 import HostHeader from '../HostHeader';
 import DatePicker from 'react-datepicker';
@@ -10,41 +10,41 @@ import { getAuthToken } from '../../../utils/getAuthToken';
 import { useUser } from '../../../context/UserContext';
 const Calender = () => {
   const { user } = useUser();
-  const token = getAuthToken();
-  const [propertydetails, setpropertydetails] = useState([]);
-  useEffect(() => {
-    const fetchPropertyDetails = async () => {
-      if (!user?.id) return;
-
-      try {
-        const response = await axios.get(`${API_URL}/getall/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        // Handle the nested data structure
-        if (response.data.success && response.data.data) {
-          // Convert the single property object to an array if it's not already
-          const propertyData = Array.isArray(response.data.data)
-            ? response.data.data
-            : [response.data.data];
-
-          // Parse the image_paths string to array if it exists
-          const propertiesWithParsedImages = propertyData.map(property => ({
-            ...property,
-            images: property.image_paths ? JSON.parse(property.image_paths) : []
-          }));
-
-          setpropertydetails(propertiesWithParsedImages);
-          console.log('Property Details:', propertiesWithParsedImages);
-        }
-      } catch (error) {
-        console.error('Error fetching property details:', error);
-      }
-    };
-
-    fetchPropertyDetails();
-  }, [token, user?.id]);
+    const token = getAuthToken();
+      const [propertydetails, setpropertydetails] = useState([]);
+      useEffect(() => {
+        const fetchPropertyDetails = async () => {
+          if (!user?.id) return;
+          
+          try {
+            const response = await axios.get(`${API_URL}/getall/${user.id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            // Handle the nested data structure
+            if (response.data.success && response.data.data) {
+              // Convert the single property object to an array if it's not already
+              const propertyData = Array.isArray(response.data.data) 
+                ? response.data.data 
+                : [response.data.data];
+                
+              // Parse the image_paths string to array if it exists
+              const propertiesWithParsedImages = propertyData.map(property => ({
+                ...property,
+                images: property.image_paths ? JSON.parse(property.image_paths) : []
+              }));
+              
+              setpropertydetails(propertiesWithParsedImages);
+              console.log('Property Details:', propertiesWithParsedImages);
+            }
+          } catch (error) {
+            console.error('Error fetching property details:', error);
+          }
+        };
+    
+        fetchPropertyDetails();
+      }, [token, user?.id]);
 
 
   const [startDate, setStartDate] = useState(new Date('2025-05-28'));
@@ -119,7 +119,7 @@ const Calender = () => {
 
   const selectedDates = (startDate && endDate) ? getDateRangeArray(startDate, endDate) : [];
 
-  // Room data
+  // Now define rooms, which uses selectedDates
   const rooms = Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms)
     ? propertydetails[0].rooms
         .filter(room => {
@@ -209,16 +209,21 @@ const Calender = () => {
         {console.log('propertydetails:', propertydetails)}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
-          <select className="border border-gray-300 rounded px-3 py-1 text-sm" defaultValue="all">
-  <option value="all">All rooms</option>
-  {Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms) && 
-    propertydetails[0].rooms.map((room) => (
-      <option key={room.room_id} value={room.room_id}>
-        {room.room_type.split('_')[0]}
-      </option>
-    ))
-  }
-</select>
+            <select
+              className="border border-gray-300 rounded px-3 py-1 text-sm"
+              value={selectedRoomType}
+              onChange={e => setSelectedRoomType(e.target.value)}
+            >
+              <option value="all">All rooms</option>
+              {Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms) &&
+                [...new Set(propertydetails[0].rooms
+                  .filter(room => room.room_type)
+                  .map(room => room.room_type.split('_')[0]))]
+                  .map(roomType => (
+                    <option key={roomType} value={roomType}>{roomType}</option>
+                  ))
+              }
+            </select>
 
             <span className="text-sm text-gray-600">
               Last sync: 27 May 2025, 13:08
@@ -228,37 +233,37 @@ const Calender = () => {
             <option>List view</option>
           </select>
         </div>
-
-        <div className="flex items-center space-x-4 mb-4">
-          <DatePicker
-            selected={startDate}
-            onChange={(dates) => {
-              const [start, end] = dates;
-              setStartDate(start);
-              setEndDate(end);
-              if (start && end) {
-                const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                const formattedEnd = end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                if (formattedStart === formattedEnd) {
+          
+          <div className="flex items-center space-x-4 mb-4">
+            <DatePicker
+              selected={startDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setStartDate(start);
+                setEndDate(end);
+                if (start && end) {
+                  const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                  const formattedEnd = end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                  if (formattedStart === formattedEnd) {
+                    setSelectedRange(formattedStart);
+                  } else {
+                    setSelectedRange(`${formattedStart} - ${formattedEnd}`);
+                  }
+                } else if (start) {
+                  const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                   setSelectedRange(formattedStart);
                 } else {
-                  setSelectedRange(`${formattedStart} - ${formattedEnd}`);
+                  setSelectedRange('');
                 }
-              } else if (start) {
-                const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                setSelectedRange(formattedStart);
-              } else {
-                setSelectedRange('');
-              }
-            }}
-            startDate={startDate}
-            endDate={endDate}
-            selectsRange
-            dateFormat="dd MMM yyyy"
-            className="border border-gray-300 rounded px-3 py-1 text-sm w-64"
-            placeholderText="Select date range"
-          />
-        </div>
+              }}
+              startDate={startDate}
+              endDate={endDate}
+              selectsRange
+              dateFormat="dd MMM yyyy"
+              className="border border-gray-300 rounded px-3 py-1 text-sm w-64"
+              placeholderText="Select date range"
+            />
+          </div>
       </div>
 
       {/* Calendar Grid */}
