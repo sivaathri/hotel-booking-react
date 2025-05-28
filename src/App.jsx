@@ -36,6 +36,7 @@ import CreateNewListing from './Pages/Host/CreateNewListing';
 import EditListing from './Pages/Host/EditListing';
 import PriceMapPage from './Pages/PriceMapPage';
 import Calender from './Pages/Host/Calender/calender';
+import Message from './Pages/Host/Message/Message';
 // Protected Routes
 import ProtectedRoute from './components/ProtectedRoute';
 import PropertyDetails from './Pages/user/PropertyDetails';
@@ -91,6 +92,11 @@ function App() {
           <Route path="/listings" element={
             <ProtectedRoute>
               <Listings />
+            </ProtectedRoute>
+          } />
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <Message />
             </ProtectedRoute>
           } />
           <Route path="/create-listing" element={
