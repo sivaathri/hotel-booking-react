@@ -27,56 +27,75 @@ const Message = () => {
   ];
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-white font-['Plus Jakarta Sans','Noto Sans',sans-serif] overflow-x-hidden">
-      {/* Header */}
-<HostHeader/>
+    <div className="relative flex min-h-screen flex-col bg-white font-['Plus Jakarta Sans','Noto Sans',sans-serif] overflow-hidden">
+      <HostHeader />
 
-      {/* Body */}
-      <div className="flex flex-1 gap-1 px-6 py-5 justify-center">
-        {/* Sidebar - Chats */}
-        <div className="flex flex-col w-80">
+      <div className="flex flex-1  gap-1 px-6 py-5">
+        {/* Sidebar */}
+        <div className="flex flex-col w-80 border-r border-gray-200 overflow-y-auto">
           <h2 className="text-[22px] font-bold px-4 pt-5 pb-3 text-[#111418]">Chats</h2>
           {users.map((user) => (
-            <div key={user.id} className="flex gap-4 items-center px-4 py-2 bg-white min-h-[72px]">
+            <div
+              key={user.id}
+              className="flex gap-4 items-center px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+            >
               <div
-                className="bg-center bg-cover aspect-square rounded-full h-14 w-14"
+                className="bg-center bg-cover rounded-full h-14 w-14"
                 style={{ backgroundImage: `url(${user.avatar})` }}
               />
               <div className="flex flex-col">
-                <p className="text-base font-medium text-[#111418] truncate">{user.name}</p>
-                <p className="text-sm font-normal text-[#60758a] line-clamp-2">{user.message}</p>
+                <p className="text-base font-semibold text-[#111418] truncate">{user.name}</p>
+                <p className="text-sm text-[#60758a] line-clamp-2">{user.message}</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Main Chat View */}
+        {/* Chat View */}
         <div className="flex flex-col flex-1 max-w-[960px]">
-          <div className="flex justify-between flex-wrap gap-3 p-4">
-            <p className="text-[32px] font-bold text-[#111418] min-w-72">Conversation with User 1234</p>
+          {/* Header */}
+          <div className="sticky top-0 bg-white z-10 border-b border-gray-200 p-4">
+            <p className="text-[28px] font-bold text-[#111418]">Conversation with User 1234</p>
           </div>
-          <div className="flex items-end gap-3 p-4">
-            <div
-              className="w-10 h-10 bg-center bg-cover bg-no-repeat rounded-full shrink-0"
-              style={{
-                backgroundImage:
-                  'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA62Cd-RXd4Sao4hXOURY_hDgMZOp8IklPdIv24i9rNgndOOfBi6iggph2g6qpB5E0OW9ymJIQWxrx8koyeXxONUIAPmboHr-QWSHpSp7HWXxdK1MKQOCHQllH8XayUAsINK1ohujYZOZJqeu8kgI9q-81HKKTclI0XWaEZ55jHP2WO2x0lOSlI8kZeSVJBHfgIU8O9MejjadlxNoAZHLijv-nyJjRo47ggbQiMhdYh9-3q4QCzUuvqYrUODZSyBcExyzJhuySVfXw")',
-              }}
+
+          {/* Messages */}
+          <div className="flex flex-col gap-4 p-4 overflow-y-auto flex-1">
+            <div className="flex items-end gap-3">
+              <div
+                className="w-10 h-10 bg-center bg-cover rounded-full shrink-0"
+                style={{
+                  backgroundImage:
+                    'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA62Cd-RXd4Sao4hXOURY_hDgMZOp8IklPdIv24i9rNgndOOfBi6iggph2g6qpB5E0OW9ymJIQWxrx8koyeXxONUIAPmboHr-QWSHpSp7HWXxdK1MKQOCHQllH8XayUAsINK1ohujYZOZJqeu8kgI9q-81HKKTclI0XWaEZ55jHP2WO2x0lOSlI8kZeSVJBHfgIU8O9MejjadlxNoAZHLijv-nyJjRo47ggbQiMhdYh9-3q4QCzUuvqYrUODZSyBcExyzJhuySVfXw")',
+                }}
+              />
+              <div className="flex flex-col gap-1 items-start">
+                <p className="text-sm text-[#60758a]">User 1234</p>
+                <div className="bg-gray-100 text-[#111418] px-4 py-3 rounded-2xl max-w-[360px] shadow-sm">
+                  Hello, I'm interested in booking your property for a week in July.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-end gap-3 justify-end">
+              <div className="flex flex-col gap-1 items-end">
+                <p className="text-sm text-[#60758a]">You</p>
+                <div className="bg-[#0c7ff2] text-white px-4 py-3 rounded-2xl max-w-[360px] shadow-md">
+                  Hi there! I'd be happy to help you with that. Could you please provide the exact...
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Message Input */}
+          <div className="border-t border-gray-200 p-4 flex gap-3">
+            <input
+              type="text"
+              placeholder="Type your message..."
+              className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <div className="flex flex-col gap-1 items-start">
-              <p className="text-[#60758a] text-sm">User 1234</p>
-              <p className="text-base bg-[#f0f2f5] text-[#111418] px-4 py-3 rounded-xl max-w-[360px]">
-                Hello, I'm interested in booking your property for a week in July.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-end gap-3 p-4 justify-end">
-            <div className="flex flex-col gap-1 items-end">
-              <p className="text-[#60758a] text-sm text-right">Property Owner</p>
-              <p className="text-base bg-[#0c7ff2] text-white px-4 py-3 rounded-xl max-w-[360px]">
-                Hi there! I'd be happy to help you with that. Could you please provide the exact...
-              </p>
-            </div>
+            <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
+              Send
+            </button>
           </div>
         </div>
       </div>
