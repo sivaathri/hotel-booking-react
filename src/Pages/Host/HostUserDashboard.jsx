@@ -168,7 +168,33 @@ const HostUserDashboard = () => {
       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
     }
   ];
-
+  const reservations = [
+    {
+      guestName: 'Ramya C',
+      guests: 2,
+      checkIn: 'Jun 2, 2025',
+      checkOut: 'Jun 3, 2025',
+      rooms: '2 BHK',
+      bookedOn: 'May 16, 2025',
+      status: 'Canceled',
+      price: 'Rs. 0',
+      commission: 'Rs. 0',
+      bookingNumber: '4763178491'
+    },
+    {
+      guestName: 'sadhish kumar',
+      guests: 2,
+      checkIn: 'Jun 11, 2025',
+      checkOut: 'Jun 12, 2025',
+      rooms: '3 BHK',
+      bookedOn: 'May 23, 2025',
+      status: 'Canceled',
+      price: 'Rs. 0',
+      commission: 'Rs. 0',
+      bookingNumber: '4336571675'
+    }
+  ];
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -207,34 +233,66 @@ const HostUserDashboard = () => {
 
         {/* Tab Content */}
         {activeTab === 'Reservation' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-semibold mb-4">Recent Bookings</h2>
-                <div className="space-y-4">
-                  {recentBookings.map((booking, index) => (
-                    <BookingCard key={index} booking={booking} />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-                <div className="space-y-4">
-                  <button className="w-full px-4 py-3 bg-[#FF5A5F] text-white rounded-lg hover:bg-[#FF5A5F]/90 transition-colors" onClick={() => navigate('/create-listing')}>
-                    Add New Property
-                  </button>
-                  <button className="w-full px-4 py-3 bg-white border border-[#FF5A5F] text-[#FF5A5F] rounded-lg hover:bg-[#FF5A5F]/5 transition-colors">
-                    View All Bookings
-                  </button>
-                  <button className="w-full px-4 py-3 bg-white border border-[#FF5A5F] text-[#FF5A5F] rounded-lg hover:bg-[#FF5A5F]/5 transition-colors">
-                    Update Profile
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+         <div className="p-6">
+         {/* Header */}
+         <div className="flex items-center justify-between mb-4">
+           <h1 className="text-2xl font-bold">Reservations</h1>
+           <div className="flex gap-2 items-center">
+             <select className="border p-2 rounded">
+               <option>Check-in</option>
+               <option>Check-out</option>
+             </select>
+             <input type="date" className="border p-2 rounded" defaultValue="2025-05-29" />
+             <input type="date" className="border p-2 rounded" defaultValue="2025-06-30" />
+             <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Show</button>
+           </div>
+         </div>
+   
+         {/* Table */}
+         <div className="overflow-x-auto border rounded shadow">
+           <table className="w-full text-sm">
+             <thead className="bg-gray-100 text-left">
+               <tr>
+                 <th className="p-3">Guest Name</th>
+                 <th className="p-3">Check-in</th>
+                 <th className="p-3">Check-out</th>
+                 <th className="p-3">Rooms</th>
+                 <th className="p-3">Booked on</th>
+                 <th className="p-3">Status</th>
+                 <th className="p-3">Price</th>
+                 <th className="p-3">Commission</th>
+                 <th className="p-3">Booking number</th>
+               </tr>
+             </thead>
+             <tbody>
+               {reservations.map((r, i) => (
+                 <tr key={i} className="border-t">
+                   <td className="p-3 text-blue-600 hover:underline cursor-pointer">
+                     {r.guestName}
+                     <div className="text-gray-500 text-xs">{r.guests} guests</div>
+                   </td>
+                   <td className="p-3">{r.checkIn}</td>
+                   <td className="p-3">{r.checkOut}</td>
+                   <td className="p-3">{r.rooms}</td>
+                   <td className="p-3">{r.bookedOn}</td>
+                   <td className="p-3 text-red-600 font-semibold">{r.status}</td>
+                   <td className="p-3">{r.price}</td>
+                   <td className="p-3">{r.commission}</td>
+                   <td className="p-3 text-blue-600 hover:underline cursor-pointer">{r.bookingNumber}</td>
+                 </tr>
+               ))}
+             </tbody>
+           </table>
+         </div>
+   
+         {/* Footer */}
+         <div className="mt-4 flex items-center justify-between text-sm">
+           <div className="text-gray-500">Page 1</div>
+           <div className="font-semibold">
+             Commission: Rs. 0 <span className="ml-4">Total Price: Rs. 0</span>
+           </div>
+         </div>
+       </div>
         )}
 
         {activeTab === 'properties' && (
