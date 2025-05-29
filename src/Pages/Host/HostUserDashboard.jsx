@@ -286,12 +286,12 @@ const HostUserDashboard = () => {
          </div>
    
          {/* Footer */}
-         <div className="mt-4 flex items-center justify-between text-sm">
+         {/* <div className="mt-4 flex items-center justify-between text-sm">
            <div className="text-gray-500">Page 1</div>
            <div className="font-semibold">
              Commission: Rs. 0 <span className="ml-4">Total Price: Rs. 0</span>
            </div>
-         </div>
+         </div> */}
        </div>
         )}
 
