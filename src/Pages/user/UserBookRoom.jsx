@@ -26,9 +26,14 @@ const UserBookRoom = () => {
 
   const [bookingDetails, setBookingDetails] = useState(null);
 
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState('');
+
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
+    bookingFor: "myself",
+    Name: "",
+
     email: "",
     phone: "",
     country: "India",
@@ -128,13 +133,77 @@ const UserBookRoom = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-const handleSubmit = (e) => {
-  e.preventDefault();
-};
+  const sendOtp = async () => {
+    if (!form.phone || form.phone.length < 10) {
+      alert('Please enter a valid phone number');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/send-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone: form.phone }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setOtpSent(true);
+        setVerificationStatus('OTP sent successfully!');
+      } else {
+        setVerificationStatus('Failed to send OTP. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      setVerificationStatus('Failed to send OTP. Please try again.');
+    }
+  };
+
+  const verifyOtp = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/verify-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone: form.phone, otp }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setVerificationStatus('Phone number verified successfully!');
+        return true;
+      } else {
+        setVerificationStatus('Invalid OTP. Please try again.');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      setVerificationStatus('Failed to verify OTP. Please try again.');
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!otpSent) {
+      await sendOtp();
+      return;
+    }
+
+    const isVerified = await verifyOtp();
+    if (isVerified) {
+      // Proceed with booking
+      console.log('Proceeding with booking...');
+    }
+  };
 
   return (
     <>
-    <Paymentheader/>
+      <Paymentheader />
 
       {/* Price Summary */}
       <div className="fixed top-40 right-[300px] w-[450px] z-10 font-inter">
@@ -223,44 +292,58 @@ const handleSubmit = (e) => {
         </p>
 
         <form onSubmit={handleSubmit}>
+          {/* Booking Type Selection */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Who are you booking for?
+            </label>
+            <div className="flex gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="bookingFor"
+                  value="myself"
+                  checked={form.bookingFor === "myself"}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-blue-600"
+                />
+                <span className="text-gray-700">Myself</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="bookingFor"
+                  value="someone"
+                  checked={form.bookingFor === "someone"}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-blue-600"
+                />
+                <span className="text-gray-700">Someone else</span>
+              </label>
+            </div>
+          </div>
+
           {/* Full Name */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label
-                htmlFor="firstName"
+                htmlFor="Name"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                First Name
+                Name
               </label>
               <input
                 type="text"
-                id="firstName"
-                name="firstName"
-                value={form.firstName}
+                id="Name"
+                name="Name"
+                value={form.Name}
                 onChange={handleInputChange}
-                placeholder="First Name"
+                placeholder="Name"
                 className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
-            <div>
-              <label
-                htmlFor="lastName"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Last Name
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={form.lastName}
-                onChange={handleInputChange}
-                placeholder="Last Name"
-                className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+
           </div>
 
           {/* Email and Phone */}
@@ -289,28 +372,65 @@ const handleSubmit = (e) => {
             >
               Phone Number
             </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone" 
-              value={form.phone}
-              onChange={handleInputChange}
-              placeholder="+91"
-              className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={form.phone}
+                onChange={handleInputChange}
+                placeholder="+91"
+                className="flex-1 border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              {!otpSent && (
+                <button
+                  type="button"
+                  onClick={sendOtp}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Send OTP
+                </button>
+              )}
+            </div>
           </div>
 
-        
+          {otpSent && (
+            <div className="mb-6">
+              <label
+                htmlFor="otp"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Enter OTP
+              </label>
+              <input
+                type="text"
+                id="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+                className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+          )}
+
+          {verificationStatus && (
+            <div className={`mb-4 text-sm ${verificationStatus.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+              {verificationStatus}
+            </div>
+          )}
+
+
           {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-3 bg-orange-600 text-white rounded-lg font-semibold text-lg hover:bg-orange-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition-shadow shadow-md"
           >
-         Book Now 
+            {otpSent ? 'Verify OTP' : 'Send OTP'}
           </button>
         </form>
-        
+
       </div>
     </>
   );
