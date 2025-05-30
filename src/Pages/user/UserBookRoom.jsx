@@ -42,6 +42,37 @@ const UserBookRoom = () => {
     travelingForWork: false,
   });
 
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/auth/profile`, {
+          method: 'GET',
+          credentials: 'include', // This is important for sending cookies
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const profileData = await response.json();
+          setForm(prev => ({
+            ...prev,
+            Name: profileData.name || '',
+            email: profileData.email || '',
+            phone: profileData.phone || '',
+          }));
+        } else {
+          console.error('Failed to fetch profile');
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []); // Empty dependency array means this runs once when component mounts
+
   useEffect(() => {
     if (location.state) {
       const requiredFields = [
