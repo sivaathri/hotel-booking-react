@@ -8,7 +8,7 @@ import {
 import Header from "./Header";
 import Paymentheader from "./payment Header/Paymentheader";
 import { Radio } from "lucide-react";
-
+import { useUser } from '../../context/UserContext';
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const getImageUrl = (path) =>
@@ -20,7 +20,7 @@ const UserBookRoom = () => {
     const options = { weekday: "short", day: "numeric", month: "short" };
     return date.toLocaleDateString("en-US", options).replace(",", "");
   };
-
+  const { user, logout } = useUser();
   const { propertyId } = useParams();
   const [searchParams] = useSearchParams();
 
@@ -229,7 +229,7 @@ const UserBookRoom = () => {
 
     try {
       const bookingData = {
-        user_id: 1, // Replace with actual user ID from authentication
+        user_id: user.id, // Replace with actual user ID from authentication
         property_id: propertyId,
         propertyName: bookingDetails.propertyName,
         propertyAddress: bookingDetails.propertyAddress,
