@@ -610,7 +610,9 @@ export default function PropertyDetails() {
   };
 
   return (
-    <>
+    <div className=' bg-white'>
+   
+   
       <Header />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -806,7 +808,7 @@ export default function PropertyDetails() {
           )}
         </motion.div>
         {/* Add this new Facilities Section at the bottom, before the closing tags */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -831,7 +833,7 @@ export default function PropertyDetails() {
                 ))}
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
  {/* Property Description */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -846,6 +848,7 @@ export default function PropertyDetails() {
               __html: sanitizeHTML(property?.property_details?.description || 'No description available')
             }}
           />
+          <button className='text-blue-600 font-bold bg-gray border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors duration-300'>Show More</button>
         </motion.div>
 
           {/* Room Comparison Table */}
@@ -1624,6 +1627,7 @@ export default function PropertyDetails() {
       </AnimatePresence>
 
 
-    </>
+   
+    </div>
   );
 }
