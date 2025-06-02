@@ -1194,6 +1194,7 @@ export default function PropertyDetails() {
                                 <option value="0">Select rooms</option>
                                 {[...Array(calculateAvailableRooms(roomOption, searchParamsState.checkIn, searchParamsState.checkOut))].map((_, i) => {
                                   const numberOfRooms = i + 1;
+                                  console.log('Calculating price for room option:',numberOfRooms )
                                   const roomPrice = calculatePrice(roomOption);
                                   const gst = calculateGST(roomPrice);
                                   const totalPrice = roomPrice * numberOfRooms;
