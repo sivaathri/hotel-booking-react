@@ -27,24 +27,38 @@ const getBookingById = async (req, res) => {
 const createBooking = async (req, res) => {
   try {
     const {
-      user_id, property_id, room_type, room_number,
-      number_of_rooms_Book, adults, children,
-      check_in_date, check_out_date, total_price,
-      payment_status, payment_method, instant_payment,
-      free_cancellation, first_name, last_name,
-      email, phone_number, country
+      user_id, property_id, rooms,
+      first_name, last_name, email, phone_number, country
     } = req.body;
 
-    if (!property_id || !room_type || !check_in_date || !check_out_date || !total_price || !first_name || !last_name || !email || !phone_number || !country) {
+    if (!property_id || !rooms || rooms.length === 0 || !first_name || !last_name || !email || !phone_number || !country) {
       return res.status(400).json({ message: 'Required fields missing' });
     }
 
-    const insertId = await RoomBooking.createBooking(req.body);
-    res.status(201).json({ success: true, insertId });
+    const insertIds = [];
+
+    for (const room of rooms) {
+      const bookingData = {
+        user_id,
+        property_id,
+        ...room,
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        country
+      };
+
+      const insertId = await RoomBooking.createBooking(bookingData);
+      insertIds.push(insertId);
+    }
+
+    res.status(201).json({ success: true, insertIds });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // PUT update booking
 const updateBooking = async (req, res) => {
