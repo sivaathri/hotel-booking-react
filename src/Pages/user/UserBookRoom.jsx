@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 import Header from "./Header";
 import Paymentheader from "./payment Header/Paymentheader";
+import { Radio } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -213,7 +214,7 @@ const UserBookRoom = () => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
-          className=" p-6 border border-blue-100 shadow-lg hover:shadow-2xl transition-shadow duration-300"
+          className=" p-6 border border-blue-100 hover:shadow-2xl transition-shadow duration-300"
         >
           <div className="space-y-6 text-gray-700">
             {/* Property Info */}
@@ -249,7 +250,7 @@ const UserBookRoom = () => {
 
             {/* Price Summary */}
             <div className="space-y-3 text-sm">
-              <h3 className="text-lg font-semibold text-gray-900">Price Summary</h3>
+              <h3 className="text-lg font-bold text-gray-900">Price Summary</h3>
               <div className="flex justify-between">
                 <span>
                   Room Price for {numberOfNights} {numberOfNights === 1 ? "Night" : "Nights"} x{" "}
@@ -282,10 +283,10 @@ const UserBookRoom = () => {
       </div>
 
       {/* Booking Form */}
-      <div className="max-w-2xl ml-60 mt-16 p-6  border-gray-100  space-y-6">
+      <div className="max-w-2xl ml-80 mt-16 p-6  border-gray-100  space-y-6">
       <h2 className="text-xxl font-bold">Enter your details</h2>
-
-    
+     
+  
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium">First name *</label>
@@ -298,7 +299,7 @@ const UserBookRoom = () => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Email address *</label>
+        <label className="block text-sm font-medium">Email address *    <span className="text-gray-400">(Booking Details will be sent to this email ID)</span></label>
         <input type="email" className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="example@email.com" />
         <p className="text-sm text-green-600 mt-1">Confirmation email goes to this address</p>
       </div>
@@ -551,7 +552,7 @@ const UserBookRoom = () => {
       </div>
        */}
     </div>
-    <button className="bg-orange-600 mt-10 ml-60 mb-10 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">Request to Book</button>
+    <button className="bg-orange-600 mt-10 ml-80 mb-10 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">Request to Book</button>
     </div>
   );
 };
