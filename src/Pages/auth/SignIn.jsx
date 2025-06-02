@@ -34,7 +34,7 @@ const SignIn = ({ setSigninOpen }) => {
     setLoading(true);
 
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password, stayLoggedIn);
       
       if (result.success) {
         if (formData.email === 'admin@gmail.com' && formData.password === 'Admin@123') {

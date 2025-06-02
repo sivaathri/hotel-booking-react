@@ -41,7 +41,7 @@ export const UserProvider = ({ children }) => {
     fetchUserData();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, stayLoggedIn = false) => {
     try {
       const response = await axios.post(`${API_URL}/auth/login`, {
         email,
@@ -50,7 +50,14 @@ export const UserProvider = ({ children }) => {
 
       if (response.status === 200) {
         const { token, user } = response.data;
-        localStorage.setItem('token', token);
+        // Store token in localStorage or sessionStorage based on stayLoggedIn
+        if (stayLoggedIn) {
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+        } else {
+          sessionStorage.setItem('token', token);
+          sessionStorage.setItem('user', JSON.stringify(user));
+        }
         setUser(user);
         return { success: true };
       }
