@@ -283,7 +283,7 @@ const UserBookRoom = () => {
 
       {/* Booking Form */}
       <div className="max-w-2xl ml-60 mt-16 p-6  border-gray-100  space-y-6">
-      <h2 className="text-xl font-semibold">Enter your details</h2>
+      <h2 className="text-xxl font-bold">Enter your details</h2>
 
     
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -521,7 +521,7 @@ const UserBookRoom = () => {
           <span className="text-sm">Yes, I'd like free paperless confirmation (recommended)</span>
         </label>
         <label className="flex items-center space-x-2">
-          <input type="checkbox" defaultChecked className="form-checkbox text-blue-600" />
+          <input type="checkbox"  className="form-checkbox text-blue-600" />
           <span className="text-sm">Update my account to include these new details</span>
         </label>
       </div>
