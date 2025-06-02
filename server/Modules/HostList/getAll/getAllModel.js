@@ -63,7 +63,7 @@ LEFT JOIN
 LEFT JOIN
     room_guest_pricing_dates rgpd ON rgpd.room_id = rs.room_id
 LEFT JOIN
-    room_bookings rb ON rb.property_id = bi.property_id AND rb.room_number = rpa.id;
+    room_bookings rb ON rb.property_id = bi.property_id AND rb.room_number = rs.room_id;
             `;
 
             const [results] = await db.query(query, [userId]);
