@@ -56,10 +56,10 @@ function App() {
             </ProtectedRoute>
             } />
           <Route path="/rooms/:id" element={<RoomDetails />} />
-          <Route path="/book/:id/:roomId" element={<UserBookRoom />} />
+          <Route path="/book/:propertyId" element={<UserBookRoom />} />
           <Route path="/register" element={<Register />} />
           <Route path="/price-map" element={<PriceMapPage />} />
-          {/* <Route path="/login" element={<UserLogin />} /> */}
+          {/* <Route path="/login" element={<UserLogin />} /> */} 
           <Route path="/user-dashboard" element={
             <ProtectedRoute>
               <UserDashboard />

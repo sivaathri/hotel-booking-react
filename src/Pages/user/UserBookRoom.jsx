@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FaCalendarCheck,
@@ -22,6 +22,16 @@ const UserBookRoom = () => {
   };
 
   const { propertyId } = useParams();
+  const [searchParams] = useSearchParams();
+  
+  // Get selected rooms from URL query parameters
+  const selectedRooms = {};
+  for (const [key, value] of searchParams.entries()) {
+    if (key.startsWith('room')) {
+      const roomId = key.replace('room', '');
+      selectedRooms[roomId] = parseInt(value);
+    }
+  }
   const location = useLocation();
   const navigate = useNavigate();
 

@@ -1051,7 +1051,12 @@ export default function PropertyDetails() {
 
                       console.log('Final booking state being passed:', bookingState);
 
-                      navigate(`/book/${propertyId}/${bookingState.rooms[0].room_id}`, {
+                      // Create query parameters for selected rooms
+                      const roomParams = bookingState.rooms
+                        .map(room => `room${room.room_id}=${room.selectedCount}`)
+                        .join('&');
+                      
+                      navigate(`/book/${propertyId}?${roomParams}`, {
                         state: bookingState,
                         replace: true // Use replace to prevent back button issues
                       });
