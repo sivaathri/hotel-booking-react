@@ -23,7 +23,7 @@ const UserBookRoom = () => {
 
   const { propertyId } = useParams();
   const [searchParams] = useSearchParams();
-  
+
   // Get selected rooms from URL query parameters
   const selectedRooms = {};
   for (const [key, value] of searchParams.entries()) {
@@ -44,14 +44,16 @@ const UserBookRoom = () => {
   const [travelForWork, setTravelForWork] = useState("no");
   const [form, setForm] = useState({
     bookingFor: "myself",
-    Name: "",
-
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     country: "India",
     paperless: true,
     mainGuest: true,
     travelingForWork: false,
+    phoneCountryCode: "+91", // Assuming a default, you might want to manage this dynamically
+    phoneNumber: ""
   });
 
   useEffect(() => {
@@ -67,6 +69,7 @@ const UserBookRoom = () => {
         "guests",
         "price",
       ];
+
       const missingFields = requiredFields.filter((field) => !location.state[field]);
       if (missingFields.length > 0) {
         navigate(`/property/${propertyId}`);
@@ -78,6 +81,7 @@ const UserBookRoom = () => {
         amenities: location.state.amenities || [],
         rules: location.state.rules || {},
       });
+      console.log('bookingDetails', bookingDetails);
     } else {
       navigate(`/property/${propertyId}`);
     }
@@ -87,7 +91,7 @@ const UserBookRoom = () => {
     return (
       <>
         <Header />
-        <div className="flex items-center  justify-center min-h-screen">
+        <div className="flex items-center  justify-center min-h-screen">
           <motion.div
             className="rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
             animate={{ rotate: 360 }}
@@ -138,7 +142,7 @@ const UserBookRoom = () => {
     0
   );
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
       ...prev,
@@ -146,7 +150,7 @@ const UserBookRoom = () => {
     }));
   };
   const sendOtp = async () => {
-    if (!form.phone || form.phone.length < 10) {
+    if (!form.phoneNumber || form.phoneNumber.length < 10) {
       alert('Please enter a valid phone number');
       return;
     }
@@ -157,7 +161,7 @@ const UserBookRoom = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phone: form.phone }),
+        body: JSON.stringify({ phone: `${form.phoneCountryCode}${form.phoneNumber}` }),
       });
 
       const data = await response.json();
@@ -180,7 +184,7 @@ const UserBookRoom = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phone: form.phone, otp }),
+        body: JSON.stringify({ phone: `${form.phoneCountryCode}${form.phoneNumber}`, otp }),
       });
 
       const data = await response.json();
@@ -212,6 +216,75 @@ const UserBookRoom = () => {
       console.log('Proceeding with booking...');
     }
   };
+  const handleBookingSubmission = async () => {
+    if (!form.firstName || !form.lastName || !form.email) {
+      alert('Please fill in all required fields: First Name, Last Name, and Email');
+      return;
+    }
+    // Consider adding OTP verification here before allowing submission
+    // if (!verificationStatus.includes('successfully!')) {
+    //   alert('Please verify your phone number first.');
+    //   return;
+    // }
+
+    try {
+      const bookingData = {
+        user_id: 1, // Replace with actual user ID from authentication
+        property_id: propertyId,
+        propertyName: bookingDetails.propertyName,
+        propertyAddress: bookingDetails.propertyAddress,
+        checkInDate: dates.checkIn,
+        checkOutDate: dates.checkOut,
+        numberOfNights: numberOfNights,
+        guests: guests,
+        roomsBooked: rooms.map(room => ({
+          roomId: room.room_id,
+          room_type: room.room_type.split('_')[0],
+          count: room.selectedCount || 0,
+          pricePerNight: room.price?.basePrice || 0,
+        })),
+        totalPrice: finalPrice,
+        gstAmount: gstAmount,
+
+        // ✅ Keep as userDetails object
+        userDetails: {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: `${form.phoneCountryCode}${form.phoneNumber}`,
+          country: form.country,
+          paperlessConfirmation: form.paperless,
+          bookingFor: bookingFor,
+        },
+      };
+
+
+      const response = await fetch(`${API_URL}/api/booking`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Include authorization token if your API requires it
+          // 'Authorization': `Bearer ${yourAuthToken}`
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Booking successful!');
+        // Redirect to a confirmation page or home
+        navigate('/booking-confirmation', { state: { bookingId: data.bookingId } });
+      } else {
+        alert(`Booking failed: ${data.message || 'Something went wrong.'}`);
+      }
+    } catch (error) {
+      console.error('Error submitting booking:', error);
+      alert('An error occurred during booking. Please try again.');
+    }
+  };
+
+
 
   return (
     <div className="bg-white">
@@ -289,6 +362,8 @@ const UserBookRoom = () => {
               Includes all taxes and fees
             </div>
           </div>
+
+
         </motion.div>
       </div>
 
@@ -300,22 +375,22 @@ const UserBookRoom = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium">First name *</label>
-            <input type="text" className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" placeholder="First name" />
+            <input type="text" name="firstName" value={form.firstName} onChange={handleChange} className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" placeholder="First name" />
           </div>
           <div>
             <label className="block text-sm font-medium">Last name *</label>
-            <input type="text" className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="Last name" />
+            <input type="text" name="lastName" value={form.lastName} onChange={handleChange} className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="Last name" />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Email address *    <span className="text-gray-400">(Booking Details will be sent to this email ID)</span></label>
-          <input type="email" className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="example@email.com" />
+          <label className="block text-sm font-medium">Email address * <span className="text-gray-400">(Booking Details will be sent to this email ID)</span></label>
+          <input type="email" name="email" value={form.email} onChange={handleChange} className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="example@email.com" />
           <p className="text-sm text-green-600 mt-1">Confirmation email goes to this address</p>
         </div>
         <div>
           <label className="block text-sm font-medium">Country/region *</label>
-          <select className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500">
+          <select name="country" value={form.country} onChange={handleChange} className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500">
             <option value="">Select a country</option>
             <option value="AF">Afghanistan</option>
             <option value="AL">Albania</option>
@@ -515,23 +590,64 @@ const UserBookRoom = () => {
         <div>
           <label className="block text-sm font-medium">Phone number *</label>
           <div className="flex gap-2 mt-1">
-            {/* <select className="border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-              <option>IN +91</option>
+            <select name="phoneCountryCode" value={form.phoneCountryCode} onChange={handleChange} className="border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="+91">IN +91</option>
               {/* Add more country codes here if needed */}
-            {/* </select>  */}
-            <input type="tel" className="flex-1 border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="Phone number" />
+            </select>
+            <input type="tel" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} className="flex-1 border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="Phone number" />
           </div>
+          {otpSent && (
+            <div className="mt-2">
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                type="button"
+                onClick={verifyOtp}
+                className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Verify OTP
+              </button>
+              <p className="text-sm mt-1">{verificationStatus}</p>
+            </div>
+          )}
+          {!otpSent && (
+            <button
+              type="button"
+              onClick={sendOtp}
+              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            >
+              Send OTP
+            </button>
+          )}
         </div>
 
-    
-
-        {/* <div className="space-y-2">
+        {/* Room Details Section */}
+        {/* <div className="mt-6 space-y-4">
+          <h3 className="text-lg font-bold text-gray-900">Selected Rooms Details</h3>
+          {bookingDetails.rooms.map((room, index) => (
+            <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-200 transition-all duration-300">
+              <h4 className="text-md font-semibold text-gray-800 mb-2">Room {index + 1}</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p><span className="font-medium">Room Type:</span> {room.room_type.split('_')[0]}</p>
+                <p><span className="font-medium">Room ID:</span> {room.room_id}</p>
+                <p><span className="font-medium">Selected Count:</span> {room.selectedCount}</p>
+                <p><span className="font-medium">Available Rooms:</span> {room.rpa_number_of_rooms}</p>
+              </div>
+            </div>
+          ))}
+        </div> */}
+        <div className="space-y-2">
           <label className="flex items-center space-x-2">
-            <input type="checkbox" defaultChecked className="form-checkbox text-blue-600" />
+            <input type="checkbox" name="paperless" checked={form.paperless} onChange={handleChange} className="form-checkbox text-blue-600" />
             <span className="text-sm">Yes, I'd like free paperless confirmation (recommended)</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input type="checkbox" className="form-checkbox text-blue-600" />
+            <input type="checkbox" name="mainGuest" checked={form.mainGuest} onChange={handleChange} className="form-checkbox text-blue-600" />
             <span className="text-sm">Update my account to include these new details</span>
           </label>
         </div>
@@ -539,40 +655,41 @@ const UserBookRoom = () => {
         <div>
           <p className="text-sm font-medium mb-2">Who are you booking for? <span className="text-gray-500">(optional)</span></p>
           <label className="flex items-center space-x-2 mb-1">
-            <input type="radio" name="bookingFor" value="self" checked={bookingFor === "self"} onChange={() => setBookingFor("self")} />
+            <input type="radio" name="bookingFor" value="myself" checked={form.bookingFor === "myself"} onChange={handleChange} />
             <span>I am the main guest</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input type="radio" name="bookingFor" value="someoneElse" checked={bookingFor === "someoneElse"} onChange={() => setBookingFor("someoneElse")} />
+            <input type="radio" name="bookingFor" value="someoneElse" checked={form.bookingFor === "someoneElse"} onChange={handleChange} />
             <span>Booking is for someone else</span>
           </label>
-        </div> */}
+        </div>
 
-        {/* <div>
-        <p className="text-sm font-medium mb-2">Are you travelling for work? <span className="text-gray-500">(optional)</span></p>
-        <label className="flex items-center space-x-2 mb-1">
-          <input type="radio" name="travelForWork" value="yes" checked={travelForWork === "yes"} onChange={() => setTravelForWork("yes")} />
-          <span>Yes</span>
-        </label>
-        <label className="flex items-center space-x-2">
-          <input type="radio" name="travelForWork" value="no" checked={travelForWork === "no"} onChange={() => setTravelForWork("no")} />
-          <span>No</span>
-        </label>
-      </div>
-       */}
+        <div>
+          <p className="text-sm font-medium mb-2">Are you travelling for work? <span className="text-gray-500">(optional)</span></p>
+          <label className="flex items-center space-x-2 mb-1">
+            <input type="radio" name="travelingForWork" value={true} checked={form.travelingForWork === true} onChange={handleChange} />
+            <span>Yes</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input type="radio" name="travelingForWork" value={false} checked={form.travelingForWork === false} onChange={handleChange} />
+            <span>No</span>
+          </label>
+        </div>
       </div>
       {/* Property Rules */}
       <div className="max-w-2xl ml-80  p-6 border-gray-100  space-y-6">
-      <h2 className="text-xxl font-bold">Cancellation policy
-      </h2>
-      <p>Cancel before check-in on 2 Jun for a partial refund. After that, your refund depends on when you cancel. Learn more</p>
-      <hr className="border-gray-200" />
+        <h2 className="text-xxl font-bold">Cancellation policy
+        </h2>
+        <p>Cancel before check-in on 2 Jun for a partial refund. After that, your refund depends on when you cancel. Learn more</p>
+        <hr className="border-gray-200" />
       </div>
-      <div className="max-w-2xl ml-80  p-6   space-y-6">
-      <p className="font-bold">By selecting the button below, I agree to the Host's House Rules, Ground rules for guests, Airbnb's Rebooking and Refund Policy and that Airbnb can charge my payment method if I’m responsible for damage.</p>
-    </div>
-      <button className="bg-orange-600 mt-10 ml-80 mb-10 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">Request to Book</button>
-   
+      <div className="max-w-2xl ml-80  p-6  space-y-6">
+        <p className="font-bold">By selecting the button below, I agree to the Host's House Rules, Ground rules for guests, Airbnb's Rebooking and Refund Policy and that Airbnb can charge my payment method if I’m responsible for damage.</p>
+      </div>
+      <button className="bg-orange-600 mt-10 ml-80 mb-10 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition"
+        onClick={handleBookingSubmission}
+      >Request to Book</button>
+
     </div>
 
   );

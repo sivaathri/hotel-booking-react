@@ -14,7 +14,16 @@ CREATE TABLE room_bookings (
     payment_method VARCHAR(100),
     instant_payment BOOLEAN DEFAULT 0,
     free_cancellation BOOLEAN DEFAULT 0,
+
+    -- New guest information fields
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20),
+    country VARCHAR(100),
+
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (room_number) REFERENCES room_pricing_availability(id) ON DELETE CASCADE
+
+    FOREIGN KEY (room_number) REFERENCES room_setup(room_id) ON DELETE CASCADE
 );
