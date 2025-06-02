@@ -56,7 +56,7 @@ function App() {
             </ProtectedRoute>
             } />
           <Route path="/rooms/:id" element={<RoomDetails />} />
-          <Route path="/book/:id" element={<UserBookRoom />} />
+          <Route path="/book/:id/:roomId" element={<UserBookRoom />} />
           <Route path="/register" element={<Register />} />
           <Route path="/price-map" element={<PriceMapPage />} />
           {/* <Route path="/login" element={<UserLogin />} /> */}

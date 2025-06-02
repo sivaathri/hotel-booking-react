@@ -1051,7 +1051,7 @@ export default function PropertyDetails() {
 
                       console.log('Final booking state being passed:', bookingState);
 
-                      navigate(`/book/${propertyId}`, {
+                      navigate(`/book/${propertyId}/${bookingState.rooms[0].room_id}`, {
                         state: bookingState,
                         replace: true // Use replace to prevent back button issues
                       });
