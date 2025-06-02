@@ -29,7 +29,8 @@ const UserBookRoom = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
   const [verificationStatus, setVerificationStatus] = useState('');
-
+  const [bookingFor, setBookingFor] = useState("self");
+  const [travelForWork, setTravelForWork] = useState("no");
   const [form, setForm] = useState({
     bookingFor: "myself",
     Name: "",
@@ -202,7 +203,8 @@ const UserBookRoom = () => {
   };
 
   return (
-    <>
+    <div className="bg-white">
+   
       <Paymentheader />
 
       {/* Price Summary */}
@@ -211,7 +213,7 @@ const UserBookRoom = () => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white p-6 border border-blue-100 shadow-lg hover:shadow-2xl transition-shadow duration-300"
+          className=" p-6 border border-blue-100 shadow-lg hover:shadow-2xl transition-shadow duration-300"
         >
           <div className="space-y-6 text-gray-700">
             {/* Property Info */}
@@ -280,159 +282,85 @@ const UserBookRoom = () => {
       </div>
 
       {/* Booking Form */}
-      <div className="max-w-xl mt-20  ml-60 mr-20 p-8 bg-white  shadow-lg border border-gray-200 font-inter">
-        <h2 className="flex items-center gap-3 text-2xl font-semibold mb-4">
-          <span className="bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
-            1
-          </span>
-          Enter your details
-        </h2>
-        <p className="mb-8 text-gray-600">
-          We will use these details to share your booking information
-        </p>
+      <div className="max-w-2xl ml-40 mt-16 p-6  border-gray-100  space-y-6">
+      <h2 className="text-xl font-semibold">Enter your details</h2>
 
-        <form onSubmit={handleSubmit}>
-          {/* Booking Type Selection */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Who are you booking for?
-            </label>
-            <div className="flex gap-6">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="bookingFor"
-                  value="myself"
-                  checked={form.bookingFor === "myself"}
-                  onChange={handleInputChange}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <span className="text-gray-700">Myself</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="bookingFor"
-                  value="someone"
-                  checked={form.bookingFor === "someone"}
-                  onChange={handleInputChange}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <span className="text-gray-700">Someone else</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Full Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label
-                htmlFor="Name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Name
-              </label>
-              <input
-                type="text"
-                id="Name"
-                name="Name"
-                value={form.Name}
-                onChange={handleInputChange}
-                placeholder="Name"
-                className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-          </div>
-
-          {/* Email and Phone */}
-          <div className="mb-6">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={form.email}
-              onChange={handleInputChange}
-              placeholder="you@example.com"
-              className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Phone Number
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={form.phone}
-                onChange={handleInputChange}
-                placeholder="+91"
-                className="flex-1 border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-              {!otpSent && (
-                <button
-                  type="button"
-                  onClick={sendOtp}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Send OTP
-                </button>
-              )}
-            </div>
-          </div>
-
-          {otpSent && (
-            <div className="mb-6">
-              <label
-                htmlFor="otp"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Enter OTP
-              </label>
-              <input
-                type="text"
-                id="otp"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter OTP"
-                className="w-full border border-gray-300 rounded-md px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-          )}
-
-          {verificationStatus && (
-            <div className={`mb-4 text-sm ${verificationStatus.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
-              {verificationStatus}
-            </div>
-          )}
-
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-orange-600 text-white rounded-lg font-semibold text-lg hover:bg-orange-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition-shadow shadow-md"
-          >
-            {otpSent ? 'Verify OTP' : 'Send OTP'}
-          </button>
-        </form>
-
+    
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium">First name *</label>
+          <input type="text" className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" placeholder="First name" defaultValue="Siva" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Last name *</label>
+          <input type="text" className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="Last name" defaultValue="Athri" />
+        </div>
       </div>
-    </>
+
+      <div>
+        <label className="block text-sm font-medium">Email address *</label>
+        <input type="email" className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="example@email.com" />
+        <p className="text-sm text-green-600 mt-1">Confirmation email goes to this address</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">Phone number *</label>
+        <div className="flex gap-2 mt-1">
+          <select className="border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+            <option>IN +91</option>
+            {/* Add more country codes here if needed */}
+          </select>
+          <input type="tel" className="flex-1 border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="Phone number"  />
+        </div>
+        <p className="text-sm text-gray-500 mt-1">Needed by the property to validate your booking</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">Country/region *</label>
+        <select className="mt-1 block w-full border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500">
+          <option>India</option>
+          {/* Add more countries as needed */}
+        </select>
+      </div>
+
+      <div className="space-y-2">
+        <label className="flex items-center space-x-2">
+          <input type="checkbox" defaultChecked className="form-checkbox text-blue-600" />
+          <span className="text-sm">Yes, I'd like free paperless confirmation (recommended)</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input type="checkbox" defaultChecked className="form-checkbox text-blue-600" />
+          <span className="text-sm">Update my account to include these new details</span>
+        </label>
+      </div>
+
+      <div>
+        <p className="text-sm font-medium mb-2">Who are you booking for? <span className="text-gray-500">(optional)</span></p>
+        <label className="flex items-center space-x-2 mb-1">
+          <input type="radio" name="bookingFor" value="self" checked={bookingFor === "self"} onChange={() => setBookingFor("self")} />
+          <span>I am the main guest</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input type="radio" name="bookingFor" value="someoneElse" checked={bookingFor === "someoneElse"} onChange={() => setBookingFor("someoneElse")} />
+          <span>Booking is for someone else</span>
+        </label>
+      </div>
+
+      {/* <div>
+        <p className="text-sm font-medium mb-2">Are you travelling for work? <span className="text-gray-500">(optional)</span></p>
+        <label className="flex items-center space-x-2 mb-1">
+          <input type="radio" name="travelForWork" value="yes" checked={travelForWork === "yes"} onChange={() => setTravelForWork("yes")} />
+          <span>Yes</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input type="radio" name="travelForWork" value="no" checked={travelForWork === "no"} onChange={() => setTravelForWork("no")} />
+          <span>No</span>
+        </label>
+      </div>
+       */}
+    </div>
+    <button className="bg-orange-600 mt-10 ml-40 mb-10 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition">Request to Book</button>
+    </div>
   );
 };
 

@@ -854,7 +854,7 @@ export default function PropertyDetails() {
           {/* Room Comparison Table */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
           <h2 className="text-2xl font-bold mb-6">Book this {property.property_type}</h2>
-
+     
           {/* Room Comparison Cards */}
           <div className="space-y-6">
             {/* Reserve Button Card */}
