@@ -274,7 +274,7 @@ const UserBookRoom = () => {
       if (response.ok) {
         alert('Booking successful!');
         // Redirect to a confirmation page or home
-        navigate('/booking-confirmation', { state: { bookingId: data.bookingId } });
+        navigate('/user-dashboard', { state: { bookingId: data.bookingId } });
       } else {
         alert(`Booking failed: ${data.message || 'Something went wrong.'}`);
       }
@@ -590,40 +590,10 @@ const UserBookRoom = () => {
         <div>
           <label className="block text-sm font-medium">Phone number *</label>
           <div className="flex gap-2 mt-1">
-            <select name="phoneCountryCode" value={form.phoneCountryCode} onChange={handleChange} className="border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="+91">IN +91</option>
-              {/* Add more country codes here if needed */}
-            </select>
+          
             <input type="tel" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} className="flex-1 border rounded-md px-3 py-2  focus:ring-blue-500 focus:border-blue-500" placeholder="Phone number" />
           </div>
-          {otpSent && (
-            <div className="mt-2">
-              <input
-                type="text"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                className="mt-1 block w-full border rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <button
-                type="button"
-                onClick={verifyOtp}
-                className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              >
-                Verify OTP
-              </button>
-              <p className="text-sm mt-1">{verificationStatus}</p>
-            </div>
-          )}
-          {!otpSent && (
-            <button
-              type="button"
-              onClick={sendOtp}
-              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              Send OTP
-            </button>
-          )}
+         
         </div>
 
         {/* Room Details Section */}
