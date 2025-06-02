@@ -602,7 +602,7 @@ export default function PropertyDetails() {
               setCurrentImageIdx(0);
             }}
           >
-            <span className="px-4 py-2 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
+            <span className=" bg-white/90 text-gray-900 rounded shadow font-medium ">Show all photos</span>
           </button>
         )}
       </div>
@@ -798,7 +798,7 @@ export default function PropertyDetails() {
                           setCurrentImageIdx(0);
                         }}
                       >
-                        <span className="px-4 py-2 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
+                        <span className="px-3 py-1 mt-60 ml-20 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
                 </button>
             )}
           </div>
