@@ -401,16 +401,17 @@ const Home = () => {
 
             {/* Content */}
             <div className="md:w-2/3 w-full md:pl-10 pt-6 md:pt-0 flex flex-col md:flex-row justify-between items-center">
-              <div className="text-center md:text-left">
+              <div className=" md:text-left">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                   Go further with the Expedia app
                 </h2>
-                <p className="mt-3 text-gray-700 max-w-xl">
+                <p className="mt-2 text-gray-700 text-sm max-w-xl">
                   Save on select hotels and earn OneKeyCash on bookings in the app.
                   Our app deals help you to save on trips so you can travel more and
                   manage it all on the go.
                 </p>
-                <p className="mt-4 font-semibold text-indigo-800">
+
+                <p className="mt-4 font-semibold text-black">
                   Scan the QR code with your device camera and download our app
                 </p>
               </div>
