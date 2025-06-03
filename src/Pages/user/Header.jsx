@@ -79,7 +79,7 @@ const Header = () => {
       {/* Spinner End */}
 
       {/* Header Start */}
-      <div className="container-fluid p-2 bg-dark px-0 rounded-top-start-3">
+      <div className="container-fluid bg-dark px-0 rounded-top-start-3">
         <div className="row gx-0">
           <div className="col-lg-3 bg-dark d-none d-lg-block">
             <a
@@ -140,13 +140,13 @@ const Header = () => {
                 <div className="navbar-nav me-auto py-0">
                   {isNavOpen ? (
                     <>
-                      <Link
+                      {/* <Link
                         to="/"
                         className={`nav-item nav-link ${currentPath === "/" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
                       >
                     Hotels
-                      </Link>
-                      <Link
+                      </Link> */}
+                      {/* <Link
                         to="/about"
                         className={`nav-item nav-link ${currentPath === "/about" ? "text-warning fw-bold border-bottom border-warning" : ""}`}
                       >
@@ -184,7 +184,7 @@ const Header = () => {
                       </div>
                       <Link to="/contact" className="nav-item nav-link">
                         Contact
-                      </Link>
+                      </Link> */}
                     </>
                   ) : (
                     <Link
@@ -213,7 +213,7 @@ const Header = () => {
                           <i className="fas fa-home mr-2"></i>
                           Join our Hotelier
                         </span>
-                        <span className="absolute inset-0 z-0 bg-white opacity-10 blur-lg"></span>
+                        {/* <span className="absolute inset-0 z-0 bg-white opacity-10 blur-lg"></span> */}
                       </Link>
 
                       <div className="position-relative">

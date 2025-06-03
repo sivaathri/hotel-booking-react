@@ -65,7 +65,7 @@ export default function HomeSearchBar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
+  const [showDropdown, setShowDropdown] = useState(false);
   // Update state when URL parameters change
   useEffect(() => {
     const urlDestination = searchParams.get('destination');
@@ -151,7 +151,55 @@ export default function HomeSearchBar() {
     const diffTime = Math.abs(endDate - startDate);
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
-
+  const filteredLocations = [
+    {
+      name: "Nearby",
+      subtitle: "Find what’s around you",
+      icon: "fas fa-location-arrow",
+      bg: "bg-blue-500",
+    },
+    {
+      name: "Puducherry",
+      subtitle: "Because your wishlist has stays in Puducherry",
+      icon: "fas fa-umbrella-beach",
+      bg: "bg-orange-400",
+    },
+    {
+      name: "Mahabalipuram, Tamil Nadu",
+      subtitle: "For its seaside allure",
+      icon: "fas fa-water",
+      bg: "bg-pink-400",
+    },
+    {
+      name: "Bengaluru, Karnataka",
+      subtitle: "For sights like Lalbagh Botanical Garden",
+      icon: "fas fa-city",
+      bg: "bg-yellow-500",
+    },
+    {
+      name: "Ooty, Tamil Nadu",
+      subtitle: "For nature lovers",
+      icon: "fas fa-tree",
+      bg: "bg-green-500",
+    },
+    {
+      name: "Calangute, Goa",
+      subtitle: "For its bustling nightlife",
+      icon: "fas fa-cocktail",
+      bg: "bg-red-500",
+    },
+  ];
+  
+  // Hide dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   return (
     <div className={`w-full transition-all duration-300 z-[100] mb-5 `}>
       <div className="w-full max-w-6xl  mx-auto px-4">
@@ -162,10 +210,7 @@ export default function HomeSearchBar() {
           className={`bg-white rounded-full p-2 shadow-lg flex items-center h-30 w-200 divide-x ${isSticky ? 'border border-gray-200' : ''}`}
         >
           {/* Where */}
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="flex-1 px-6"
-          >
+          <motion.div whileHover={{ scale: 1.02 }} className="relative flex-1 px-6" ref={dropdownRef}>
             <div className="flex flex-col">
               <label className="text-sm font-semibold text-gray-800">Where</label>
               <motion.input
@@ -174,9 +219,48 @@ export default function HomeSearchBar() {
                 placeholder="Search destinations"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                className="w-full outline-none text-gray-600 placeholder-gray-400 text-sm"
+                onFocus={() => setShowDropdown(true)}
+                className="w-full  py-2 outline-none text-gray-600 placeholder-gray-400 text-sm"
               />
             </div>
+
+            {showDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute left-3 right-6 mt-4 w-full bg-white border rounded-xl shadow-xl z-20 max-h-72 overflow-y-auto"
+              >
+                <div className="px-4 py-2 text-sm text-gray-500 font-semibold">
+                  Suggested destinations
+                </div>
+
+                {filteredLocations.map((location, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setDestination(location.name);
+                      setShowDropdown(false);
+                    }}
+                 
+                    className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer ${destination === location.name ? "bg-gray-100 rounded-xl" : ""
+                      }`}
+                  >
+                    {/* Icon */}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${location.bg}`}>
+                      <i className={`${location.icon} text-white text-lg`}></i>
+                    </div>
+
+                    {/* Text Content */}
+                    <div>
+                      <div className="text-gray-800 font-medium">{location.name}</div>
+                      <div className="text-xs text-gray-500">{location.subtitle}</div>
+                    </div>
+                  </div>
+                ))}
+                
+              </motion.div>
+            )}
+   
           </motion.div>
 
           {/* Date */}
@@ -194,7 +278,7 @@ export default function HomeSearchBar() {
                 className="text-left outline-none cursor-pointer"
               >
                 <div className="flex flex-col mt-2">
-                 
+
 
                   <motion.button
                     whileTap={{ scale: 0.95 }}
