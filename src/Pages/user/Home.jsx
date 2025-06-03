@@ -70,13 +70,20 @@ const Home = () => {
       delay: "0.6s",
     },
   ];
+  const destinations = [
+    { name: "Pondicherry", image: "src/assets/Home/Pondicherry.jpg" },
+    { name: "Auroville", image: "src/assets/Home/Auroville.jpeg" },
+    { name: "Kerala", image: "src/assets/Home/Kerala.webp" },
+    { name: "bangalore", image: "src/assets/Home/bangalore.webp" },
+    { name: "Mysore", image: "src/assets/Home/mysore.webp" },
+  ];
   return (
     <>
       {/* Header  */}
       <Header />
       {/* Hero Section Start */}
       <div
-        className="relative w-full  h-full md:h-[180px] lg:h-[400px] flex items-center justify-center"
+        className="relative w-full   h-full md:h-[180px] lg:h-[400px] flex items-center justify-center"
         style={{
           backgroundImage: `url(${carouselImg1})`,
         }}
@@ -97,7 +104,21 @@ const Home = () => {
         </div>
       </div>
 
-
+      <div className="max-w-6xl bg-white mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold mb-4">Popular destinations</h2>
+      <div className="flex flex-wrap gap-4">
+        {destinations.map((dest, index) => (
+          <div key={index} className="flex flex-col items-center">
+            <img
+              src={dest.image}
+              alt={dest.name}
+              className="w-40 h-40 object-cover rounded-xl shadow"
+            />
+            <p className="mt-2 text-gray-800 font-medium">{dest.name}</p>
+          </div>
+        ))}
+      </div>
+    </div>
 
       {/* Hero Section End */}
       <div className="container-fluid bg-white ">
