@@ -188,7 +188,7 @@ const Home = () => {
           data-bs-ride="carousel"
         ></div>
 
-        <div className="mb-5 md:px-10 ">
+        {/* <div className="mb-5 md:px-10 ">
           <div className="max-w-7xl mx-auto">
             <div
               className="text-center animate__animated animate__fadeInUp"
@@ -260,16 +260,16 @@ const Home = () => {
                           Book Now
                         </a>
                       </div> */}
-                    </div>
+                    {/* </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </div> */} 
 
         {/* Call to Action Section */}
-        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
+        {/* <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
           <motion.div
             className="text-center"
             initial={{ opacity: 0, y: 50 }}
@@ -304,13 +304,13 @@ const Home = () => {
               Book Your Room Now
             </motion.button>
           </motion.div>
-        </div>
+        </div> */}
 
 
 
 
         <div className="py-10 mb-30 px-4 md:px-10">
-          <div className="flex flex-wrap g-0">
+          {/* <div className="flex flex-wrap g-0">
             <div className="w-full md:w-1/2 bg-black flex items-center">
               <div className="p-5">
                 <h6 className="text-white text-uppercase text-xl mb-3">
@@ -335,7 +335,7 @@ const Home = () => {
                 </a>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="max-w-6xl mx-auto border border-gray-300 rounded-3xl mt-10 overflow-hidden flex flex-col md:flex-row items-center ">
             {/* Left Image */}
             <div className="md:w-1/3 w-full">
