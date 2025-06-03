@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import carouselImg1 from "../../assets/Home/Leo.jpg";
+import carouselImg1 from "../../assets/Home/pexels.jpg";
 import room1 from "../../assets/Images/About Images/room-1.jpg";
 import room2 from "../../assets/Images/About Images/room-2.jpg";
 import room3 from "../../assets/Images/About Images/room-3.jpg";
@@ -109,7 +109,7 @@ const Home = () => {
       <Header />
       {/* Hero Section Start */}
       <div
-        className="relative w-full bg-white   h-full md:h-[180px] lg:h-[400px] flex items-center justify-center"
+        className="relative w-full bg-white bg-center bg-cover   h-full md:h-[180px] lg:h-[400px] flex items-center justify-center"
         style={{
           backgroundImage: `url(${carouselImg1})`,
         }}
@@ -389,6 +389,15 @@ const Home = () => {
               </div>
             </div>
           </div> */}
+
+
+          <div className="relative max-w-6xl mx-auto px-4 mt-10 mb-20" >
+            <p className="text-sm font-bold text-gray-800 mb-4">
+              A hotelier is a dedicated professional who specializes in managing hotels, resorts, or hospitality businesses. Their role involves overseeing every aspect of hotel operations—from guest services and housekeeping to finance, marketing, and staff management. Hoteliers are passionate about hospitality and strive to create a welcoming environment where guests feel valued and comfortable. With a strong focus on customer satisfaction, attention to detail, and efficient management, hoteliers ensure that every guest experience is smooth, enjoyable, and memorable. In a fast-evolving travel industry, hoteliers also embrace innovation, sustainability, and personalized service to stay competitive and meet the growing expectations of modern travelers.
+            </p>
+          </div>
+
+
           <div className="max-w-6xl mx-auto border border-gray-300 rounded-3xl mt-10 overflow-hidden flex flex-col md:flex-row items-center ">
             {/* Left Image */}
             <div className="md:w-1/3 w-full">
