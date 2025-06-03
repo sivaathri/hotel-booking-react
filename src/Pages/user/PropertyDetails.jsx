@@ -602,7 +602,7 @@ export default function PropertyDetails() {
               setCurrentImageIdx(0);
             }}
           >
-            <span className="px-4 py-2 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
+            <span className=" bg-white/90 text-gray-900 rounded shadow font-medium ">Show all photos</span>
           </button>
         )}
       </div>
@@ -798,7 +798,7 @@ export default function PropertyDetails() {
                           setCurrentImageIdx(0);
                         }}
                       >
-                        <span className="px-4 py-2 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
+                        <span className="px-3 py-1 mt-60 ml-20 bg-white/90 text-gray-900 rounded shadow font-medium border border-gray-200">Show all photos</span>
                 </button>
             )}
           </div>
@@ -1194,6 +1194,7 @@ export default function PropertyDetails() {
                                 <option value="0">Select rooms</option>
                                 {[...Array(calculateAvailableRooms(roomOption, searchParamsState.checkIn, searchParamsState.checkOut))].map((_, i) => {
                                   const numberOfRooms = i + 1;
+                                  console.log('Calculating price for room option:',numberOfRooms )
                                   const roomPrice = calculatePrice(roomOption);
                                   const gst = calculateGST(roomPrice);
                                   const totalPrice = roomPrice * numberOfRooms;
