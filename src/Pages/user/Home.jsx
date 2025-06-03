@@ -112,45 +112,73 @@ const Home = () => {
       </div>
 
       {/* Trending Destinations */}
-      <div className="max-w-7xl mx-auto bg-white px-4 py-8">
-      <h2 className="text-2xl font-bold">Trending destinations</h2>
-      <p className="text-gray-600 mb-6">Travelers searching for India also booked these</p>
-      
-      <div className="grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-        {destination.map((dest, idx) => (
-          <div key={idx} className="relative rounded-xl overflow-hidden shadow-md">
-            <img
-              src={dest.image}
-              alt={dest.name}
-              className="w-full h-56 object-cover"
-            />
-            <div className="absolute top-2 left-2  px-3 py-1 rounded-md">
-              <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                {dest.name}
-           
-              </h3>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <h2 className="text-3xl font-extrabold text-gray-800 mb-1">Trending destinations</h2>
+        <p className="text-gray-500 mb-8 text-lg">Travelers searching for India also booked these</p>
 
-    {/* Popular Destinations */}
-      <div className="max-w-6xl   mt-10 bg-white mx-auto px-4 py-8">
-      <h2 className="text-2xl  font-bold mb-4">Popular destinations</h2>
-      <div className="flex flex-wrap gap-4">
-        {destinations.map((dest, index) => (
-          <div key={index} className="flex flex-col items-center">
-            <img
-              src={dest.image}
-              alt={dest.name}
-              className="w-40 h-40 object-cover rounded-xl shadow"
-            />
-            <p className="mt-2 text-gray-800 font-medium">{dest.name}</p>
-          </div>
-        ))}
+        {/* Top 2 destinations */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          {destination.slice(0, 2).map((dest, idx) => (
+            <div
+              key={idx}
+              className="relative overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 group"
+              >
+              <img
+                src={dest.image}
+                alt={dest.name}
+                className="w-full h-64 object-cover group-hover:brightness-75 transition-all duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-90" />
+              <div className="absolute bottom-4 left-4">
+                <h3 className="text-white text-xl font-semibold flex items-center gap-2 backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg">
+                  {dest.name} <span role="img" aria-label="India flag">🇮🇳</span>
+                </h3>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom 3 destinations */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {destination.slice(2).map((dest, idx) => (
+            <div
+              key={idx}
+              className="relative overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 group"
+            >
+              <img
+                src={dest.image}
+                alt={dest.name}
+                className="w-full h-64 object-cover group-hover:brightness-75 transition-all duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-90" />
+              <div className="absolute bottom-4 left-4">
+                <h3 className="text-white text-xl font-semibold flex items-center gap-2 backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg">
+                  {dest.name} <span role="img" aria-label="India flag">🇮🇳</span>
+                </h3>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+
+
+
+      {/* Popular Destinations */}
+      <div className="max-w-6xl   mt-10 bg-white mx-auto px-4 py-8">
+        <h2 className="text-2xl  font-bold mb-4">Popular destinations</h2>
+        <div className="flex flex-wrap gap-4">
+          {destinations.map((dest, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <img
+                src={dest.image}
+                alt={dest.name}
+                className="w-40 h-40 object-cover rounded-xl shadow"
+              />
+              <p className="mt-2 text-gray-800 font-medium">{dest.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Hero Section End */}
       <div className="container-fluid bg-white ">
@@ -312,7 +340,7 @@ const Home = () => {
             {/* Left Image */}
             <div className="md:w-1/3 w-full">
               <img
-                src="src\assets\Home\Gemini.png" // replace with your image path
+                src="src\assets\Popular destinations\Gemini.png" // replace with your image path
                 alt="Tropical destination"
                 className=" object-cover w-full h-64 "
               />
@@ -367,7 +395,7 @@ const Home = () => {
         </div>
         <Footer />
       </div>
-      </div>
+    </div>
   );
 };
 
