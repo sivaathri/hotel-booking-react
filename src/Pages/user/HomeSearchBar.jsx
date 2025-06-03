@@ -145,15 +145,21 @@ export default function HomeSearchBar() {
     // Navigate to rooms page with query parameters
     navigate(`/rooms?destination=${encodeURIComponent(destination)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&adults=${guests.adults}&children=${guests.children}&childrenAges=${encodeURIComponent(JSON.stringify(childrenAges))}`);
   };
+  const calculateNights = (start, end) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffTime = Math.abs(endDate - startDate);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
 
   return (
     <div className={`w-full transition-all duration-300 z-[100] mb-5 `}>
-      <div className="w-full max-w-6xl mx-auto px-4">
+      <div className="w-full max-w-6xl  mx-auto px-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className={`bg-white rounded-full shadow-lg flex items-center h-30 w-200 divide-x ${isSticky ? 'border border-gray-200' : ''}`}
+          className={`bg-white rounded-full p-2 shadow-lg flex items-center h-30 w-200 divide-x ${isSticky ? 'border border-gray-200' : ''}`}
         >
           {/* Where */}
           <motion.div
@@ -179,28 +185,55 @@ export default function HomeSearchBar() {
             className="flex-1 px-6 relative"
             ref={datePickerRef}
           >
-            <div className="flex flex-col">
-              <label className="text-sm mt-3 font-semibold text-gray-800">Date</label>
+            <div className="flex flex-col mt-3">
+
+
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-                className="text-left outline-none text-gray-600 text-sm cursor-pointer"
+                className="text-left outline-none cursor-pointer"
               >
-                <p className="text-sm font-medium">
-                  {checkIn && checkOut ? (
-                    <span className="text-gray-800">
-                      {`${formatDateForDisplay(checkIn)} - ${formatDateForDisplay(checkOut)}`}
-                    </span>
-                  ) : (
-                    <span className="text-gray-500">
-                      Check-in - Check-out
-                    </span>
-                  )}
-                </p>
+                <div className="flex flex-col mt-2">
+                 
 
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                    className="outline-none cursor-pointer"
+                  >
+                    <div className="flex justify-between items-center  text-center">
+
+                      {/* Arrival */}
+                      <div className="flex flex-col items-center mb-3 flex-1">
+                        <span className="text-xs text-gray-500">Arrival</span>
+                        <span className="text-sm font-semibold text-black mt-1">
+                          {checkIn ? formatDateForDisplay(checkIn) : 'Check-in'}
+                        </span>
+                      </div>
+
+                      {/* Night count and moon icon */}
+                      <div className="flex flex-col mb-3  items-center flex-1">
+                        <span className="text-xl">🌙</span>
+                        <span className="text-xs text-gray-500 mt-1">
+                          {checkIn && checkOut ? `${calculateNights(checkIn, checkOut)} night${calculateNights(checkIn, checkOut) > 1 ? 's' : ''}` : '0 night'}
+                        </span>
+                      </div>
+
+                      {/* Departure */}
+                      <div className="flex flex-col mb-3  items-center flex-1">
+                        <span className="text-xs text-gray-500">Departure</span>
+                        <span className="text-sm font-semibold text-black mt-1">
+                          {checkOut ? formatDateForDisplay(checkOut) : 'Check-out'}
+                        </span>
+                      </div>
+
+                    </div>
+                  </motion.button>
+                </div>
 
               </motion.button>
             </div>
+
             <AnimatePresence>
               {isDatePickerOpen && (
                 <motion.div
