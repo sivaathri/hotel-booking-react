@@ -77,19 +77,26 @@ const Home = () => {
     { name: "bangalore", image: "src/assets/Popular destinations/bangalore.webp" },
     { name: "Mysore", image: "src/assets/Popular destinations/mysore.webp" },
   ];
+  const destination = [
+    { name: "Pondicherry", image: "src/assets/Popular destinations/Pondicherry.jpg" },
+    { name: "Auroville", image: "src/assets/Popular destinations/Auroville.jpeg" },
+    { name: "Kerala", image: "src/assets/Popular destinations/Kerala.webp" },
+    { name: "bangalore", image: "src/assets/Popular destinations/bangalore.webp" },
+    { name: "Mysore", image: "src/assets/Popular destinations/mysore.webp" },
+  ];
   return (
-    <>
+    <div className="bg-white">
       {/* Header  */}
       <Header />
       {/* Hero Section Start */}
       <div
-        className="relative w-full   h-full md:h-[180px] lg:h-[400px] flex items-center justify-center"
+        className="relative w-full bg-white   h-full md:h-[180px] lg:h-[400px] flex items-center justify-center"
         style={{
           backgroundImage: `url(${carouselImg1})`,
         }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 h-200 bg-opacity-40 z-0" />
+        <div className="absolute  inset-0 h-200 bg-opacity-40 z-0" />
         {/* Centered Content */}
         <div className="relative z-10 flex flex-col  w-full px-4">
           <h1 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold ml-10 drop-shadow-lg">
@@ -98,13 +105,38 @@ const Home = () => {
         </div>
       </div>
       {/* Floating Search Bar */}
-      <div className=" flex items-start bg-white justify-center bg-gray-50  -mt-14">
+      <div className=" flex   items-start bg-white justify-center bg-gray-50  -mt-14">
         <div className="w-full max-w-6xl rounded-full shadow-6xl px-8 py-6 flex flex-col justify-center min-h-[120px]">
           <HomeSearchBar />
         </div>
       </div>
 
-      <div className="max-w-6xl bg-white mx-auto px-4 py-8">
+      {/* Trending Destinations */}
+      <div className="max-w-7xl mx-auto bg-white px-4 py-8">
+      <h2 className="text-2xl font-bold">Trending destinations</h2>
+      <p className="text-gray-600 mb-6">Travelers searching for India also booked these</p>
+      
+      <div className="grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        {destination.map((dest, idx) => (
+          <div key={idx} className="relative rounded-xl overflow-hidden shadow-md">
+            <img
+              src={dest.image}
+              alt={dest.name}
+              className="w-full h-56 object-cover"
+            />
+            <div className="absolute top-2 left-2  px-3 py-1 rounded-md">
+              <h3 className="text-white font-bold text-lg flex items-center gap-2">
+                {dest.name}
+           
+              </h3>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Popular Destinations */}
+      <div className="max-w-6xl mt-10 bg-white mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-4">Popular destinations</h2>
       <div className="flex flex-wrap gap-4">
         {destinations.map((dest, index) => (
@@ -335,7 +367,7 @@ const Home = () => {
         </div>
         <Footer />
       </div>
-    </>
+      </div>
   );
 };
 
