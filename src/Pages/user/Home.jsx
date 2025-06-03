@@ -74,14 +74,15 @@ const Home = () => {
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
-    const { current } = scrollRef;
-    if (current) {
-      current.scrollBy({
-        left: direction === "left" ? -400 : 400,
+    if (scrollRef.current) {
+      const scrollAmount = 250; // Adjust to match card width
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
     }
   };
+
 
   const destinations = [
     { name: "Pondicherry", image: "src/assets/Popular destinations/Pondicherry.jpg" },
@@ -143,7 +144,7 @@ const Home = () => {
             <div
               key={idx}
               className="relative overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 group"
-              >
+            >
               <img
                 src={dest.image}
                 alt={dest.name}
@@ -152,7 +153,7 @@ const Home = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-90" />
               <div className="absolute bottom-4 left-4">
                 <h3 className="text-white text-xl font-semibold flex items-center gap-2 backdrop-blur-sm bg-white/10 px-2 py-2 rounded-lg">
-                  {dest.name} 
+                  {dest.name}
                 </h3>
               </div>
             </div>
@@ -174,7 +175,7 @@ const Home = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-90" />
               <div className="absolute bottom-4 left-4">
                 <h3 className="text-white text-xl font-semibold flex items-center gap-2 backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg">
-                  {dest.name} 
+                  {dest.name}
                 </h3>
               </div>
             </div>
@@ -185,51 +186,52 @@ const Home = () => {
 
 
       {/* Popular Destinations */}
-      <div className="max-w-7xl mt-16 mx-auto px-6 py-10 ">
-      <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        🌍 Popular Destinations
-      </h2>
+      <div className="relative max-w-6xl mx-auto px-4 mt-10">
+        <h2 className="text-3xl font-bold  mb-8 text-gray-800">
+          Popular Destinations
+        </h2>
 
-      <div className="relative">
-        {/* Left Arrow */}
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
-        >
-          <ChevronLeft className="w-6 h-6 text-gray-800" />
-        </button>
+        <div className="relative">
+          {/* Left Arrow */}
+          <button
+            onClick={() => scroll("left")}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-800" />
+          </button>
 
-        {/* Scrollable list */}
-        <div
-          ref={scrollRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-10"
-        >
-          {destinations.map((dest, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 transform hover:scale-105 transition-transform duration-500 ease-in-out rounded-2xl bg-white shadow-md overflow-hidden w-48 group"
-            >
-              <img
-                src={dest.image}
-                alt={dest.name}
-                className="w-48 h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-              />
-              <div className="p-3 text-center">
-                <p className="text-gray-700 font-semibold">{dest.name}</p>
+          {/* Scrollable list */}
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-10"
+          >
+            {destinations.map((dest, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-48 flex flex-col items-center"
+              >
+                <div className="transform hover:scale-105 transition-transform duration-500 ease-in-out rounded-2xl bg-white shadow-md overflow-hidden w-48 group">
+                  <img
+                    src={dest.image}
+                    alt={dest.name}
+                    className="w-48 h-48 object-cover transition-transform duration-300 group-hover:scale-110 rounded-2xl"
+                  />
+                </div>
+                <p className="mt-2 text-center text-gray-700 font-semibold">{dest.name}</p>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
 
-        {/* Right Arrow */}
-        <button
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
-        >
-          <ChevronRight className="w-6 h-6 text-gray-800" />
-        </button>
+          </div>
+
+          {/* Right Arrow */}
+          <button
+            onClick={() => scroll("right")}
+            className="absolute right-0  top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-800" />
+          </button>
+        </div>
       </div>
-    </div>
 
       {/* Hero Section End */}
       <div className="container-fluid bg-white ">
@@ -311,13 +313,13 @@ const Home = () => {
                           Book Now
                         </a>
                       </div> */}
-                    {/* </div>
+        {/* </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div> */} 
+        </div> */}
 
         {/* Call to Action Section */}
         {/* <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
