@@ -9,6 +9,7 @@ import Footer from "./Footer";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import HomeSearchBar from "./HomeSearchBar";
+import { ChevronLeft, ChevronRight } from "lucide-react"; // Optional: icon library
 
 const Home = () => {
   const navigate = useNavigate();
@@ -70,7 +71,24 @@ const Home = () => {
       delay: "0.6s",
     },
   ];
+  const scrollRef = useRef(null);
+
+  const scroll = (direction) => {
+    const { current } = scrollRef;
+    if (current) {
+      current.scrollBy({
+        left: direction === "left" ? -400 : 400,
+        behavior: "smooth",
+      });
+    }
+  };
+
   const destinations = [
+    { name: "Pondicherry", image: "src/assets/Popular destinations/Pondicherry.jpg" },
+    { name: "Auroville", image: "src/assets/Popular destinations/Auroville.jpeg" },
+    { name: "Kerala", image: "src/assets/Popular destinations/Kerala.webp" },
+    { name: "bangalore", image: "src/assets/Popular destinations/bangalore.webp" },
+    { name: "Mysore", image: "src/assets/Popular destinations/mysore.webp" },
     { name: "Pondicherry", image: "src/assets/Popular destinations/Pondicherry.jpg" },
     { name: "Auroville", image: "src/assets/Popular destinations/Auroville.jpeg" },
     { name: "Kerala", image: "src/assets/Popular destinations/Kerala.webp" },
@@ -111,7 +129,10 @@ const Home = () => {
         </div>
       </div>
 
+
+
       {/* Trending Destinations */}
+
       <div className="max-w-7xl mx-auto px-4 py-10">
         <h2 className="text-3xl font-extrabold text-gray-800 mb-1">Trending destinations</h2>
         <p className="text-gray-500 mb-8 text-lg">Travelers searching for India also booked these</p>
@@ -164,21 +185,51 @@ const Home = () => {
 
 
       {/* Popular Destinations */}
-      <div className="max-w-6xl   mt-10 bg-white mx-auto px-4 py-8">
-        <h2 className="text-2xl  font-bold mb-4">Popular destinations</h2>
-        <div className="flex flex-wrap gap-4">
+      <div className="max-w-7xl mt-16 mx-auto px-6 py-10 ">
+      <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
+        🌍 Popular Destinations
+      </h2>
+
+      <div className="relative">
+        {/* Left Arrow */}
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
+        >
+          <ChevronLeft className="w-6 h-6 text-gray-800" />
+        </button>
+
+        {/* Scrollable list */}
+        <div
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-10"
+        >
           {destinations.map((dest, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div
+              key={index}
+              className="flex-shrink-0 transform hover:scale-105 transition-transform duration-500 ease-in-out rounded-2xl bg-white shadow-md overflow-hidden w-48 group"
+            >
               <img
                 src={dest.image}
                 alt={dest.name}
-                className="w-40 h-40 object-cover rounded-xl shadow"
+                className="w-48 h-48 object-cover transition-transform duration-300 group-hover:scale-110"
               />
-              <p className="mt-2 text-gray-800 font-medium">{dest.name}</p>
+              <div className="p-3 text-center">
+                <p className="text-gray-700 font-semibold">{dest.name}</p>
+              </div>
             </div>
           ))}
         </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
+        >
+          <ChevronRight className="w-6 h-6 text-gray-800" />
+        </button>
       </div>
+    </div>
 
       {/* Hero Section End */}
       <div className="container-fluid bg-white ">
