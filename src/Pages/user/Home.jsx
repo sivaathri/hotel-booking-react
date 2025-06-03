@@ -136,8 +136,8 @@ const Home = () => {
     </div>
 
     {/* Popular Destinations */}
-      <div className="max-w-6xl mt-10 bg-white mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-4">Popular destinations</h2>
+      <div className="max-w-6xl   mt-10 bg-white mx-auto px-4 py-8">
+      <h2 className="text-2xl  font-bold mb-4">Popular destinations</h2>
       <div className="flex flex-wrap gap-4">
         {destinations.map((dest, index) => (
           <div key={index} className="flex flex-col items-center">
