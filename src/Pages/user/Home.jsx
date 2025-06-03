@@ -71,11 +71,11 @@ const Home = () => {
     },
   ];
   const destinations = [
-    { name: "Pondicherry", image: "src/assets/Home/Pondicherry.jpg" },
-    { name: "Auroville", image: "src/assets/Home/Auroville.jpeg" },
-    { name: "Kerala", image: "src/assets/Home/Kerala.webp" },
-    { name: "bangalore", image: "src/assets/Home/bangalore.webp" },
-    { name: "Mysore", image: "src/assets/Home/mysore.webp" },
+    { name: "Pondicherry", image: "src/assets/Popular destinations/Pondicherry.jpg" },
+    { name: "Auroville", image: "src/assets/Popular destinations/Auroville.jpeg" },
+    { name: "Kerala", image: "src/assets/Popular destinations/Kerala.webp" },
+    { name: "bangalore", image: "src/assets/Popular destinations/bangalore.webp" },
+    { name: "Mysore", image: "src/assets/Popular destinations/mysore.webp" },
   ];
   return (
     <>
