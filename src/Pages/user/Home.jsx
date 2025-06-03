@@ -130,8 +130,8 @@ const Home = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-90" />
               <div className="absolute bottom-4 left-4">
-                <h3 className="text-white text-xl font-semibold flex items-center gap-2 backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg">
-                  {dest.name} <span role="img" aria-label="India flag">🇮🇳</span>
+                <h3 className="text-white text-xl font-semibold flex items-center gap-2 backdrop-blur-sm bg-white/10 px-2 py-2 rounded-lg">
+                  {dest.name} 
                 </h3>
               </div>
             </div>
@@ -153,7 +153,7 @@ const Home = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-90" />
               <div className="absolute bottom-4 left-4">
                 <h3 className="text-white text-xl font-semibold flex items-center gap-2 backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg">
-                  {dest.name} <span role="img" aria-label="India flag">🇮🇳</span>
+                  {dest.name} 
                 </h3>
               </div>
             </div>
