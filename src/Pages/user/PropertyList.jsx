@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CheckCircle } from "lucide-react";
 import {
   useNavigate,
@@ -53,6 +53,10 @@ export default function PropertyList({ properties, loading, error }) {
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Get number of adults from search params
   const numberOfAdults = parseInt(searchParams.get("adults")) || 1;
 
@@ -63,16 +67,16 @@ export default function PropertyList({ properties, loading, error }) {
   const calculateNights = () => {
     const checkIn = searchParams.get('checkIn');
     const checkOut = searchParams.get('checkOut');
-    
+
     if (!checkIn || !checkOut) return 1;
-    
+
     const start = new Date(checkIn);
     const end = new Date(checkOut);
-    
+
     // Calculate difference in milliseconds and convert to days
     const diffTime = Math.abs(end - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return diffDays;
   };
 
@@ -152,7 +156,7 @@ export default function PropertyList({ properties, loading, error }) {
 
         // Calculate average price per night
         const averagePricePerNight = totalPrice / nights;
-        
+
         console.log("Price breakdown:", {
           nightlyPrices,
           totalPrice,
@@ -211,33 +215,33 @@ export default function PropertyList({ properties, loading, error }) {
         remainingRooms: room.rpa_number_of_rooms || 1
       };
     }
-    
+
     const requestedStart = new Date(checkIn);
     const requestedEnd = new Date(checkOut);
-    
+
     // Calculate total rooms and booked rooms for the requested dates
     const totalRooms = room.rpa_number_of_rooms || 1;
     let bookedRooms = 0;
-    
+
     // Check each booking for date overlap
     room.bookings.forEach(booking => {
       const bookingStart = new Date(booking.check_in_date);
       const bookingEnd = new Date(booking.check_out_date);
-      
+
       // Check if booking overlaps with requested dates
       const hasOverlap = (
         (requestedStart >= bookingStart && requestedStart < bookingEnd) ||
         (requestedEnd > bookingStart && requestedEnd <= bookingEnd) ||
         (requestedStart <= bookingStart && requestedEnd >= bookingEnd)
       );
-      
+
       if (hasOverlap) {
         bookedRooms += (booking.number_of_rooms_Book || 1);
       }
     });
-    
+
     const remainingRooms = totalRooms - bookedRooms;
-    
+
     // Room is available if there are any remaining rooms
     return {
       isAvailable: remainingRooms > 0,
@@ -319,10 +323,10 @@ export default function PropertyList({ properties, loading, error }) {
             isAvailable: availability.isAvailable
           };
         }).filter(room => room.isAvailable) || [];
-        
+
         // Skip this property if no rooms are available
         if (availableRooms.length === 0) return null;
-        
+
         // Get all unique room types from available rooms
         const roomTypes = availableRooms.map((room) => cleanRoomType(room.room_type));
         const uniqueRoomTypes = [...new Set(roomTypes)];
@@ -380,11 +384,10 @@ export default function PropertyList({ properties, loading, error }) {
                     {[...Array(5)].map((_, index) => (
                       <svg
                         key={index}
-                        className={`w-4 h-4 ${
-                          index < Math.floor(rating)
+                        className={`w-4 h-4 ${index < Math.floor(rating)
                             ? "text-yellow-400"
                             : "text-gray-300"
-                        }`}
+                          }`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -496,9 +499,8 @@ export default function PropertyList({ properties, loading, error }) {
                                       lat: property.location.latitude,
                                       lng: property.location.longitude,
                                       name: property.property_name,
-                                      address: `${
-                                        property.location?.address || ""
-                                      }, ${city}`,
+                                      address: `${property.location?.address || ""
+                                        }, ${city}`,
                                     });
                                     setMapModalOpen(true);
                                   }}
@@ -687,11 +689,10 @@ export default function PropertyList({ properties, loading, error }) {
                   key={idx}
                   src={getImageUrl(img)}
                   alt={`Thumbnail ${idx + 1}`}
-                  className={`w-16 h-12 object-cover rounded cursor-pointer border-2 ${
-                    idx === currentImageIdx
+                  className={`w-16 h-12 object-cover rounded cursor-pointer border-2 ${idx === currentImageIdx
                       ? "border-blue-500"
                       : "border-transparent"
-                  }`}
+                    }`}
                   onClick={() => setCurrentImageIdx(idx)}
                   onError={(e) => {
                     e.target.src = "https://placehold.co/100x75?text=No+Image";
