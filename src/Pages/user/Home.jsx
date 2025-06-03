@@ -136,7 +136,7 @@ const Home = () => {
                         alt={room.title}
                         className="w-full h-40 object-cover"
                       />
-                 
+
                     </div>
 
                     <div className="p-4">
@@ -144,7 +144,7 @@ const Home = () => {
                         <h5 className="text-base font-semibold">
                           {room.title}
                         </h5>
-                      
+
                       </div>
 
                       <div className="flex flex-wrap text-xs text-gray-600 mb-2 gap-x-3 gap-y-1">
@@ -188,42 +188,42 @@ const Home = () => {
         </div>
 
         {/* Call to Action Section */}
-       <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
-  <motion.div
-    className="text-center"
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.8, ease: "easeOut" }}
-    viewport={{ once: true }}
-  >
-    <motion.h2
-      className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 drop-shadow-sm"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2, duration: 0.6 }}
-    >
-      Ready to Book Your Perfect Stay?
-    </motion.h2>
+        <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 drop-shadow-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              Ready to Book Your Perfect Stay?
+            </motion.h2>
 
-    <motion.p
-      className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4, duration: 0.6 }}
-    >
-      Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
-    </motion.p>
+            <motion.p
+              className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
+            </motion.p>
 
-    <motion.button
-      whileHover={{ scale: 1.08 }}
-      whileTap={{ scale: 0.95 }}
-      className="bg-[#FEA116] text-white font-bold py-4 px-8 rounded-full shadow-xl hover:bg-[#e1920e] transition-all duration-300 transform hover:-translate-y-1"
-      onClick={() => navigate("/rooms")}
-    >
-      Book Your Room Now
-    </motion.button>
-  </motion.div>
-</div>
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#FEA116] text-white font-bold py-4 px-8 rounded-full shadow-xl hover:bg-[#e1920e] transition-all duration-300 transform hover:-translate-y-1"
+              onClick={() => navigate("/rooms")}
+            >
+              Book Your Room Now
+            </motion.button>
+          </motion.div>
+        </div>
 
 
 
@@ -255,7 +255,42 @@ const Home = () => {
               </div>
             </div>
           </div>
+          <div className="max-w-6xl mx-auto border border-gray-300 rounded-3xl mt-10 overflow-hidden flex flex-col md:flex-row items-center ">
+            {/* Left Image */}
+            <div className="md:w-1/3 w-full">
+              <img
+                src="src\assets\Home\Gemini.png" // replace with your image path
+                alt="Tropical destination"
+                className=" object-cover w-full h-64 "
+              />
+            </div>
 
+            {/* Content */}
+            <div className="md:w-2/3 w-full md:pl-10 pt-6 md:pt-0 flex flex-col md:flex-row justify-between items-center">
+              <div className="text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  Go further with the Expedia app
+                </h2>
+                <p className="mt-3 text-gray-700 max-w-xl">
+                  Save on select hotels and earn OneKeyCash on bookings in the app.
+                  Our app deals help you to save on trips so you can travel more and
+                  manage it all on the go.
+                </p>
+                <p className="mt-4 font-semibold text-indigo-800">
+                  Scan the QR code with your device camera and download our app
+                </p>
+              </div>
+
+              {/* QR Code */}
+              <div className="mt-6 md:mt-0 md:ml-6">
+                <img
+                  src="src\assets\Home\unnamed.png" // replace with your QR code path
+                  alt="QR Code"
+                  className="w-32 h-32"
+                />
+              </div>
+            </div>
+          </div>
           {/* Video Modal */}
           {videoSrc && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
