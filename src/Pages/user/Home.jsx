@@ -75,7 +75,7 @@ const Home = () => {
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = 250; // Adjust to match card width
+      const scrollAmount = 1150; // Adjust to match card width
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
