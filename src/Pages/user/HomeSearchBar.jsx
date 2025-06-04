@@ -37,7 +37,9 @@ export default function HomeSearchBar() {
     adults: 1,
     children: 0
   });
-  const dropdownRef = useRef(null);
+  // --- NEW: Separate refs for different dropdowns ---
+  const whereDropdownRef = useRef(null); // Ref for the "Where" section
+  const whoDropdownRef = useRef(null);   // Ref for the "Who" sectio
   const datePickerRef = useRef(null);
 
   // Handle scroll event to set sticky state
@@ -54,9 +56,14 @@ export default function HomeSearchBar() {
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
+     // Use the new ref for the "Where" dropdown
+     if (whereDropdownRef.current && !whereDropdownRef.current.contains(event.target)) {
+      setShowDropdown(false); // This controls the 'Suggested destinations' dropdown
+    }
+    // Use the new ref for the "Who" dropdown
+    if (whoDropdownRef.current && !whoDropdownRef.current.contains(event.target)) {
+      setIsOpen(false); // This controls the 'Guests' dropdown
+    }
       if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
         setIsDatePickerOpen(false);
       }
@@ -200,6 +207,7 @@ export default function HomeSearchBar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   return (
     <div className={`w-full transition-all duration-300 z-[100] mb-5 `}>
       <div className="w-full max-w-6xl  mx-auto px-4">
@@ -210,7 +218,7 @@ export default function HomeSearchBar() {
           className={`bg-white rounded-full p-2 shadow-lg flex items-center h-30 w-200 divide-x ${isSticky ? 'border border-gray-200' : ''}`}
         >
           {/* Where */}
-          <motion.div whileHover={{ scale: 1.02 }} className="relative flex-1 px-6" ref={dropdownRef}>
+          <motion.div whileHover={{ scale: 1.02 }} className="relative flex-1 px-6" ref={whereDropdownRef}>
             <div className="flex flex-col">
               <label className="text-sm font-semibold text-gray-800">Where</label>
               <motion.input
@@ -224,6 +232,7 @@ export default function HomeSearchBar() {
               />
             </div>
 
+
             {showDropdown && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -233,34 +242,40 @@ export default function HomeSearchBar() {
                 <div className="px-4 py-2 text-sm text-gray-500 font-semibold">
                   Suggested destinations
                 </div>
-
-                {filteredLocations.map((location, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => {
-                      setDestination(location.name);
-                      setShowDropdown(false);
-                    }}
-                 
-                    className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer ${destination === location.name ? "bg-gray-100 rounded-xl" : ""
-                      }`}
-                  >
-                    {/* Icon */}
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${location.bg}`}>
-                      <i className={`${location.icon} text-white text-lg`}></i>
-                    </div>
-
-                    {/* Text Content */}
-                    <div>
-                      <div className="text-gray-800 font-medium">{location.name}</div>
-                      <div className="text-xs text-gray-500">{location.subtitle}</div>
-                    </div>
-                  </div>
-                ))}
-                
+                {(() => {
+                  console.log('filteredLocations before map:', filteredLocations); // Debug: Check filteredLocations array
+                  if (!filteredLocations || filteredLocations.length === 0) {
+                    console.log('filteredLocations is empty or undefined.');
+                    return <div className="px-4 py-2 text-sm text-gray-500">No locations to display.</div>;
+                  }
+                  return filteredLocations.map((location, idx) => {
+                    console.log('Rendering location item in map:', location.name); // Debug: Check if item is being mapped
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => {
+                          console.log('Clicked location object:', location);
+                          console.log('Setting destination to:', location.name);
+                          setDestination(location.name);
+                          setShowDropdown(false);
+                        }}
+                        className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer ${destination === location.name ? "bg-gray-100 rounded-xl" : ""}`}
+                      >
+                        {/* Icon */}
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${location.bg}`}>
+                          <i className={`${location.icon} text-white text-lg`}></i>
+                        </div>
+                        {/* Text Content */}
+                        <div>
+                          <div className="text-gray-800 font-medium">{location.name}</div>
+                          <div className="text-xs text-gray-500">{location.subtitle}</div>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
               </motion.div>
             )}
-   
           </motion.div>
 
           {/* Date */}
@@ -499,7 +514,7 @@ export default function HomeSearchBar() {
             whileHover={{ scale: 1.02 }}
             className="flex-1 px-6"
           >
-            <div className="flex flex-col relative" ref={dropdownRef}>
+            <div className="flex flex-col relative" ref={whoDropdownRef}>
               <label className="text-sm font-semibold text-gray-800">Who</label>
               <motion.input
                 whileTap={{ scale: 0.95 }}
