@@ -479,10 +479,7 @@ export default function PropertyList({ properties, loading, error }) {
                       .filter(
                         (loc) => loc.distance && parseFloat(loc.distance) > 0
                       )
-                      .sort(
-                        (a, b) =>
-                          parseFloat(a.distance) - parseFloat(b.distance)
-                      );
+                     
 
                     // Return the nearest location if available
                     if (availableLocations.length > 0) {
@@ -504,7 +501,7 @@ export default function PropertyList({ properties, loading, error }) {
                                     });
                                     setMapModalOpen(true);
                                   }}
-                                  className="text-blue-600 hover:text-blue-800 flex items-center underline"
+                                  className="text-orange-600 hover:text-blue-800 flex items-center "
                                 >
                                   Show on map
                                 </button>
@@ -513,7 +510,7 @@ export default function PropertyList({ properties, loading, error }) {
                           <span className="text-gray-400">|</span>
                           <span className="flex items-center text-gray-600">
                             {nearest.icon}
-                            {nearest.distance} km
+                            {nearest.distance} km from {nearest.type}
                           </span>
                         </>
                       );
