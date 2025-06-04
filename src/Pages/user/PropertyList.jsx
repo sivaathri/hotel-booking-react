@@ -380,7 +380,7 @@ export default function PropertyList({ properties, loading, error }) {
                   >
                     {property.property_name}
                   </a>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     {[...Array(5)].map((_, index) => (
                       <svg
                         key={index}
@@ -397,7 +397,7 @@ export default function PropertyList({ properties, loading, error }) {
                     <span className="ml-1 text-sm text-gray-600">
                       ({rating})
                     </span>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-blue-700">
                   <span>{city}</span>
