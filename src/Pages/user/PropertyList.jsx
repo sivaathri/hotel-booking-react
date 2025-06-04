@@ -312,7 +312,7 @@ export default function PropertyList({ properties, loading, error }) {
   }
 
   return (
-    <div className="w-full lg:w-4/5">
+    <div className="w-full lg:w-/5">
       {properties.map((property) => {
         // Filter out rooms that are not available for the selected dates
         const availableRooms = property.rooms?.map(room => {
@@ -356,7 +356,7 @@ export default function PropertyList({ properties, loading, error }) {
         return (
           <div
             key={property.property_id}
-            className="flex bg-white rounded-2xl shadow-lg mb-3  border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-hidden relative group hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2"
+            className="flex bg-white rounded-2xl shadow-lg mb-3 h-60  border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-hidden relative group hover:outline-none hover:ring-2 hover:ring-blue-500 hover:ring-offset-2"
             style={{ boxShadow: undefined }}
           >
             {/* Image with heart icon */}
