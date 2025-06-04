@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import AnimatedLoader from "../../components/AnimatedLoader"; // Adjust path if needed
 import carouselImg1 from "../../assets/Home/pexels.jpg";
 import room1 from "../../assets/Images/About Images/room-1.jpg";
 import room2 from "../../assets/Images/About Images/room-2.jpg";
@@ -13,13 +12,6 @@ import HomeSearchBar from "./HomeSearchBar";
 import { ChevronLeft, ChevronRight } from "lucide-react"; // Optional: icon library
 
 const Home = () => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate loading (e.g., API call)
-    const timer = setTimeout(() => setLoading(false), 1200); // 1.2s fade
-    return () => clearTimeout(timer);
-  }, []);
   const navigate = useNavigate();
   const [videoSrc, setVideoSrc] = useState(null);
   const [guests, setGuests] = useState({
@@ -111,19 +103,8 @@ const Home = () => {
     { name: "bangalore", image: "src/assets/Popular destinations/bangalore.webp" },
     { name: "Mysore", image: "src/assets/Popular destinations/mysore.webp" },
   ];
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center ml-50 w-80 h-80 ">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><linearGradient id="a8"><stop offset="0" stop-color="#071B35" stop-opacity="0"></stop><stop offset="1" stop-color="#071B35"></stop></linearGradient><circle fill="none" stroke="url(#a8)" stroke-width="15" stroke-linecap="round" stroke-dasharray="0 44 0 44 0 44 0 44 0 360" cx="100" cy="100" r="70" transform-origin="center"><animateTransform type="rotate" attributeName="transform" calcMode="discrete" dur="0.8" values="360;324;288;252;216;180;144;108;72;36" repeatCount="indefinite"></animateTransform></circle></svg>      </div>
-    );
-  }
   return (
-    <motion.div
-      className="bg-white"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-    >
+    <div className="bg-white">
       {/* Header  */}
       <Header />
       {/* Hero Section Start */}
@@ -150,18 +131,19 @@ const Home = () => {
       </div>
 
 
+
       {/* Trending Destinations */}
+
       <div className="max-w-7xl mx-auto px-4 py-10">
-        <h2 className="text-3xl font-extrabold text-gray-800 mb-1 animate__animated animate__fadeInUp" style={{ animationDelay: '1s' }}>Trending destinations</h2>
-        <p className="text-gray-500 mb-8 text-lg animate__animated animate__fadeInUp" style={{ animationDelay: '1.2s' }}>Travelers searching for India also booked these</p>
+        <h2 className="text-3xl font-extrabold text-gray-800 mb-1">Trending destinations</h2>
+        <p className="text-gray-500 mb-8 text-lg">Travelers searching for India also booked these</p>
 
         {/* Top 2 destinations */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           {destination.slice(0, 2).map((dest, idx) => (
             <div
               key={idx}
-              className="relative overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300  "
-              style={{ animationDelay: `${1.4 + idx * 0.2}s` }}
+              className="relative overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 group"
             >
               <img
                 src={dest.image}
@@ -183,8 +165,7 @@ const Home = () => {
           {destination.slice(2).map((dest, idx) => (
             <div
               key={idx}
-              className="relative overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 "
-              style={{ animationDelay: `${1.8 + idx * 0.2}s` }}
+              className="relative overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 group"
             >
               <img
                 src={dest.image}
@@ -202,9 +183,11 @@ const Home = () => {
         </div>
       </div>
 
+
+
       {/* Popular Destinations */}
       <div className="relative max-w-6xl mx-auto px-4 mt-10">
-        <h2 className="text-3xl font-bold mb-8 text-gray-800 animate__animated animate__fadeInUp" style={{ animationDelay: '2.4s' }}>
+        <h2 className="text-3xl font-bold  mb-8 text-gray-800">
           Popular Destinations
         </h2>
 
@@ -212,8 +195,7 @@ const Home = () => {
           {/* Left Arrow */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300 animate__animated animate__fadeInLeft"
-            style={{ animationDelay: '2.6s' }}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
           >
             <ChevronLeft className="w-6 h-6 text-gray-800" />
           </button>
@@ -226,8 +208,7 @@ const Home = () => {
             {destinations.map((dest, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-48 flex flex-col items-center animate__animated animate__fadeInUp"
-                style={{ animationDelay: `${2.8 + index * 0.1}s` }}
+                className="flex-shrink-0 w-48 flex flex-col items-center"
               >
                 <div className="transform hover:scale-105 transition-transform duration-500 ease-in-out rounded-2xl bg-white shadow-md overflow-hidden w-48 group">
                   <img
@@ -239,13 +220,13 @@ const Home = () => {
                 <p className="mt-2 text-center text-gray-700 font-semibold">{dest.name}</p>
               </div>
             ))}
+
           </div>
 
           {/* Right Arrow */}
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300 animate__animated animate__fadeInRight"
-            style={{ animationDelay: '2.6s' }}
+            className="absolute right-0  top-1/2 -translate-y-1/2 z-20 bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 hover:bg-white shadow-xl p-3 rounded-full transition duration-300"
           >
             <ChevronRight className="w-6 h-6 text-gray-800" />
           </button>
@@ -253,21 +234,171 @@ const Home = () => {
       </div>
 
       {/* Hero Section End */}
-      <div className="container-fluid bg-white">
+      <div className="container-fluid bg-white ">
         <div
           id="header-carousel"
           className="carousel slide"
           data-bs-ride="carousel"
         ></div>
 
+        {/* <div className="mb-5 md:px-10 ">
+          <div className="max-w-7xl mx-auto">
+            <div
+              className="text-center animate__animated animate__fadeInUp"
+              style={{ animationDelay: "0.1s" }}
+            >
+              <h6 className="section-title font-semibold uppercase tracking-widest">
+                <span className="text-[#FEA116] uppercase">Our Rooms</span>
+              </h6>
+              <h1 className="text-3xl md:text-5xl font-bold mb-10">
+                Explore Our{" "}
+                <span className="text-[#FEA116] uppercase">Rooms</span>
+              </h1>
+            </div>
+
+            <div className="grid grid-cols-1  mt-10 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {rooms.map((room, idx) => (
+                <div
+                  key={idx}
+                  className="animate__animated animate__fadeInUp w-full md:w-80 mx-auto"
+                  style={{ animationDelay: room.delay }}
+                >
+                  <div className="rounded shadow-lg overflow-hidden bg-white">
+                    <div className="relative">
+                      <img
+                        src={room.image}
+                        alt={room.title}
+                        className="w-full h-40 object-cover"
+                      />
+
+                    </div>
+
+                    <div className="p-4">
+                      <div className="flex justify-between mb-2">
+                        <h5 className="text-base font-semibold">
+                          {room.title}
+                        </h5>
+
+                      </div>
+
+                      <div className="flex flex-wrap text-xs text-gray-600 mb-2 gap-x-3 gap-y-1">
+                        <span className="border-r pr-2">
+                          <i className="fa fa-bed text-[#FEA116] mr-1"></i>3 Bed
+                        </span>
+                        <span className="border-r pr-2">
+                          <i className="fa fa-bath text-[#FEA116] mr-1"></i>2
+                          Bath
+                        </span>
+                        <span>
+                          <i className="fa fa-wifi text-[#FEA116] mr-1"></i>Wifi
+                        </span>
+                      </div>
+
+                      <p className="text-gray-500 text-sm mb-3 line-clamp-3">
+                        Erat ipsum justo amet duo et elitr dolor, est duo duo
+                        eos lorem sed diam stet diam sed stet lorem.
+                      </p>
+
+                      {/* <div className="flex justify-between">
+                        <a
+                          href="#"
+                          className="text-white bg-[#FEA116] px-3 py-1.5 text-xs rounded hover:bg-[#e1920e]"
+                        >
+                          View Detail
+                        </a>
+                        <a
+                          href="#"
+                          className="text-white bg-gray-800 px-3 py-1.5 text-xs rounded hover:bg-black"
+                        >
+                          Book Now
+                        </a>
+                      </div> */}
+        {/* </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div> */}
+
+        {/* Call to Action Section */}
+        {/* <div className="py-16 px-4 md:px-10 bg-gradient-to-r from-[#fff7e6] to-[#ffe8b3] max-w-4xl mx-auto rounded-3xl border border-gray-300">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 drop-shadow-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              Ready to Book Your Perfect Stay?
+            </motion.h2>
+
+            <motion.p
+              className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              Discover our luxurious rooms and suites, each designed to provide the ultimate comfort and experience.
+            </motion.p>
+
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#FEA116] text-white font-bold py-4 px-8 rounded-full shadow-xl hover:bg-[#e1920e] transition-all duration-300 transform hover:-translate-y-1"
+              onClick={() => navigate("/rooms")}
+            >
+              Book Your Room Now
+            </motion.button>
+          </motion.div>
+        </div> */}
+
+
+
+
         <div className="py-10 mb-30 px-4 md:px-10">
-          <div className="relative max-w-6xl mx-auto px-4 mt-10 mb-20 animate__animated animate__fadeInUp" style={{ animationDelay: '3.5s' }}>
+          {/* <div className="flex flex-wrap g-0">
+            <div className="w-full md:w-1/2 bg-black flex items-center">
+              <div className="p-5">
+                <h6 className="text-white text-uppercase text-xl mb-3">
+                  Luxury Living
+                </h6>
+                <h1 className="text-white text-3xl mb-4">
+                  Discover A Brand Luxurious Hotel
+                </h1>
+                <p className="text-white mb-4">
+                  Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit.
+                  Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit,
+                  sed stet lorem sit clita duo justo magna dolore erat amet
+                </p>
+                <a
+                  href="#"
+                  className="btn bg-blue-500 text-white py-3 px-5 mr-3"
+                >
+                  Our Rooms
+                </a>
+                <a href="#" className="btn bg-gray-200 text-gray-700 py-3 px-5">
+                  Book A Room
+                </a>
+              </div>
+            </div>
+          </div> */}
+
+
+          <div className="relative max-w-6xl mx-auto px-4 mt-10 mb-20" >
             <p className="text-sm font-bold text-gray-800 mb-4">
               A hotelier is a dedicated professional who specializes in managing hotels, resorts, or hospitality businesses. Their role involves overseeing every aspect of hotel operations—from guest services and housekeeping to finance, marketing, and staff management. Hoteliers are passionate about hospitality and strive to create a welcoming environment where guests feel valued and comfortable. With a strong focus on customer satisfaction, attention to detail, and efficient management, hoteliers ensure that every guest experience is smooth, enjoyable, and memorable. In a fast-evolving travel industry, hoteliers also embrace innovation, sustainability, and personalized service to stay competitive and meet the growing expectations of modern travelers.
             </p>
           </div>
 
-          <div className="max-w-6xl mx-auto border border-gray-300 rounded-3xl mt-10 overflow-hidden flex flex-col md:flex-row items-center animate__animated animate__fadeInUp" style={{ animationDelay: '3.8s' }}>
+
+          <div className="max-w-6xl mx-auto border border-gray-300 rounded-3xl mt-10 overflow-hidden flex flex-col md:flex-row items-center ">
             {/* Left Image */}
             <div className="md:w-1/3 w-full">
               <img
@@ -304,7 +435,6 @@ const Home = () => {
               </div>
             </div>
           </div>
-
           {/* Video Modal */}
           {videoSrc && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -328,7 +458,7 @@ const Home = () => {
         </div>
         <Footer />
       </div>
-    </motion.div>
+    </div>
   );
 };
 

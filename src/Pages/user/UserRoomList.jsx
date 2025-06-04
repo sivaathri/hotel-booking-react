@@ -298,7 +298,7 @@ export default function UserRoomList() {
       {/* Breadcrumb */}
       <div className="container mx-auto">
         <div className="flex items-center text-sm">
-          <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">Home</a>
+          <a href="#" className="text-orange-600  font-medium">Home</a>
           <span className="mx-2 text-gray-400">&gt;</span>
           <span className="text-gray-600">Hotels and more in {searchParams.get('destination') || 'Pondicherry'}</span>
         </div>
