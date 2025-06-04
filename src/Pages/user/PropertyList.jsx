@@ -376,7 +376,7 @@ export default function PropertyList({ properties, loading, error }) {
                     href={`/property/${property.property_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xl font-bold text-blue-700 hover:underline"
+                    className="text-xl font-bold text-orange-500 hover:underline"
                   >
                     {property.property_name}
                   </a>
@@ -610,7 +610,7 @@ export default function PropertyList({ properties, loading, error }) {
                   + ₹ {gst.amount.toLocaleString("en-IN")} taxes and charges
                 </span>
                 <button
-                  className="mt-2 px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                  className="mt-2 px-5 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors duration-200"
                   onClick={(e) => {
                     e.stopPropagation();
                     const searchParamsObj = {
