@@ -6,6 +6,7 @@ import SignIn from "../auth/SignIn";
 import { useUser } from '../../context/UserContext';
 import axios from "axios";
 import { API_URL } from '../../config/api.config';
+import { motion } from 'framer-motion';
 
 const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
@@ -243,48 +244,44 @@ const Header = () => {
                           </div>
                         </div>
                         {showUserMenu && (
-                          <div className="absolute right-0 mr-1 mt-2 w-64 bg-white rounded-xl border border-gray-200 z-50 overflow-hidden">
-                            <div className="flex flex-col text-sm text-black"> {/* Fixed from text-bla-800 to text-black */}
-
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute right-0 mr-1 mt-2 w-64 rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-md shadow-xl z-50 overflow-hidden"
+                          >
+                            <div className="flex flex-col text-sm text-gray-800 divide-y divide-gray-100">
                               {/* Section 1 */}
-                              <Link to="/messages" className="px-4 py-3 hover:bg-gray-100">
-                                Messages
+                              <Link to="/messages" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
+                                 Messages
                               </Link>
-                              <Link to="/notifications" className="px-4 py-3 hover:bg-gray-100 flex justify-between items-center">
-                                <span>Notifications</span>
-                                <span className="h-2 w-2 bg-red-500 rounded-full inline-block"></span>
+                              <Link to="/notifications" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 flex justify-between items-center transition-all duration-200">
+                                <span>🔔 Notifications</span>
+                                <span className="h-2 w-2 bg-red-500 rounded-full inline-block animate-ping"></span>
                               </Link>
-
-                              <Link to="/wishlists" className="px-4 py-3 hover:bg-gray-100">
-                                Wishlists
+                              <Link to="/wishlists" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
+                                 Wishlists
                               </Link>
-
-                              <hr className="border-t border-gray-200" />
 
                               {/* Section 2 */}
-
-
-
-                              <Link to="/user-dashboard" className="px-4 py-3 hover:bg-gray-100">
-                                Account
+                              <Link to="/user-dashboard" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
+                                👤 Account
                               </Link>
 
-                              <hr className="border-t border-gray-200" />
-
                               {/* Section 3 */}
-                              <Link to="/help" className="px-4 py-3 hover:bg-gray-100">
-                                Help Centre
+                              <Link to="/help" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
+                                 Help Centre
                               </Link>
                               <button
                                 onClick={handleLogout}
-                                className="text-left w-full px-4 py-3 hover:bg-gray-100 text-red-600"
+                                className="text-left w-full px-5 py-3 hover:bg-gray-100 hover:pl-6 text-red-600 transition-all duration-200"
                               >
-                                Log out
+                                 Log out
                               </button>
                             </div>
-                          </div>
+                          </motion.div>
                         )}
-
                         {/* Logout Confirmation Popup */}
                         {showLogoutConfirm && (
                           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[999]">
@@ -361,9 +358,9 @@ const Header = () => {
                         {/* Logo */}
                         <div className="z-10 mb-6">
                           <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="32" cy="32" r="32" fill="#fff" fillOpacity="0.15"/>
-                            <path d="M32 12L36 36H28L32 12Z" fill="#fff"/>
-                            <circle cx="32" cy="44" r="4" fill="#fff"/>
+                            <circle cx="32" cy="32" r="32" fill="#fff" fillOpacity="0.15" />
+                            <path d="M32 12L36 36H28L32 12Z" fill="#fff" />
+                            <circle cx="32" cy="44" r="4" fill="#fff" />
                           </svg>
                         </div>
                         <h2 className="z-10 text-2xl font-bold text-white mb-2">Welcome!</h2>
@@ -399,9 +396,9 @@ const Header = () => {
                         {/* Logo */}
                         <div className="z-10 mb-6">
                           <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="32" cy="32" r="32" fill="#fff" fillOpacity="0.15"/>
-                            <path d="M32 12L36 36H28L32 12Z" fill="#fff"/>
-                            <circle cx="32" cy="44" r="4" fill="#fff"/>
+                            <circle cx="32" cy="32" r="32" fill="#fff" fillOpacity="0.15" />
+                            <path d="M32 12L36 36H28L32 12Z" fill="#fff" />
+                            <circle cx="32" cy="44" r="4" fill="#fff" />
                           </svg>
                         </div>
                         <h2 className="z-10 text-2xl font-bold text-white mb-2">Welcome!</h2>
