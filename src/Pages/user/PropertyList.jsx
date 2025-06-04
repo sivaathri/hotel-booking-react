@@ -399,7 +399,7 @@ export default function PropertyList({ properties, loading, error }) {
                     </span>
                   </div> */}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-blue-700">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
                   <span>{city}</span>
                   {(() => {
                     const locations = [
@@ -501,7 +501,7 @@ export default function PropertyList({ properties, loading, error }) {
                                     });
                                     setMapModalOpen(true);
                                   }}
-                                  className="text-orange-600 hover:text-blue-800 flex items-center "
+                                  className="text-gray-500 hover:text-gray-800 flex items-center "
                                 >
                                   Show on map
                                 </button>
