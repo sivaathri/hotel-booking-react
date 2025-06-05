@@ -882,7 +882,7 @@ export default function UserDashboard() {
               <span className="font-medium text-gray-900">{profileData.name}</span>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             <button className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
               <Bell className="w-5 h-5 mr-2" />
               <span className="text-sm">Notifications</span>
@@ -891,7 +891,7 @@ export default function UserDashboard() {
               <MessageSquare className="w-5 h-5 mr-2" />
               <span className="text-sm">Messages</span>
             </button>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -914,7 +914,7 @@ export default function UserDashboard() {
                 {[
                   { name: 'Profile', icon: User },
                   { name: 'My Bookings', icon: BookOpen },
-                  { name: 'Login Details', icon: Lock },
+                  { name: 'Forgot Password', icon: Lock },
                   { name: 'Logged In Devices', icon: Monitor }
                 ].map((item) => (
                   <button
