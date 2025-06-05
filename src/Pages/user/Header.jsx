@@ -9,7 +9,7 @@ import { API_URL } from '../../config/api.config';
 import { motion } from 'framer-motion';
 import {
   FiHeart,
-  FiMapPin,
+  FiLogOut,
   FiMessageSquare,
   FiUser,
   FiBell,
@@ -258,54 +258,65 @@ const Header = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute right-0 mr-1 mt-3 w-64 rounded-2xl  bg-white backdrop-blur-md shadow-xl z-50 overflow-hidden"
+                            className="absolute right-0 mr-1 mt-3 w-64 rounded-xl bg-white shadow-xl z-50 overflow-hidden border border-gray-100"
                           >
-                            <div className="flex flex-col text-sm  text-gray-800 ">
+                            <div className="flex flex-col text-sm text-gray-800 py-2">
                               {/* Section 1 */}
                               <Link
                                 to="/messages"
-                                className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
                               >
-                                <FiMessageSquare size={18} />
+                                <FiMessageSquare size={18} className="text-gray-600" />
                                 Messages
                               </Link>
 
-                              <Link 
-                              to="/notifications"
-                              className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200"
->
-                              <FiBell size={18}/>Notifications
-                                {/* <span className="h-2 w-2 bg-red-500 rounded-full inline-block animate-ping"></span> */}
+                              <Link
+                                to="/notifications"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                              >
+                                <FiBell size={18} className="text-gray-600" />
+                                Notifications
+                                {/* You can re-enable this for a notification dot */}
+                                {/* <span className="ml-auto h-2 w-2 bg-red-500 rounded-full inline-block animate-ping"></span> */}
                               </Link>
+
                               <Link
                                 to="/wishlists"
-                                className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
                               >
-                                <FiHeart size={18} />
+                                <FiHeart size={18} className="text-gray-600" />
                                 Wishlists
                               </Link>
 
+                              {/* Section Divider */}
+                              <div className="my-2 border-t border-gray-100"></div>
 
                               {/* Section 2 */}
-                              <Link 
-                              to="/user-dashboard" 
-                              
-                              className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200">
-                                
-                                <FiUser  size={18}/>
+                              <Link
+                                to="/user-dashboard"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                              >
+                                <FiUser size={18} className="text-gray-600" />
                                 Account
                               </Link>
 
+                              {/* Section Divider */}
+                              <div className="my-2 border-t border-gray-100"></div>
+
                               {/* Section 3 */}
-                              <Link to="/help" 
-                              className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200">
-                                <FiHelpCircle size={18} />
+                              <Link
+                                to="/help"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                              >
+                                <FiHelpCircle size={18} className="text-gray-600" />
                                 Help Centre
                               </Link>
+
                               <button
                                 onClick={handleLogout}
-                                className="text-left w-full px-5 py-3 hover:bg-gray-100 hover:pl-6 text-red-600 transition-all duration-200"
+                                className="text-left w-full px-5 py-3 hover:bg-gray-50 text-red-600 font-medium transition-colors duration-200 flex items-center gap-3"
                               >
+                                <FiLogOut size={18} className="text-red-600" />
                                 Log out
                               </button>
                             </div>
