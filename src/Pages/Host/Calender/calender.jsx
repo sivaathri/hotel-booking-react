@@ -497,20 +497,21 @@ const Calender = () => {
                       // Save pricing logic here
                       if (!selectedRoom) return;
                       try {
-                        // For demo, save for the first selected date
-                        const pricing_date = selectedDates[0]?.full.toISOString().split('T')[0];
-                        const payload = {
-                          room_id: selectedRoom.id,
-                          room_type: selectedRoom.name,
-                          pricing_date,
-                          adults: selectedRoom.room_capacity_adults || 1,
-                          price: guestPricing['1']?.price || 0,
-                          currency: 'INR', // or make dynamic if needed
-                          child_age_from: 0, // Replace with actual value if available
-                          child_age_to: 0,   // Replace with actual value if available
-                          child_price: 0     // Replace with actual value if available
-                        };
-                        await axios.post('http://localhost:3000/api/calender/pricing', payload);
+                        for (let i = 0; i < selectedDates.length; i++) {
+                          const pricing_date = selectedDates[i].full.toISOString().split('T')[0];
+                          const payload = {
+                            room_id: selectedRoom.id,
+                            room_type: selectedRoom.name,
+                            pricing_date,
+                            adults: selectedRoom.room_capacity_adults || 1,
+                            price: guestPricing['1']?.price || 0,
+                            currency: 'INR', // or make dynamic if needed
+                            child_age_from: 0, // Replace with actual value if available
+                            child_age_to: 0,   // Replace with actual value if available
+                            child_price: 0     // Replace with actual value if available
+                          };
+                          await axios.post('http://localhost:3000/api/calender/pricing', payload);
+                        }
                         alert('Pricing saved successfully!');
                       } catch (err) {
                         alert('Failed to save pricing.');
