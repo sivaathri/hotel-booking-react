@@ -13,6 +13,29 @@ const Calender = () => {
   const token = getAuthToken();
   const [propertydetails, setpropertydetails] = useState([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  // ...all other state declarations remain here...
+
+  // Log price for selected property and selected room
+  useEffect(() => {
+    if (!selectedPropertyId || !selectedRoom) return;
+    const selectedProperty = propertydetails.find(p => p.property_id === Number(selectedPropertyId)) || propertydetails[0];
+    const room = selectedProperty && Array.isArray(selectedProperty.rooms)
+      ? selectedProperty.rooms.find(r => r.room_id === selectedRoom.id)
+      : null;
+    if (room) {
+      // Parse occupancy_price_adjustments if string
+      let occAdjustments = room.occupancy_price_adjustments;
+      if (typeof occAdjustments === 'string') {
+        try { occAdjustments = JSON.parse(occAdjustments); } catch { occAdjustments = []; }
+      }
+      if (occAdjustments && Array.isArray(occAdjustments) && occAdjustments.length > 0) {
+        console.log('Room Occupancy Price Adjustments:', occAdjustments);
+      } else {
+        console.log('Room Base Price:', room.base_price);
+      }
+    }
+  }, [propertydetails, selectedPropertyId, selectedRoom]);
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -53,7 +76,6 @@ const Calender = () => {
   const [selectedRange, setSelectedRange] = useState('28 May 2025 - 27 Jun 2025');
   const [viewType, setViewType] = useState('List view');
   const [showPricingPopup, setShowPricingPopup] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null);
   const [pricingMode, setPricingMode] = useState('custom');
   const [guestPricing, setGuestPricing] = useState({
     6: { price: 0, enabled: true },
@@ -137,7 +159,33 @@ const Calender = () => {
         roomsToSell: room.rpa_number_of_rooms || room.number_of_rooms || 0,
         netBooked: '',
         rate: 'Standard Rate',
-        pricing: Array(selectedDates.length).fill({ price: room.base_price ? `INR ${parseFloat(room.base_price)}` : '', available: room.rpa_number_of_rooms || room.number_of_rooms || 0 })
+        // Determine pricing per occupancy
+        pricing: (() => {
+          // Parse occupancy_price_adjustments if it's a string (API returns stringified JSON)
+          let occAdjustments = room.occupancy_price_adjustments;
+          if (typeof occAdjustments === 'string') {
+            try {
+              occAdjustments = JSON.parse(occAdjustments);
+            } catch {
+              occAdjustments = [];
+            }
+          }
+          if (occAdjustments && Array.isArray(occAdjustments) && occAdjustments.length > 0) {
+            // Map to expected UI structure
+            return occAdjustments.map(adj => ({
+              price: adj.adjustment ? `${adj.type || 'INR'} ${parseFloat(adj.adjustment)}` : '',
+              occupancy: adj.minGuests
+            }));
+          } else {
+            // fallback: use base_price * guest_count for all occupancies up to room_capacity_adults
+            const maxGuests = room.room_capacity_adults || 1;
+            const base = room.base_price ? parseFloat(room.base_price) : 0;
+            return Array.from({ length: maxGuests }, (_, i) => ({
+              price: base ? `INR ${base * (i + 1)}` : '',
+              occupancy: i + 1
+            }));
+          }
+        })(),
       }))
     : [];
 
@@ -280,12 +328,38 @@ const Calender = () => {
                         ...room,
                         room_capacity_adults: origRoom ? origRoom.room_capacity_adults : undefined,
                       });
+                      // Parse occupancy_price_adjustments and set guestPricing for popup
+                      let occAdjustments = origRoom && origRoom.occupancy_price_adjustments;
+                      if (typeof occAdjustments === 'string') {
+                        try { occAdjustments = JSON.parse(occAdjustments); } catch { occAdjustments = []; }
+                      }
+                      if (occAdjustments && Array.isArray(occAdjustments) && occAdjustments.length > 0) {
+                        const newGuestPricing = {};
+                        occAdjustments.forEach(adj => {
+                          newGuestPricing[adj.minGuests] = { price: parseInt(adj.adjustment) || 0, enabled: true };
+                        });
+                        setGuestPricing(newGuestPricing);
+                      } else {
+                        // fallback: use base_price * guest_count for all occupancies up to room_capacity_adults
+                        const maxGuests = origRoom && origRoom.room_capacity_adults ? origRoom.room_capacity_adults : 1;
+                        const base = origRoom && origRoom.base_price ? parseFloat(origRoom.base_price) : 0;
+                        const newGuestPricing = {};
+                        for (let i = 1; i <= maxGuests; i++) {
+                          newGuestPricing[i] = { price: base * i, enabled: true };
+                        }
+                        setGuestPricing(newGuestPricing);
+                      }
                       setShowPricingPopup(true);
                     }}>▼ ✎ Edit</div>
                   </td>
                   {selectedDates.map((_, index) => (
                     <td key={index} className="w-16 p-2 text-center border-l border-gray-200 align-middle">
-                      <div className="text-xs text-gray-600">{room.pricing[0].price}</div>
+                      {/* Show price per occupancy (guest), fallback to base_price if no occupancy_price_adjustments */}
+                      <div className="text-xs text-gray-600">
+                        {room.pricing && room.pricing[index] && room.pricing[index].price
+                          ? room.pricing[index].price
+                          : room.base_price ? `INR ${parseFloat(room.base_price)}` : ''}
+                      </div>
                     </td>
                   ))}
                 </tr>
@@ -309,6 +383,8 @@ const Calender = () => {
             <div className="p-4">
               <div className="mb-2 text-sm text-gray-700">
                 <strong>Room Capacity (Adults):</strong> {selectedRoom && selectedRoom.room_capacity_adults !== undefined ? selectedRoom.room_capacity_adults : '-'}
+                
+
               </div>
             </div>
 
