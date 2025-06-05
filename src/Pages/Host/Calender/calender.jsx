@@ -10,42 +10,43 @@ import { getAuthToken } from '../../../utils/getAuthToken';
 import { useUser } from '../../../context/UserContext';
 const Calender = () => {
   const { user } = useUser();
-    const token = getAuthToken();
-      const [propertydetails, setpropertydetails] = useState([]);
-      useEffect(() => {
-        const fetchPropertyDetails = async () => {
-          if (!user?.id) return;
-          
-          try {
-            const response = await axios.get(`${API_URL}/getall/${user.id}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            // Handle the nested data structure
-            if (response.data.success && response.data.data) {
-              // Convert the single property object to an array if it's not already
-              const propertyData = Array.isArray(response.data.data) 
-                ? response.data.data 
-                : [response.data.data];
-                
-              // Parse the image_paths string to array if it exists
-              const propertiesWithParsedImages = propertyData.map(property => ({
-                ...property,
-                images: property.image_paths ? JSON.parse(property.image_paths) : []
-              }));
-              
-              setpropertydetails(propertiesWithParsedImages);
-              console.log('Property Details:', propertiesWithParsedImages);
-            }
-          } catch (error) {
-            console.error('Error fetching property details:', error);
-          }
-        };
-    
-        fetchPropertyDetails();
-      }, [token, user?.id]);
+  const token = getAuthToken();
+  const [propertydetails, setpropertydetails] = useState([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState('');
 
+  useEffect(() => {
+    const fetchPropertyDetails = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const response = await axios.get(`${API_URL}/getall/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        // Handle the nested data structure
+        if (response.data.success && response.data.data) {
+          // Convert the single property object to an array if it's not already
+          const propertyData = Array.isArray(response.data.data) 
+            ? response.data.data 
+            : [response.data.data];
+            
+          // Parse the image_paths string to array if it exists
+          const propertiesWithParsedImages = propertyData.map(property => ({
+            ...property,
+            images: property.image_paths ? JSON.parse(property.image_paths) : []
+          }));
+          
+          setpropertydetails(propertiesWithParsedImages);
+          console.log('Property Details:', propertiesWithParsedImages);
+        }
+      } catch (error) {
+        console.error('Error fetching property details:', error);
+      }
+    };
+    
+    fetchPropertyDetails();
+  }, [token, user?.id]);
 
   const [startDate, setStartDate] = useState(new Date('2025-05-28'));
   const [endDate, setEndDate] = useState(new Date('2025-06-27'));
@@ -119,9 +120,12 @@ const Calender = () => {
 
   const selectedDates = (startDate && endDate) ? getDateRangeArray(startDate, endDate) : [];
 
-  // Now define rooms, which uses selectedDates
-  const rooms = Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms)
-    ? propertydetails[0].rooms
+  // Find selected property
+  const selectedProperty = propertydetails.find(p => p.property_id === Number(selectedPropertyId)) || propertydetails[0];
+
+  // Now define rooms, which uses selectedDates and selectedProperty
+  const rooms = selectedProperty && Array.isArray(selectedProperty.rooms)
+    ? selectedProperty.rooms
         .filter(room => {
           if (selectedRoomType === 'all') return true;
           return room.room_type && room.room_type.split('_')[0] === selectedRoomType;
@@ -137,64 +141,6 @@ const Calender = () => {
         }))
     : [];
 
-  // const renderCalendarHeader = () => {
-  //   return (
-  //     <div className="flex">
-  //       <div className="w-48 flex-shrink-0 p-2">
-  //         <div className="text-sm font-medium">May 2025</div>
-  //       </div>
-  //       <div className="flex-1 flex">
-  //         {allDates.map((date, index) => (
-  //           <div key={index} className="flex-1 text-center border-l border-gray-200">
-  //             <div className="text-xs text-gray-600">{date.day}</div>
-  //             <div className="text-xs">{date.date}</div>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
-  // const renderRoom = (room) => {
-  //   return (
-  //     <div>
-  //       <div className="flex">
-  //         <div className="w-48 flex-shrink-0 p-2">
-  //           <div className="font-medium">{room.name}</div>
-  //           <div className="text-xs text-gray-500">Room ID: {room.id}</div>
-  //         </div>
-  //       </div>
-  //       <div className="flex">
-  //         <div className="w-48 flex-shrink-0 p-2">
-  //           <div className="text-xs">Rooms to sell</div>
-  //         </div>
-  //         <div className="flex-1 flex">
-  //           {room.pricing.map((price, index) => (
-  //             <div key={index} className="flex-1 text-center border-l border-gray-200">
-  //               <div className="text-xs">{room.roomsToSell}</div>
-  //             </div>
-  //           ))}
-  //         </div>
-  //       </div>
-  //       <div className="flex border-t border-gray-200">
-  //         <div className="w-48 flex-shrink-0 p-2">
-  //           <div className="flex items-center space-x-2">
-  //             <span className="h-2 w-2 rounded-full bg-green-500"></span>
-  //             <span className="text-xs">Standard Rate</span>
-  //           </div>
-  //         </div>
-  //         <div className="flex-1 flex">
-  //           {room.pricing.map((price, index) => (
-  //             <div key={index} className="flex-1 text-center border-l border-gray-200">
-  //               <div className="text-xs">INR {room.name === '3 BHK' ? '6000' : '4000'}</div>
-  //             </div>
-  //           ))}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   return (
     <div className="bg-white min-h-screen">
       <HostHeader />
@@ -207,16 +153,33 @@ const Calender = () => {
         </div>
 
         {console.log('propertydetails:', propertydetails)}
+        {/* Property Selection Dropdown */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
             <select
               className="border border-gray-300 rounded px-3 py-1 text-sm"
+              value={selectedPropertyId}
+              onChange={e => {
+                setSelectedPropertyId(e.target.value);
+                setSelectedRoomType('all'); // reset room type filter on property change
+              }}
+            >
+              <option value="">Select property</option>
+              {propertydetails.map(property => (
+                <option key={property.property_id} value={property.property_id}>{property.property_name}</option>
+              ))}
+            </select>
+
+            {/* Room Type Dropdown depends on selected property */}
+            <select
+              className="border border-gray-300 rounded px-3 py-1 text-sm"
               value={selectedRoomType}
               onChange={e => setSelectedRoomType(e.target.value)}
+              disabled={!selectedProperty && !propertydetails.length}
             >
               <option value="all">All rooms</option>
-              {Array.isArray(propertydetails) && propertydetails.length > 0 && Array.isArray(propertydetails[0]?.rooms) &&
-                [...new Set(propertydetails[0].rooms
+              {selectedProperty && Array.isArray(selectedProperty.rooms) &&
+                [...new Set(selectedProperty.rooms
                   .filter(room => room.room_type)
                   .map(room => room.room_type.split('_')[0]))]
                   .map(roomType => (
