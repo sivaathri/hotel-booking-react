@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, HelpCircle, X } from 'lucide-react';
 import HostHeader from '../HostHeader';
 import DatePicker from 'react-datepicker';
@@ -17,7 +17,7 @@ const Calender = () => {
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       if (!user?.id) return;
-      
+
       try {
         const response = await axios.get(`${API_URL}/getall/${user.id}`, {
           headers: {
@@ -27,16 +27,16 @@ const Calender = () => {
         // Handle the nested data structure
         if (response.data.success && response.data.data) {
           // Convert the single property object to an array if it's not already
-          const propertyData = Array.isArray(response.data.data) 
-            ? response.data.data 
+          const propertyData = Array.isArray(response.data.data)
+            ? response.data.data
             : [response.data.data];
-            
+
           // Parse the image_paths string to array if it exists
           const propertiesWithParsedImages = propertyData.map(property => ({
             ...property,
             images: property.image_paths ? JSON.parse(property.image_paths) : []
           }));
-          
+
           setpropertydetails(propertiesWithParsedImages);
           console.log('Property Details:', propertiesWithParsedImages);
         }
@@ -44,7 +44,7 @@ const Calender = () => {
         console.error('Error fetching property details:', error);
       }
     };
-    
+
     fetchPropertyDetails();
   }, [token, user?.id]);
 
@@ -126,19 +126,19 @@ const Calender = () => {
   // Now define rooms, which uses selectedDates and selectedProperty
   const rooms = selectedProperty && Array.isArray(selectedProperty.rooms)
     ? selectedProperty.rooms
-        .filter(room => {
-          if (selectedRoomType === 'all') return true;
-          return room.room_type && room.room_type.split('_')[0] === selectedRoomType;
-        })
-        .map(room => ({
-          id: room.room_id,
-          name: room.room_type ? room.room_type.split('_')[0] : '',
-          status: 'Bookable',
-          roomsToSell: room.rpa_number_of_rooms || room.number_of_rooms || 0,
-          netBooked: '',
-          rate: 'Standard Rate',
-          pricing: Array(selectedDates.length).fill({ price: room.base_price ? `INR ${parseFloat(room.base_price)}` : '', available: room.rpa_number_of_rooms || room.number_of_rooms || 0 })
-        }))
+      .filter(room => {
+        if (selectedRoomType === 'all') return true;
+        return room.room_type && room.room_type.split('_')[0] === selectedRoomType;
+      })
+      .map(room => ({
+        id: room.room_id,
+        name: room.room_type ? room.room_type.split('_')[0] : '',
+        status: 'Bookable',
+        roomsToSell: room.rpa_number_of_rooms || room.number_of_rooms || 0,
+        netBooked: '',
+        rate: 'Standard Rate',
+        pricing: Array(selectedDates.length).fill({ price: room.base_price ? `INR ${parseFloat(room.base_price)}` : '', available: room.rpa_number_of_rooms || room.number_of_rooms || 0 })
+      }))
     : [];
 
   return (
@@ -151,84 +151,84 @@ const Calender = () => {
             <h1 className="text-xl font-semibold text-gray-900">Calendar</h1>
           </div>
         </div>
-
-        {console.log('propertydetails:', propertydetails)}
-        {/* Property Selection Dropdown */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4">
-            <select
-              className="border border-gray-300 rounded px-3 py-1 text-sm"
-              value={selectedPropertyId}
-              onChange={e => {
-                setSelectedPropertyId(e.target.value);
-                setSelectedRoomType('all'); // reset room type filter on property change
-              }}
-            >
-              <option value="">Select property</option>
-              {propertydetails.map(property => (
-                <option key={property.property_id} value={property.property_id}>{property.property_name}</option>
-              ))}
-            </select>
-
-            {/* Room Type Dropdown depends on selected property */}
-            <select
-              className="border border-gray-300 rounded px-3 py-1 text-sm"
-              value={selectedRoomType}
-              onChange={e => setSelectedRoomType(e.target.value)}
-              disabled={!selectedProperty && !propertydetails.length}
-            >
-              <option value="all">All rooms</option>
-              {selectedProperty && Array.isArray(selectedProperty.rooms) &&
-                [...new Set(selectedProperty.rooms
-                  .filter(room => room.room_type)
-                  .map(room => room.room_type.split('_')[0]))]
-                  .map(roomType => (
-                    <option key={roomType} value={roomType}>{roomType}</option>
-                  ))
-              }
-            </select>
-
-            <span className="text-sm text-gray-600">
-              Last sync: 27 May 2025, 13:08
-            </span>
-          </div>
-          <select className="border border-gray-300 rounded px-3 py-1 text-sm">
-            <option>List view</option>
-          </select>
-        </div>
-          
-          <div className="flex items-center space-x-4 mb-4">
-            <DatePicker
-              selected={startDate}
-              onChange={(dates) => {
-                const [start, end] = dates;
-                setStartDate(start);
-                setEndDate(end);
-                if (start && end) {
-                  const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                  const formattedEnd = end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                  if (formattedStart === formattedEnd) {
-                    setSelectedRange(formattedStart);
-                  } else {
-                    setSelectedRange(`${formattedStart} - ${formattedEnd}`);
-                  }
-                } else if (start) {
-                  const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                  setSelectedRange(formattedStart);
-                } else {
-                  setSelectedRange('');
-                }
-              }}
-              startDate={startDate}
-              endDate={endDate}
-              selectsRange
-              dateFormat="dd MMM yyyy"
-              className="border border-gray-300 rounded px-3 py-1 text-sm w-64"
-              placeholderText="Select date range"
-            />
-          </div>
       </div>
 
+      {console.log('propertydetails:', propertydetails)}
+
+      {/* Property Selection Dropdown */ }
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          <select
+            className="border border-gray-300 rounded px-3 py-1 text-sm"
+            value={selectedPropertyId}
+            onChange={e => {
+              setSelectedPropertyId(e.target.value);
+              setSelectedRoomType('all'); // reset room type filter on property change
+            }}
+          >
+            <option value="">Select property</option>
+            {propertydetails.map(property => (
+              <option key={property.property_id} value={property.property_id}>{property.property_name}</option>
+            ))}
+          </select>
+
+          {/* Room Type Dropdown depends on selected property */}
+          <select
+            className="border border-gray-300 rounded px-3 py-1 text-sm"
+            value={selectedRoomType}
+            onChange={e => setSelectedRoomType(e.target.value)}
+            disabled={!selectedProperty && !propertydetails.length}
+          >
+            <option value="all">All rooms</option>
+            {selectedProperty && Array.isArray(selectedProperty.rooms) &&
+              [...new Set(selectedProperty.rooms
+                .filter(room => room.room_type)
+                .map(room => room.room_type.split('_')[0]))]
+                .map(roomType => (
+                  <option key={roomType} value={roomType}>{roomType}</option>
+                ))
+            }
+          </select>
+
+          <span className="text-sm text-gray-600">
+            Last sync: 27 May 2025, 13:08
+          </span>
+        </div>
+        <select className="border border-gray-300 rounded px-3 py-1 text-sm">
+          <option>List view</option>
+        </select>
+      </div>
+
+      <div className="flex items-center space-x-4 mb-4">
+        <DatePicker
+          selected={startDate}
+          onChange={(dates) => {
+            const [start, end] = dates;
+            setStartDate(start);
+            setEndDate(end);
+            if (start && end) {
+              const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+              const formattedEnd = end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+              if (formattedStart === formattedEnd) {
+                setSelectedRange(formattedStart);
+              } else {
+                setSelectedRange(`${formattedStart} - ${formattedEnd}`);
+              }
+            } else if (start) {
+              const formattedStart = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+              setSelectedRange(formattedStart);
+            } else {
+              setSelectedRange('');
+            }
+          }}
+          startDate={startDate}
+          endDate={endDate}
+          selectsRange
+          dateFormat="dd MMM yyyy"
+          className="border border-gray-300 rounded px-3 py-1 text-sm w-64"
+          placeholderText="Select date range"
+        />
+      </div>
       {/* Calendar Grid */}
       <div className="overflow-x-auto">
         <table className="min-w-full border-separate border-spacing-0">
@@ -274,7 +274,12 @@ const Calender = () => {
                   <td className="w-48 p-3 align-middle">
                     <div className="text-sm text-blue-600">▼ {room.rate}</div>
                     <div className="text-xs text-blue-600 cursor-pointer" onClick={() => {
-                      setSelectedRoom(room);
+                      // Find the original room object from selectedProperty.rooms
+                      const origRoom = selectedProperty.rooms.find(r => r.room_id === room.id);
+                      setSelectedRoom({
+                        ...room,
+                        room_capacity_adults: origRoom ? origRoom.room_capacity_adults : undefined,
+                      });
                       setShowPricingPopup(true);
                     }}>▼ ✎ Edit</div>
                   </td>
@@ -290,7 +295,7 @@ const Calender = () => {
         </table>
       </div>
 
-      {/* Pricing per Guest Popup */}
+      {/* Pricing per Guest Popup */ }
       {showPricingPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-[500px] shadow-xl">
@@ -299,6 +304,12 @@ const Calender = () => {
               <button onClick={() => setShowPricingPopup(false)} className="text-gray-500 hover:text-gray-700">
                 <X className="w-5 h-5" />
               </button>
+            </div>
+            {/* Show room_capacity_adults value */}
+            <div className="p-4">
+              <div className="mb-2 text-sm text-gray-700">
+                <strong>Room Capacity (Adults):</strong> {selectedRoom && selectedRoom.room_capacity_adults !== undefined ? selectedRoom.room_capacity_adults : '-'}
+              </div>
             </div>
 
             <div className="p-6">
@@ -336,66 +347,69 @@ const Calender = () => {
                 </p>
 
                 <div className="space-y-4">
-                  {Object.entries(guestPricing).map(([guests, data]) => (
-                    <div key={guests} className="flex items-center justify-between">
-                      <div className="w-24">{guests} guests</div>
-                      <div className="flex-1">
-                        {guests === '6' ? (
-                          <div className="text-sm">Normal price</div>
-                        ) : (
-                          <div className="flex items-center space-x-2">
-                            <div className="text-sm">Normal price reduced by</div>
-                            <input
-                              type="number"
-                              value={data.price}
-                              onChange={(e) => setGuestPricing(prev => ({
-                                ...prev,
-                                [guests]: { ...data, price: parseInt(e.target.value) || 0 }
-                              }))}
-                              className="border rounded px-2 py-1 w-24"
-                            />
-                            <select className="border rounded px-2 py-1">
-                              <option>INR</option>
-                            </select>
+                  {/* Dynamically generate guest pricing rows based on room_capacity_adults */}
+                  {selectedRoom && selectedRoom.room_capacity_adults
+                    ? Array.from({ length: selectedRoom.room_capacity_adults }, (_, i) => {
+                      const guests = (i + 1).toString();
+                      const data = guestPricing[guests] || { price: 0, enabled: true };
+                      return (
+                        <div key={guests} className="flex items-center justify-between">
+                          <div className="w-24">{guests} guest{guests !== '1' ? 's' : ''}</div>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <div className="text-sm">Price</div>
+                              <input
+                                type="number"
+                                value={data.price}
+                                onChange={(e) => setGuestPricing(prev => ({
+                                  ...prev,
+                                  [guests]: { ...data, price: parseInt(e.target.value) || 0 }
+                                }))}
+                                className="border rounded px-2 py-1 w-24"
+                              />
+                              <select className="border rounded px-2 py-1">
+                                <option>INR</option>
+                              </select>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="text-sm">On</div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={data.enabled}
-                            onChange={() => setGuestPricing(prev => ({
-                              ...prev,
-                              [guests]: { ...data, enabled: !data.enabled }
-                            }))}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                    </div>
-                  ))}
+                          <div className="flex items-center space-x-2">
+                            <div className="text-sm">On</div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={data.enabled}
+                                onChange={() => setGuestPricing(prev => ({
+                                  ...prev,
+                                  [guests]: { ...data, enabled: !data.enabled }
+                                }))}
+                                className="sr-only peer"
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    })
+                    : null};
                 </div>
-              </div>
 
-              <div className="flex justify-end space-x-4 mt-6">
-                <button
-                  onClick={() => setShowPricingPopup(false)}
-                  className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    // Save pricing logic here
-                    setShowPricingPopup(false);
-                  }}
-                  className="px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
-                >
-                  Save
-                </button>
+                <div className="flex justify-end space-x-4 mt-6">
+                  <button
+                    onClick={() => setShowPricingPopup(false)}
+                    className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Save pricing logic here
+                      setShowPricingPopup(false);
+                    }}
+                    className="px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
             </div>
           </div>
