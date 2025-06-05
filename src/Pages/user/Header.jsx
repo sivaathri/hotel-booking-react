@@ -7,7 +7,16 @@ import { useUser } from '../../context/UserContext';
 import axios from "axios";
 import { API_URL } from '../../config/api.config';
 import { motion } from 'framer-motion';
-
+import {
+  FiHeart,
+  FiMapPin,
+  FiMessageSquare,
+  FiUser,
+  FiBell,
+  FiSettings,
+  FiGlobe,
+  FiHelpCircle,
+} from 'react-icons/fi';
 const Header = () => {
   const [isSignupOpen, setSignupOpen] = useState(false);
   const [isSigninOpen, setSigninOpen] = useState(false);
@@ -249,35 +258,55 @@ const Header = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute right-0 mr-1 mt-2 w-64 rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-md shadow-xl z-50 overflow-hidden"
+                            className="absolute right-0 mr-1 mt-3 w-64 rounded-2xl  bg-white backdrop-blur-md shadow-xl z-50 overflow-hidden"
                           >
-                            <div className="flex flex-col text-sm text-gray-800 divide-y divide-gray-100">
+                            <div className="flex flex-col text-sm  text-gray-800 ">
                               {/* Section 1 */}
-                              <Link to="/messages" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
-                                 Messages
-                              </Link>
-                              <Link to="/notifications" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 flex justify-between items-center transition-all duration-200">
-                                <span>🔔 Notifications</span>
-                                <span className="h-2 w-2 bg-red-500 rounded-full inline-block animate-ping"></span>
-                              </Link>
-                              <Link to="/wishlists" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
-                                 Wishlists
+                              <Link
+                                to="/messages"
+                                className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200"
+                              >
+                                <FiMessageSquare size={18} />
+                                Messages
                               </Link>
 
+                              <Link 
+                              to="/notifications"
+                              className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200"
+>
+                              <FiBell size={18}/>Notifications
+                                {/* <span className="h-2 w-2 bg-red-500 rounded-full inline-block animate-ping"></span> */}
+                              </Link>
+                              <Link
+                                to="/wishlists"
+                                className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200"
+                              >
+                                <FiHeart size={18} />
+                                Wishlists
+                              </Link>
+
+
                               {/* Section 2 */}
-                              <Link to="/user-dashboard" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
-                                👤 Account
+                              <Link 
+                              to="/user-dashboard" 
+                              
+                              className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200">
+                                
+                                <FiUser  size={18}/>
+                                Account
                               </Link>
 
                               {/* Section 3 */}
-                              <Link to="/help" className="px-5 py-3 hover:bg-gray-100 hover:pl-6 transition-all duration-200">
-                                 Help Centre
+                              <Link to="/help" 
+                              className="flex items-center gap-2 px-4 py-3 text-[15px] text-gray-900 font-medium hover:bg-gray-100 transition-all duration-200">
+                                <FiHelpCircle size={18} />
+                                Help Centre
                               </Link>
                               <button
                                 onClick={handleLogout}
                                 className="text-left w-full px-5 py-3 hover:bg-gray-100 hover:pl-6 text-red-600 transition-all duration-200"
                               >
-                                 Log out
+                                Log out
                               </button>
                             </div>
                           </motion.div>
