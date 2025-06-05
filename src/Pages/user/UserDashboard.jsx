@@ -6,7 +6,7 @@ import { API_URL } from '../../config/api.config';
 import { getAuthToken } from '../../utils/getAuthToken';
 
 const MyBookings = () => {
-  
+
   const [activeTab, setActiveTab] = useState('upcoming');
   const [hoveredBooking, setHoveredBooking] = useState(null);
 
@@ -191,8 +191,8 @@ const MyBookings = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full mr-2 ${booking.status === 'confirmed' ? 'bg-green-500' :
-                    booking.status === 'pending' ? 'bg-yellow-500' :
-                      booking.status === 'completed' ? 'bg-blue-500' : 'bg-red-500'
+                  booking.status === 'pending' ? 'bg-yellow-500' :
+                    booking.status === 'completed' ? 'bg-blue-500' : 'bg-red-500'
                   }`}></div>
                 <span className="text-sm font-medium text-gray-900">
                   {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
@@ -238,8 +238,8 @@ const MyBookings = () => {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`pb-4 text-sm font-medium relative ${activeTab === tab
-                  ? 'text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                ? 'text-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
                 }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -460,7 +460,7 @@ const LoginDetails = ({ profileData }) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-   
+
 
     if (!token) {
       setError('You must be logged in to update your password');
@@ -716,7 +716,7 @@ export default function UserDashboard() {
     const token = getAuthToken();
     const fetchUserData = async () => {
       try {
-        
+
         if (!token) {
           // Redirect to login if no token
           window.location.href = '/';
@@ -921,8 +921,8 @@ export default function UserDashboard() {
                     key={item.name}
                     onClick={() => setSelectedMenu(item.name)}
                     className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors ${selectedMenu === item.name
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-600 hover:bg-gray-50'
                       }`}
                   >
                     <item.icon className="w-5 h-5 mr-3" />
@@ -960,55 +960,55 @@ export default function UserDashboard() {
               <>
                 {/* Profile Completion */}
                 <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 mb-6">
-  <div className="flex items-center justify-between mb-4">
-    <h3 className="text-xl font-semibold text-gray-800">Complete your Profile</h3>
-    <span className="text-sm font-medium text-gray-500">
-      {Math.min(Math.round((Object.entries(profileData)
-        .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
-        .filter(([_, value]) => value !== '').length / 7) * 100), 100)}% Complete
-    </span>
-  </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">Complete your Profile</h3>
+                    <span className="text-sm font-medium text-gray-500">
+                      {Math.min(Math.round((Object.entries(profileData)
+                        .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
+                        .filter(([_, value]) => value !== '').length / 7) * 100), 100)}% Complete
+                    </span>
+                  </div>
 
-  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-    <div
-      className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-      style={{
-        width: `${Math.min((Object.entries(profileData)
-          .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
-          .filter(([_, value]) => value !== '').length / 7) * 100, 100)}%`
-      }}
-    />
-  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min((Object.entries(profileData)
+                          .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
+                          .filter(([_, value]) => value !== '').length / 7) * 100, 100)}%`
+                      }}
+                    />
+                  </div>
 
-  <p className="text-sm text-gray-600 mb-6">
-    Complete your profile to get the best booking experience.
-  </p>
+                  <p className="text-sm text-gray-600 mb-6">
+                    Complete your profile to get the best booking experience.
+                  </p>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-    {[
-      { label: 'Email', value: profileData.email, icon: Mail },
-      { label: 'Phone', value: profileData.mobile, icon: Phone, isVerified: true }
-    ].map((item) => (
-      <div key={item.label} className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
-        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 shadow-sm">
-          <item.icon className="w-5 h-5 text-blue-600" />
-        </div>
-        <div className="flex-1">
-          <p className="text-xs uppercase text-gray-500 font-semibold">{item.label}</p>
-          <div className="flex items-center mt-1">
-            <p className="text-sm font-medium text-gray-800">{item.value || 'Not set'}</p>
-            {item.isVerified && item.value && (
-              <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center">
-                <Check className="w-3 h-3 mr-1" />
-                Verified
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {[
+                      { label: 'Email', value: profileData.email, icon: Mail },
+                      { label: 'Phone', value: profileData.mobile, icon: Phone, isVerified: true }
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 shadow-sm">
+                          <item.icon className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs uppercase text-gray-500 font-semibold">{item.label}</p>
+                          <div className="flex items-center mt-1">
+                            <p className="text-sm font-medium text-gray-800">{item.value || 'Not set'}</p>
+                            {item.isVerified && item.value && (
+                              <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center">
+                                <Check className="w-3 h-3 mr-1" />
+                                Verified
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
 
                 {/* Profile Details */}
@@ -1047,8 +1047,8 @@ export default function UserDashboard() {
                         setIsEditMode(!isEditMode);
                       }}
                       className={`flex items-center px-4 py-2 rounded-lg transition-colors ${isEditMode
-                          ? 'bg-green-500 text-white hover:bg-green-600'
-                          : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
                         }`}
                     >
                       <Edit className="w-4 h-4 mr-2" />
