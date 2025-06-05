@@ -356,9 +356,25 @@ const Calender = () => {
                     <td key={index} className="w-16 p-2 text-center border-l border-gray-200 align-middle">
                       {/* Show price per occupancy (guest), fallback to base_price if no occupancy_price_adjustments */}
                       <div className="text-xs text-gray-600">
-                        {room.pricing && room.pricing[index] && room.pricing[index].price
-                          ? room.pricing[index].price
-                          : room.base_price ? `INR ${parseFloat(room.base_price)}` : ''}
+                        {/* Show the highest price among all guest counts */}
+                        {(() => {
+                          if (room.pricing && Array.isArray(room.pricing) && room.pricing.length > 0) {
+                            // Find the max price from pricing array
+                            let maxPriceObj = room.pricing.reduce((max, curr) => {
+                              // Extract numeric value from price string
+                              const currVal = parseFloat((curr.price || '').replace(/[^\d.]/g, ''));
+                              const maxVal = parseFloat((max.price || '').replace(/[^\d.]/g, ''));
+                              return currVal > maxVal ? curr : max;
+                            }, room.pricing[0]);
+                            return maxPriceObj.price;
+                          } else if (room.base_price && room.room_capacity_adults) {
+                            // fallback: base_price * max guests
+                            const maxPrice = parseFloat(room.base_price) * room.room_capacity_adults;
+                            return `INR ${maxPrice}`;
+                          } else {
+                            return room.base_price ? `INR ${parseFloat(room.base_price)}` : '';
+                          }
+                        })()}
                       </div>
                     </td>
                   ))}
