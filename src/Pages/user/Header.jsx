@@ -297,7 +297,7 @@ const Header = () => {
                                 className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-orange-50 transition-colors duration-200"
                               >
                                 <FiUser size={18} className="text-gray-600" />
-                                Account
+                                Account Settings
                               </Link>
 
                               {/* Section Divider */}

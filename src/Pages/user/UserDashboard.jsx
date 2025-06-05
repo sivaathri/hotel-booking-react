@@ -959,54 +959,57 @@ export default function UserDashboard() {
             ) : (
               <>
                 {/* Profile Completion */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Complete your Profile</h3>
-                    <span className="text-sm text-gray-500">
-                      {Math.min(Math.round((Object.entries(profileData)
-                        .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
-                        .filter(([_, value]) => value !== '').length / 7) * 100), 100)}% Complete
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                      style={{
-                        width: `${Math.min((Object.entries(profileData)
-                          .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
-                          .filter(([_, value]) => value !== '').length / 7) * 100, 100)}%`
-                      }}
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500 mb-6">
-                    Complete your profile to get the best booking experience
-                  </p>
+                <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 mb-6">
+  <div className="flex items-center justify-between mb-4">
+    <h3 className="text-xl font-semibold text-gray-800">Complete your Profile</h3>
+    <span className="text-sm font-medium text-gray-500">
+      {Math.min(Math.round((Object.entries(profileData)
+        .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
+        .filter(([_, value]) => value !== '').length / 7) * 100), 100)}% Complete
+    </span>
+  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      { label: 'Email', value: profileData.email, icon: Mail },
-                      { label: 'Phone', value: profileData.mobile, icon: Phone, isVerified: true }
-                    ].map((item) => (
-                      <div key={item.label} className="flex items-center p-4 bg-gray-50 rounded-lg">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                          <item.icon className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">{item.label}</p>
-                          <div className="flex items-center">
-                            <p className="text-sm font-medium text-gray-900">{item.value || 'Not set'}</p>
-                            {item.isVerified && item.value && (
-                              <span className="ml-2 mb-3 px-2 py-0.5 bg-green-100 text-green-600 text-xs font-medium rounded-full flex items-center">
-                                <Check className="w-3 h-3 mr-1" />
-                                Verified
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+    <div
+      className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+      style={{
+        width: `${Math.min((Object.entries(profileData)
+          .filter(([key]) => ['name', 'date_of_birth', 'gender', 'marital_status', 'address', 'pincode', 'state'].includes(key))
+          .filter(([_, value]) => value !== '').length / 7) * 100, 100)}%`
+      }}
+    />
+  </div>
+
+  <p className="text-sm text-gray-600 mb-6">
+    Complete your profile to get the best booking experience.
+  </p>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    {[
+      { label: 'Email', value: profileData.email, icon: Mail },
+      { label: 'Phone', value: profileData.mobile, icon: Phone, isVerified: true }
+    ].map((item) => (
+      <div key={item.label} className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 shadow-sm">
+          <item.icon className="w-5 h-5 text-blue-600" />
+        </div>
+        <div className="flex-1">
+          <p className="text-xs uppercase text-gray-500 font-semibold">{item.label}</p>
+          <div className="flex items-center mt-1">
+            <p className="text-sm font-medium text-gray-800">{item.value || 'Not set'}</p>
+            {item.isVerified && item.value && (
+              <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center">
+                <Check className="w-3 h-3 mr-1" />
+                Verified
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
 
                 {/* Profile Details */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
