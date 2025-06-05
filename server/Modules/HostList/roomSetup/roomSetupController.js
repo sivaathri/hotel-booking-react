@@ -46,7 +46,7 @@ const createRoom = async (req, res) => {
    
 
     const insertId = await Room.createRoom(req.body);
-    res.status(201).json({ success: true, insertId });
+    res.status(201).json({ success: true, data: insertId });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

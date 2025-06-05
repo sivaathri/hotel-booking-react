@@ -490,10 +490,11 @@ const CreateNewListing = () => {
       const results = await Promise.all(roomPromises);
       
       if (results.every(result => result.success)) {
-        // Store the room IDs for later use
-        const roomIds = results.map(result => result.insertId);
-        setFormData(prev => ({ ...prev, roomIds }));
-        
+        // Store the room IDs and full API responses for later use
+        console.log('Full room setup API results:', results);
+        const roomIds = results.map(result => result.data);
+        setFormData(prev => ({ ...prev, roomIds, room_setup: results }));
+        console.log('Received ROOM_setup:', roomIds ); // Debug log
         toast.success('Room setup saved successfully!', {
           position: "top-right",
           autoClose: 3000,
@@ -915,31 +916,37 @@ const CreateNewListing = () => {
           type: pricing.type
         }));
 
-        const pricingData = {
-          property_id: formData.property_id,
-          floor: room.floor,
-          room_type: room.bhk,
-          number_of_rooms: room.numberOfRooms || "1",
-          room_capacity_adults: roomCapacityAdults,
-          room_capacity_children: roomCapacityChildren,
-          total_capacity: totalCapacity,
-          base_price: parseFloat(room.pricePerNight || 0),
-          occupancy_price_adjustments: JSON.stringify(occupancyPriceAdjustments),
-          child_pricing: JSON.stringify(childPricingData),
-          instant_payment_enabled: formData.instantPayment || false,
-          free_cancellation_enabled: formData.freeCancellation || false,
-          individual_room_capacities: JSON.stringify(roomCapacities),
-          // Refund policies
-          refundable1: formData.refundPolicies?.[0]?.type === 'fully_refundable' || false,
-          days_before1: formData.refundPolicies?.[0]?.daysBeforeCheckIn || null,
-          refund_percent1: formData.refundPolicies?.[0]?.percentage || null,
-          refundable2: formData.refundPolicies?.[1]?.type === 'partially_refundable' || false,
-          days_before2: formData.refundPolicies?.[1]?.daysBeforeCheckIn || null,
-          refund_percent2: formData.refundPolicies?.[1]?.percentage || null,
-          refundable3: formData.refundPolicies?.[2]?.type === 'non_refundable' || false,
-          days_before3: formData.refundPolicies?.[2]?.daysBeforeCheckIn || null,
-          refund_percent3: formData.refundPolicies?.[2]?.percentage || null
-        };
+        const roomSetupId = Array.isArray(formData.room_setup) && formData.room_setup[0]?.success 
+  ? formData.room_setup[0].data 
+  : formData.room_setup; // fallback if not array
+
+const pricingData = {
+  id: roomSetupId,
+  property_id: formData.property_id,
+  floor: room.floor,
+  room_type: room.bhk,
+  number_of_rooms: room.numberOfRooms || "1",
+  room_capacity_adults: roomCapacityAdults,
+  room_capacity_children: roomCapacityChildren,
+  total_capacity: totalCapacity,
+  base_price: parseFloat(room.pricePerNight || 0),
+  occupancy_price_adjustments: JSON.stringify(occupancyPriceAdjustments),
+  child_pricing: JSON.stringify(childPricingData),
+  instant_payment_enabled: formData.instantPayment || false,
+  free_cancellation_enabled: formData.freeCancellation || false,
+  individual_room_capacities: JSON.stringify(roomCapacities),
+  // Refund policies
+  refundable1: formData.refundPolicies?.[0]?.type === 'fully_refundable' || false,
+  days_before1: formData.refundPolicies?.[0]?.daysBeforeCheckIn || null,
+  refund_percent1: formData.refundPolicies?.[0]?.percentage || null,
+  refundable2: formData.refundPolicies?.[1]?.type === 'partially_refundable' || false,
+  days_before2: formData.refundPolicies?.[1]?.daysBeforeCheckIn || null,
+  refund_percent2: formData.refundPolicies?.[1]?.percentage || null,
+  refundable3: formData.refundPolicies?.[2]?.type === 'non_refundable' || false,
+  days_before3: formData.refundPolicies?.[2]?.daysBeforeCheckIn || null,
+  refund_percent3: formData.refundPolicies?.[2]?.percentage || null
+};
+
 
         console.log('Sending room pricing data:', pricingData); // Debug log
 
