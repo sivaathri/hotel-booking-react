@@ -264,7 +264,7 @@ const Header = () => {
                               {/* Section 1 */}
                               <Link
                                 to="/messages"
-                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-orange-50 transition-colors duration-200"
                               >
                                 <FiMessageSquare size={18} className="text-gray-600" />
                                 Messages
@@ -272,7 +272,7 @@ const Header = () => {
 
                               <Link
                                 to="/notifications"
-                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-orange-50 transition-colors duration-200"
                               >
                                 <FiBell size={18} className="text-gray-600" />
                                 Notifications
@@ -282,7 +282,7 @@ const Header = () => {
 
                               <Link
                                 to="/wishlists"
-                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-orange-50 transition-colors duration-200"
                               >
                                 <FiHeart size={18} className="text-gray-600" />
                                 Wishlists
@@ -294,7 +294,7 @@ const Header = () => {
                               {/* Section 2 */}
                               <Link
                                 to="/user-dashboard"
-                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-orange-50 transition-colors duration-200"
                               >
                                 <FiUser size={18} className="text-gray-600" />
                                 Account
@@ -306,7 +306,7 @@ const Header = () => {
                               {/* Section 3 */}
                               <Link
                                 to="/help"
-                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-gray-50 transition-colors duration-200"
+                                className="flex items-center gap-3 px-5 py-3 text-gray-900 font-medium hover:bg-orange-50 transition-colors duration-200"
                               >
                                 <FiHelpCircle size={18} className="text-gray-600" />
                                 Help Centre
@@ -314,7 +314,7 @@ const Header = () => {
 
                               <button
                                 onClick={handleLogout}
-                                className="text-left w-full px-5 py-3 hover:bg-gray-50 text-red-600 font-medium transition-colors duration-200 flex items-center gap-3"
+                                className="text-left w-full px-5 py-3 hover:bg-orange-50 text-red-600 font-medium transition-colors duration-200 flex items-center gap-3"
                               >
                                 <FiLogOut size={18} className="text-red-600" />
                                 Log out
