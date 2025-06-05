@@ -217,11 +217,11 @@ const Header = () => {
                     <>
                       <Link
                         to="/HostHeader"
-                        className="relative  inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 px-6 py-3 font-semibold text-white shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
+                        className="relative  inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl     px-6 py-2 font-semibold text-white shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
                       >
-                        <span className="relative z-10 flex items-center">
-                          <i className="fas fa-home mr-2"></i>
-                          Join our Hotelier
+                        <span className="relative text-white backdrop-blur-sm bg-white/10 px-2 py-2 rounded-lg  font-semibold z-10 flex items-center">
+                      
+                        Go Host Mode
                         </span>
                         {/* <span className="absolute inset-0 z-0 bg-white opacity-10 blur-lg"></span> */}
                       </Link>
@@ -258,9 +258,9 @@ const Header = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute right-0 mr-1 mt-3 w-64 rounded-xl bg-white shadow-xl z-50 overflow-hidden border border-gray-100"
+                            className="absolute right-0  mt-3 w-64 rounded-xl bg-white shadow-xl z-50 overflow-hidden border border-gray-100"
                           >
-                            <div className="flex flex-col text-sm text-gray-800 py-2">
+                            <div className="flex flex-col  text-sm text-gray-800 py-2">
                               {/* Section 1 */}
                               <Link
                                 to="/messages"
