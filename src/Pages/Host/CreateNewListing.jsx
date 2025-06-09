@@ -139,7 +139,7 @@ const CreateNewListing = () => {
       name: '',
       floor: '',
       bhk: '',
-     
+
     }],
 
     // Step 4: Room Photos
@@ -289,10 +289,10 @@ const CreateNewListing = () => {
     'Laundry Service',
     'Room Service',
     '24-Hour Reception',
-   'Cab Service',
-   
-  
-    
+    'Cab Service',
+
+
+
   ];
 
   const languages = ['English', 'Hindi'];
@@ -303,9 +303,9 @@ const CreateNewListing = () => {
   const saveBasicInfo = async () => {
     try {
       setIsLoading(true);
-  
+
       const token = getAuthToken();
-  
+
       const response = await axios.post(
         `${API_URL}/basicInfo/create/${user.id}`,
         {
@@ -318,12 +318,12 @@ const CreateNewListing = () => {
           }
         }
       );
-  
+
       if (response.data.success) {
         // Store the property_id in formData
         const property_id = response.data.data.property_id;
         console.log('Received property_id:', property_id); // Debug log
-        
+
         setFormData(prev => ({
           ...prev,
           property_id: property_id
@@ -368,7 +368,7 @@ const CreateNewListing = () => {
       setIsLoading(false);
     }
   };
-  
+
   const saveLocationDetails = async () => {
     try {
       setIsLoading(true);
@@ -476,7 +476,7 @@ const CreateNewListing = () => {
             floor: room.floor,
             room_type: room.bhk,
             number_of_rooms: parseInt(room.numberOfRooms) || 1, // Use the actual number of rooms value
-           
+
           },
           {
             headers: {
@@ -488,13 +488,13 @@ const CreateNewListing = () => {
       });
 
       const results = await Promise.all(roomPromises);
-      
+
       if (results.every(result => result.success)) {
         // Store the room IDs and full API responses for later use
         console.log('Full room setup API results:', results);
         const roomIds = results.map(result => result.data);
         setFormData(prev => ({ ...prev, roomIds, room_setup: results }));
-        console.log('Received ROOM_setup:', roomIds ); // Debug log
+        console.log('Received ROOM_setup:', roomIds); // Debug log
         toast.success('Room setup saved successfully!', {
           position: "top-right",
           autoClose: 3000,
@@ -572,7 +572,7 @@ const CreateNewListing = () => {
       });
 
       // Upload images for each room
-      const uploadPromises = formData.roomIds.map(roomId => 
+      const uploadPromises = formData.roomIds.map(roomId =>
         axios.post(
           `${API_URL}/uploadImages/room/${roomId}`,
           formDataToSend,
@@ -586,7 +586,7 @@ const CreateNewListing = () => {
       );
 
       const results = await Promise.all(uploadPromises);
-      
+
       if (results.every(result => result.data.success)) {
         toast.success('Room photos saved successfully!', {
           position: "top-right",
@@ -727,10 +727,10 @@ const CreateNewListing = () => {
     } catch (error) {
       console.error('Error saving property rules:', error);
       // More detailed error message
-      const errorMessage = error.response?.data?.message || 
-        (error.response?.status === 404 ? 'Property not found. Please complete Step 1 first.' : 
-        'An error occurred while saving. Please try again.');
-      
+      const errorMessage = error.response?.data?.message ||
+        (error.response?.status === 404 ? 'Property not found. Please complete Step 1 first.' :
+          'An error occurred while saving. Please try again.');
+
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 3000,
@@ -883,7 +883,7 @@ const CreateNewListing = () => {
       }
 
       // Process each room's pricing data
-      const roomPricingPromises = formData.rooms.map(async (room) => {
+      const roomPricingPromises = formData.rooms.map(async (room,index) => {
         // Format individual room capacities
         const roomCapacities = Object.entries(room.individualRoomCapacities || {}).map(([roomNum, capacity]) => ({
           room_number: parseInt(roomNum),
@@ -892,9 +892,9 @@ const CreateNewListing = () => {
         }));
 
         // Calculate room capacities
-        const roomCapacityAdults = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => 
+        const roomCapacityAdults = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) =>
           sum + (capacity?.adults || 0), 0);
-        const roomCapacityChildren = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) => 
+        const roomCapacityChildren = Object.values(room.individualRoomCapacities || {}).reduce((sum, capacity) =>
           sum + (capacity?.children || 0), 0);
 
         // Calculate total capacity
@@ -916,36 +916,49 @@ const CreateNewListing = () => {
           type: pricing.type
         }));
 
-        const roomSetupId = Array.isArray(formData.room_setup) && formData.room_setup[0]?.success 
-  ? formData.room_setup[0].data 
-  : formData.room_setup; // fallback if not array
+        let roomSetupId;
 
-const pricingData = {
-  id: roomSetupId,
-  property_id: formData.property_id,
-  floor: room.floor,
-  room_type: room.bhk,
-  number_of_rooms: room.numberOfRooms || "1",
-  room_capacity_adults: roomCapacityAdults,
-  room_capacity_children: roomCapacityChildren,
-  total_capacity: totalCapacity,
-  base_price: parseFloat(room.pricePerNight || 0),
-  occupancy_price_adjustments: JSON.stringify(occupancyPriceAdjustments),
-  child_pricing: JSON.stringify(childPricingData),
-  instant_payment_enabled: formData.instantPayment || false,
-  free_cancellation_enabled: formData.freeCancellation || false,
-  individual_room_capacities: JSON.stringify(roomCapacities),
-  // Refund policies
-  refundable1: formData.refundPolicies?.[0]?.type === 'fully_refundable' || false,
-  days_before1: formData.refundPolicies?.[0]?.daysBeforeCheckIn || null,
-  refund_percent1: formData.refundPolicies?.[0]?.percentage || null,
-  refundable2: formData.refundPolicies?.[1]?.type === 'partially_refundable' || false,
-  days_before2: formData.refundPolicies?.[1]?.daysBeforeCheckIn || null,
-  refund_percent2: formData.refundPolicies?.[1]?.percentage || null,
-  refundable3: formData.refundPolicies?.[2]?.type === 'non_refundable' || false,
-  days_before3: formData.refundPolicies?.[2]?.daysBeforeCheckIn || null,
-  refund_percent3: formData.refundPolicies?.[2]?.percentage || null
-};
+        if (Array.isArray(formData.room_setup)) {
+          if (typeof formData.room_setup[0] === 'object' && 'success' in formData.room_setup[0]) {
+            roomSetupId = formData.room_setup[index]?.data;  // pick single ID for current room
+          } else {
+            roomSetupId = formData.room_setup[index];        // pick single ID for current room
+          }
+        } else {
+          roomSetupId = formData.room_setup; // single value case
+        }
+      
+        // now roomSetupId is a single number (e.g. 42, or 43), NOT an array
+
+
+
+
+        const pricingData = {
+          room_id: roomSetupId,
+          property_id: formData.property_id,
+          floor: room.floor,
+          room_type: room.bhk,
+          number_of_rooms: room.numberOfRooms || "1",
+          room_capacity_adults: roomCapacityAdults,
+          room_capacity_children: roomCapacityChildren,
+          total_capacity: totalCapacity,
+          base_price: parseFloat(room.pricePerNight || 0),
+          occupancy_price_adjustments: JSON.stringify(occupancyPriceAdjustments),
+          child_pricing: JSON.stringify(childPricingData),
+          instant_payment_enabled: formData.instantPayment || false,
+          free_cancellation_enabled: formData.freeCancellation || false,
+          individual_room_capacities: JSON.stringify(roomCapacities),
+          // Refund policies
+          refundable1: formData.refundPolicies?.[0]?.type === 'fully_refundable' || false,
+          days_before1: formData.refundPolicies?.[0]?.daysBeforeCheckIn || null,
+          refund_percent1: formData.refundPolicies?.[0]?.percentage || null,
+          refundable2: formData.refundPolicies?.[1]?.type === 'partially_refundable' || false,
+          days_before2: formData.refundPolicies?.[1]?.daysBeforeCheckIn || null,
+          refund_percent2: formData.refundPolicies?.[1]?.percentage || null,
+          refundable3: formData.refundPolicies?.[2]?.type === 'non_refundable' || false,
+          days_before3: formData.refundPolicies?.[2]?.daysBeforeCheckIn || null,
+          refund_percent3: formData.refundPolicies?.[2]?.percentage || null
+        };
 
 
         console.log('Sending room pricing data:', pricingData); // Debug log
@@ -963,7 +976,7 @@ const pricingData = {
       });
 
       const results = await Promise.all(roomPricingPromises);
-      
+
       if (results.every(result => result.success)) {
         toast.success('Room pricing saved successfully!', {
           position: "top-right",
@@ -1247,11 +1260,10 @@ const pricingData = {
             <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
               <button
                 onClick={handleBack}
-                className={`px-8 py-3 border-2 rounded-xl text-lg font-medium transition-all duration-200 ${
-                  step === 1 || completedSteps.has(step - 1)
-                    ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' 
+                className={`px-8 py-3 border-2 rounded-xl text-lg font-medium transition-all duration-200 ${step === 1 || completedSteps.has(step - 1)
+                    ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400'
                     : 'border-gray-400 text-gray-700 hover:bg-gray-50 hover:border-gray-500'
-                }`}
+                  }`}
                 disabled={step === 1 || completedSteps.has(step - 1)}
               >
                 Back
@@ -1259,9 +1271,8 @@ const pricingData = {
               <button
                 onClick={handleNext}
                 disabled={isLoading}
-                className={`px-8 py-3 bg-blue-600 text-white rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl ${
-                  isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
-                }`}
+                className={`px-8 py-3 bg-blue-600 text-white rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+                  }`}
               >
                 {isLoading ? 'Saving...' : (step === 11 ? 'Complete Payment' : 'Save')}
               </button>
