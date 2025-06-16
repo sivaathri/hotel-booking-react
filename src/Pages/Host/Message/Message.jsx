@@ -37,7 +37,7 @@ const Message = () => {
           {users.map((user) => (
             <div
               key={user.id}
-              className="flex gap-4 items-center px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+              className="flex gap-4 items-center px-4 py-3  hover:bg-gray-50 cursor-pointer transition"
             >
               <div
                 className="bg-center bg-cover rounded-full h-14 w-14"
@@ -52,9 +52,9 @@ const Message = () => {
         </div>
 
         {/* Chat View */}
-        <div className="flex flex-col flex-1 max-w-[960px]">
+        <div className="flex flex-col flex-1 ml-60 max-w-[960px]">
           {/* Header */}
-          <div className="sticky top-0 bg-white z-10 border-b border-gray-200 p-4">
+          <div className="sticky mb-9 bg-white z-10 border-b border-gray-200 p-4">
             <p className="text-[28px] font-bold text-[#111418]">Conversation with User 1234</p>
           </div>
 
@@ -87,7 +87,7 @@ const Message = () => {
           </div>
 
           {/* Message Input */}
-          <div className="border-t border-gray-200 p-4 flex gap-3">
+          <div className=" p-4 flex gap-3">
             <input
               type="text"
               placeholder="Type your message..."

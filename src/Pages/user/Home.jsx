@@ -412,7 +412,7 @@ const Home = () => {
             <div className="md:w-2/3 w-full md:pl-10 pt-6 md:pt-0 flex flex-col md:flex-row justify-between items-center">
               <div className=" md:text-left">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                  Go further with the Expedia app
+                  Go further with the Hotelier app
                 </h2>
                 <p className="mt-2 text-gray-700 text-sm max-w-xl">
                   Save on select hotels and earn OneKeyCash on bookings in the app.
