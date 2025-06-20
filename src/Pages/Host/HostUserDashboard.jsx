@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,6 +13,10 @@ import {
   Bell
 } from 'lucide-react';
 import HostHeader from '../Host/HostHeader';
+import { API_URL } from '../../config/api.config';
+import { getAuthToken } from '../../utils/getAuthToken';
+import { useUser } from '../../context/UserContext';
+import axios from 'axios';
 const StatCard = ({ title, value, icon: Icon, trend, color }) => (
   <motion.div
     className="bg-white rounded-xl p-6 shadow-sm"
@@ -54,8 +58,8 @@ const BookingCard = ({ booking }) => (
     </div>
     <div className="mt-3 flex items-center justify-between">
       <span className={`px-2 py-1 rounded-full text-xs ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-          booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-            'bg-red-100 text-red-800'
+        booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+          'bg-red-100 text-red-800'
         }`}>
         {booking.status}
       </span>
@@ -99,13 +103,64 @@ const PropertyCard = ({ property }) => (
 const HostUserDashboard = () => {
   const [activeTab, setActiveTab] = useState('Reservation');
   const navigate = useNavigate();
+  const { user } = useUser();
+  const token = getAuthToken();
+  const [propertydetails, setpropertydetails] = useState([]);
+  const [statsData, setStatsData] = useState([]);
 
-  const stats = [
-    { title: 'Total Properties', value: '5', icon: Home, trend: '+2 this month', color: 'text-blue-500' },
-    { title: 'Active Bookings', value: '12', icon: Calendar, trend: '+3 today', color: 'text-green-500' },
-    { title: 'Total Revenue', value: '₹1,25,000', icon: DollarSign, trend: '+15% this month', color: 'text-purple-500' },
-    { title: 'Total Guests', value: '48', icon: Users, trend: '+8 this week', color: 'text-orange-500' },
-  ];
+  useEffect(() => {
+    const fetchPropertyDetails = async () => {
+      if (!user?.id) return;
+
+      try {
+        const response = await axios.get(`${API_URL}/getall/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data.success && response.data.data) {
+          const propertyData = Array.isArray(response.data.data)
+            ? response.data.data
+            : [response.data.data];
+
+          const propertiesWithParsedImages = propertyData.map(property => ({
+            ...property,
+            images: property.image_paths ? JSON.parse(property.image_paths) : []
+          }));
+
+          setpropertydetails(propertiesWithParsedImages);
+
+          // Calculate and set stats
+          const totalProperties = propertiesWithParsedImages.length;
+
+          const stats = [
+            { title: 'Total Properties', value: totalProperties.toString(), icon: Home, trend: '+2 this month', color: 'text-blue-500' },
+            { title: 'Active Bookings',  icon: Calendar, trend: '+3 today', color: 'text-green-500' },
+            { title: 'Total Revenue',  icon: DollarSign, trend: '+15% this month', color: 'text-purple-500' },
+            { title: 'Total Guests',  icon: Users, trend: '+8 this week', color: 'text-orange-500' },
+          ];
+
+          setStatsData(stats);
+        }
+      } catch (error) {
+        console.error('Error fetching property details:', error);
+      }
+    };
+
+    fetchPropertyDetails();
+  }, [token, user?.id]);
+
+
+
+
+
+  // const stats = [
+  //   { title: 'Total Properties', value: '{property.property_id}', icon: Home, trend: '+2 this month', color: 'text-blue-500' },
+  //   { title: 'Active Bookings', value: '12', icon: Calendar, trend: '+3 today', color: 'text-green-500' },
+  //   { title: 'Total Revenue', value: '₹1,25,000', icon: DollarSign, trend: '+15% this month', color: 'text-purple-500' },
+  //   { title: 'Total Guests', value: '48', icon: Users, trend: '+8 this week', color: 'text-orange-500' },
+  // ];
 
   const recentBookings = [
     {
@@ -194,7 +249,7 @@ const HostUserDashboard = () => {
       bookingNumber: '4336571675'
     }
   ];
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -206,7 +261,7 @@ const HostUserDashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+          {statsData.map((stat, index) => (
             <StatCard key={index} {...stat} />
           ))}
         </div>
@@ -220,8 +275,8 @@ const HostUserDashboard = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-6 py-4 text-sm font-medium capitalize ${activeTab === tab
-                      ? 'border-b-2 border-[#FF5A5F] text-[#FF5A5F]'
-                      : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-b-2 border-[#FF5A5F] text-[#FF5A5F]'
+                    : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                 >
                   {tab}
@@ -233,66 +288,66 @@ const HostUserDashboard = () => {
 
         {/* Tab Content */}
         {activeTab === 'Reservation' && (
-         <div className="p-6">
-         {/* Header */}
-         <div className="flex items-center justify-between mb-4">
-           <h1 className="text-2xl font-bold">Reservations</h1>
-           <div className="flex gap-2 items-center">
-             <select className="border p-2 rounded">
-               <option>Check-in</option>
-               <option>Check-out</option>
-             </select>
-             <input type="date" className="border p-2 rounded" defaultValue="2025-05-29" />
-             <input type="date" className="border p-2 rounded" defaultValue="2025-06-30" />
-             <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Show</button>
-           </div>
-         </div>
-   
-         {/* Table */}
-         <div className="overflow-x-auto border rounded shadow">
-           <table className="w-full text-sm">
-             <thead className="bg-gray-100 text-left">
-               <tr>
-                 <th className="p-3">Guest Name</th>
-                 <th className="p-3">Check-in</th>
-                 <th className="p-3">Check-out</th>
-                 <th className="p-3">Rooms</th>
-                 <th className="p-3">Booked on</th>
-                 <th className="p-3">Status</th>
-                 <th className="p-3">Price</th>
-                 <th className="p-3">Commission</th>
-                 <th className="p-3">Booking number</th>
-               </tr>
-             </thead>
-             <tbody>
-               {reservations.map((r, i) => (
-                 <tr key={i} className="border-t">
-                   <td className="p-3 text-blue-600 hover:underline cursor-pointer">
-                     {r.guestName}
-                     <div className="text-gray-500 text-xs">{r.guests} guests</div>
-                   </td>
-                   <td className="p-3">{r.checkIn}</td>
-                   <td className="p-3">{r.checkOut}</td>
-                   <td className="p-3">{r.rooms}</td>
-                   <td className="p-3">{r.bookedOn}</td>
-                   <td className="p-3 text-red-600 font-semibold">{r.status}</td>
-                   <td className="p-3">{r.price}</td>
-                   <td className="p-3">{r.commission}</td>
-                   <td className="p-3 text-blue-600 hover:underline cursor-pointer">{r.bookingNumber}</td>
-                 </tr>
-               ))}
-             </tbody>
-           </table>
-         </div>
-   
-         {/* Footer */}
-         {/* <div className="mt-4 flex items-center justify-between text-sm">
+          <div className="p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-bold">Reservations</h1>
+              <div className="flex gap-2 items-center">
+                <select className="border p-2 rounded">
+                  <option>Check-in</option>
+                  <option>Check-out</option>
+                </select>
+                <input type="date" className="border p-2 rounded" defaultValue="2025-05-29" />
+                <input type="date" className="border p-2 rounded" defaultValue="2025-06-30" />
+                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Show</button>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border rounded shadow">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100 text-left">
+                  <tr>
+                    <th className="p-3">Guest Name</th>
+                    <th className="p-3">Check-in</th>
+                    <th className="p-3">Check-out</th>
+                    <th className="p-3">Rooms</th>
+                    <th className="p-3">Booked on</th>
+                    <th className="p-3">Status</th>
+                    <th className="p-3">Price</th>
+                    <th className="p-3">Commission</th>
+                    <th className="p-3">Booking number</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reservations.map((r, i) => (
+                    <tr key={i} className="border-t">
+                      <td className="p-3 text-blue-600 hover:underline cursor-pointer">
+                        {r.guestName}
+                        <div className="text-gray-500 text-xs">{r.guests} guests</div>
+                      </td>
+                      <td className="p-3">{r.checkIn}</td>
+                      <td className="p-3">{r.checkOut}</td>
+                      <td className="p-3">{r.rooms}</td>
+                      <td className="p-3">{r.bookedOn}</td>
+                      <td className="p-3 text-red-600 font-semibold">{r.status}</td>
+                      <td className="p-3">{r.price}</td>
+                      <td className="p-3">{r.commission}</td>
+                      <td className="p-3 text-blue-600 hover:underline cursor-pointer">{r.bookingNumber}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Footer */}
+            {/* <div className="mt-4 flex items-center justify-between text-sm">
            <div className="text-gray-500">Page 1</div>
            <div className="font-semibold">
              Commission: Rs. 0 <span className="ml-4">Total Price: Rs. 0</span>
            </div>
          </div> */}
-       </div>
+          </div>
         )}
 
         {activeTab === 'properties' && (
