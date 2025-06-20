@@ -107,6 +107,7 @@ const HostUserDashboard = () => {
   const token = getAuthToken();
   const [propertydetails, setpropertydetails] = useState([]);
   const [statsData, setStatsData] = useState([]);
+  const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -123,7 +124,26 @@ const HostUserDashboard = () => {
           const propertyData = Array.isArray(response.data.data)
             ? response.data.data
             : [response.data.data];
-
+            const allBookings = [];
+            propertyData.forEach(property => {
+              property.rooms?.forEach(room => {
+                room.bookings?.forEach(booking => {
+                  allBookings.push({
+                    guestName: `${booking.first_name} ${booking.last_name}`,
+                    guests: booking.adults + booking.children,
+                    checkIn: formatDate(booking.check_in_date),
+                    checkOut: formatDate(booking.check_out_date),
+                    rooms: room.room_type,
+                    bookedOn: formatDate(booking.created_at),
+                    status: booking.payment_status === 'Canceled' ? 'Canceled' : 'Confirmed',
+                    price: `Rs. ${booking.total_price}`,
+                    commission: 'Rs. 0', // Change this if commission logic exists
+                    bookingNumber: booking.booking_id.toString(),
+                  });
+                });
+              });
+            });
+            setReservations(allBookings);
           const propertiesWithParsedImages = propertyData.map(property => ({
             ...property,
             images: property.image_paths ? JSON.parse(property.image_paths) : []
@@ -133,12 +153,21 @@ const HostUserDashboard = () => {
 
           // Calculate and set stats
           const totalProperties = propertiesWithParsedImages.length;
+          // Count total active bookings
+          const totalBookings = propertiesWithParsedImages.reduce((bookingCount, property) => {
+            if (!property.rooms || !Array.isArray(property.rooms)) return bookingCount;
 
+            const propertyBookingCount = property.rooms.reduce((roomCount, room) => {
+              return roomCount + (room.bookings ? room.bookings.length : 0);
+            }, 0);
+
+            return bookingCount + propertyBookingCount;
+          }, 0);
           const stats = [
             { title: 'Total Properties', value: totalProperties.toString(), icon: Home, trend: '+2 this month', color: 'text-blue-500' },
-            { title: 'Active Bookings',  icon: Calendar, trend: '+3 today', color: 'text-green-500' },
-            { title: 'Total Revenue',  icon: DollarSign, trend: '+15% this month', color: 'text-purple-500' },
-            { title: 'Total Guests',  icon: Users, trend: '+8 this week', color: 'text-orange-500' },
+            { title: 'Active Bookings', value: totalBookings.toString(), icon: Calendar, trend: '+3 today', color: 'text-green-500' },
+            { title: 'Total Revenue', icon: DollarSign, trend: '+15% this month', color: 'text-purple-500' },
+            { title: 'Total Guests', icon: Users, trend: '+8 this week', color: 'text-orange-500' },
           ];
 
           setStatsData(stats);
@@ -151,7 +180,12 @@ const HostUserDashboard = () => {
     fetchPropertyDetails();
   }, [token, user?.id]);
 
-
+// Helper to format dates like "Jun 23, 2025"
+const formatDate = (dateStr) => {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'short', day: 'numeric'
+  });
+};
 
 
 
@@ -223,32 +257,32 @@ const HostUserDashboard = () => {
       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
     }
   ];
-  const reservations = [
-    {
-      guestName: 'Ramya C',
-      guests: 2,
-      checkIn: 'Jun 2, 2025',
-      checkOut: 'Jun 3, 2025',
-      rooms: '2 BHK',
-      bookedOn: 'May 16, 2025',
-      status: 'Canceled',
-      price: 'Rs. 0',
-      commission: 'Rs. 0',
-      bookingNumber: '4763178491'
-    },
-    {
-      guestName: 'sadhish kumar',
-      guests: 2,
-      checkIn: 'Jun 11, 2025',
-      checkOut: 'Jun 12, 2025',
-      rooms: '3 BHK',
-      bookedOn: 'May 23, 2025',
-      status: 'Canceled',
-      price: 'Rs. 0',
-      commission: 'Rs. 0',
-      bookingNumber: '4336571675'
-    }
-  ];
+  // const reservations = [
+  //   {
+  //     guestName: 'Ramya C',
+  //     guests: 2,
+  //     checkIn: 'Jun 2, 2025',
+  //     checkOut: 'Jun 3, 2025',
+  //     rooms: '2 BHK',
+  //     bookedOn: 'May 16, 2025',
+  //     status: 'Canceled',
+  //     price: 'Rs. 0',
+  //     commission: 'Rs. 0',
+  //     bookingNumber: '4763178491'
+  //   },
+  //   {
+  //     guestName: 'sadhish kumar',
+  //     guests: 2,
+  //     checkIn: 'Jun 11, 2025',
+  //     checkOut: 'Jun 12, 2025',
+  //     rooms: '3 BHK',
+  //     bookedOn: 'May 23, 2025',
+  //     status: 'Canceled',
+  //     price: 'Rs. 0',
+  //     commission: 'Rs. 0',
+  //     bookingNumber: '4336571675'
+  //   }
+  // ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -328,7 +362,8 @@ const HostUserDashboard = () => {
                       </td>
                       <td className="p-3">{r.checkIn}</td>
                       <td className="p-3">{r.checkOut}</td>
-                      <td className="p-3">{r.rooms}</td>
+                      <td className="p-3">{r.rooms.split('_')[0]}</td>
+
                       <td className="p-3">{r.bookedOn}</td>
                       <td className="p-3 text-red-600 font-semibold">{r.status}</td>
                       <td className="p-3">{r.price}</td>
