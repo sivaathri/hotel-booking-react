@@ -391,8 +391,8 @@ const Home = () => {
           </div> */}
 
 
-          <div className="relative max-w-6xl mx-auto px-4 mt-10 mb-20" >
-            <p className="text-sm font-bold text-gray-800 mb-4">
+          <div className="relative max-w-6xl mx-auto px-4 border border-gray-300 rounded-3xl mt-10 mb-20" >
+            <p className="text-sm font-bold mt-4 text-gray-800 mb-4">
               A hotelier is a dedicated professional who specializes in managing hotels, resorts, or hospitality businesses. Their role involves overseeing every aspect of hotel operations—from guest services and housekeeping to finance, marketing, and staff management. Hoteliers are passionate about hospitality and strive to create a welcoming environment where guests feel valued and comfortable. With a strong focus on customer satisfaction, attention to detail, and efficient management, hoteliers ensure that every guest experience is smooth, enjoyable, and memorable. In a fast-evolving travel industry, hoteliers also embrace innovation, sustainability, and personalized service to stay competitive and meet the growing expectations of modern travelers.
             </p>
           </div>
